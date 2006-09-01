@@ -1,0 +1,67 @@
+TIME 1000                   
+SPEED 133000000             
+CRE 0 1000 0
+NAM 0 1000 Prod             
+STA 0 1000 1                
+CRE 1 10 2
+NAM 1 10 Vsync              
+STA 1 10 10                 
+STO 1 10 15                 
+STA 3 20 15                 
+NAM 3 20 BufA               
+STA 1 10 40                 
+STO 1 10 45                 
+STA 3 20 45 100                
+STA 1 10 70
+STO 1 10 75                 
+STA 3 20 75                
+STA 1 10 100                
+STO 1 10 105 
+STA 3 20 105 
+STA 4 100 105               
+NAM 4 100 FrameAvailable    
+STO 0 1000 107              
+DEL 0 1000 112
+STO 4 100 113               
+CRE 0 1000 114
+NAM 0 1000 Extra
+STA 0 1000 115
+STA 0 1100 115              
+NAM 0 1100 Cons             
+CRE 10 60 116
+NAM 10 60 ProdCons
+CRE 11 1001 116 1000 60
+NAM 11 1001 out0
+CRE 11 1101 116 60 1100
+NAM 11 1101 in6
+STA 11 1001 117
+VAL 5 2 0                   
+NAM 5 2 Icache              
+STA 11 1001 117 20
+STA 8 40 120                
+NAM 8 40 ReadVideoInfo      
+STA 2 30 120                
+NAM 2 30 VideoInfo          
+OCC 7 50 122                
+NAM 7 50 ReadHeader         
+DSC 1 1 256                 
+DNM 0 1 bytes_processed     
+STO 8 40 125     
+STO 11 1101 125 5
+STO 2 30 125                
+STO 0 1000 130
+STA 1 10 132                
+VAL 5 2 100                 
+STO 1 10 135                
+STO 3 20 135 50                
+STA 1 10 160                
+VAL 5 2 150                 
+STO 1 10 165                
+STO 3 20 165 50             
+STA 1 10 190                
+VAL 5 2 200                 
+STO 1 10 195                
+STO 3 20 195                
+STO 3 20 210                
+STO 0 1100 210
+END                         
