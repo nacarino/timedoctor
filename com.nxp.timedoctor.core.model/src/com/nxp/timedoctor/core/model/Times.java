@@ -1,0 +1,87 @@
+/*******************************************************************************
+ * Copyright (c) 2006 Royal Philips Electronics NV.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License version 1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     Royal Philips Electronics NV. - initial API and implementation
+ *******************************************************************************/
+package com.nxp.timedoctor.core.model;
+
+/**
+ * Utility class containing methods for formatting time strings.
+ */
+// MR find more desctiptive name
+public final class Times {
+
+	/**
+	 * Constant representing the precision value for time = 0.
+	 */
+	private static final double PREC_0 = 0.000000001;
+
+	/**
+	 * Constant representing the precision value for seconds.
+	 */
+	private static final double PREC_S = 0.1;
+
+	/**
+	 * Constant representing the precision value for milliseconds.
+	 */
+	private static final double PREC_MS = 0.0001;
+
+	/**
+	 * Constant representing the multiplier value for milliseconds.
+	 */
+	private static final double MULT_MS = 1000;
+
+	/**
+	 * Constant representing the multiplier value for microseconds.
+	 */
+	private static final double MULT_US = 1000000;
+
+	/**
+	 * Private constructor to prevent class instantiation.
+	 * 
+	 */
+	private Times() {
+	}
+
+	/**
+	 * Returns a properly formatted string representation of the given time,
+	 * using the time itself as a precision value.
+	 * 
+	 * @param t
+	 *            the time to be formatted
+	 * @return a formatted string representing the time
+	 */
+	public static String timeToString(final double t) {
+		return timeToString(t, t);
+	}
+
+	/**
+	 * Returns a properly formatted string representation of the given time,
+	 * using the supplied precision.
+	 * 
+	 * @param time
+	 *            the time to be formatted
+	 * @param precision
+	 *            the accuracy to use in the final string representation
+	 * @return a formatted string representing the time
+	 */
+	public static String timeToString(final double time,
+			final double precision) {
+		String s;
+		if (time < PREC_0) {
+			s = "0s";
+		} else if (precision >= PREC_S) {
+			s = String.format("%.3fs", time);
+		} else if (precision >= PREC_MS) {
+			s = String.format("%.3fms", time * MULT_MS);
+		} else {
+			s = String.format("%.3fus", time * MULT_US);
+		}
+		return s;
+	}
+}
