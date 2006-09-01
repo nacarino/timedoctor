@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TimeDoctor Trace Editor Plug-in
+Bundle-SymbolicName: com.nxp.timedoctor.ui.trace;singleton:=true
+Bundle-Version: 1.1.0
+Bundle-Vendor: Royal Philips Electronics NV.
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ com.nxp.timedoctor.core.model
+Eclipse-LazyStart: true
+Export-Package: com.nxp.timedoctor.ui.trace,
+ com.nxp.timedoctor.ui.trace.actions
