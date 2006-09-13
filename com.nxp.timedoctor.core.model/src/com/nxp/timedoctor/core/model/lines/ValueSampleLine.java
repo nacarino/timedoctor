@@ -36,7 +36,7 @@ public class ValueSampleLine extends SampleLine {
 	 */
 	public ValueSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.VALUE);
+		setType(LineType.VALUES);
 	}
 
 	/**

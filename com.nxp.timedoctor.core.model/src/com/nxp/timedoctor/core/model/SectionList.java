@@ -26,9 +26,8 @@ public class SectionList {
 	/**
 	 * HashMap to contain sections, keyed by line type.
 	 */
-	private HashMap<LineType, Section> sectionMap = new HashMap<LineType,
-		Section>();
-
+	private HashMap < LineType, Section > sectionMap = new HashMap < LineType,
+		Section > ();
 
 	/**
 	 * Adds the specified section to the SectionList, associating it with the
@@ -62,7 +61,7 @@ public class SectionList {
 	 * 
 	 * @return a collection of the values in the map
 	 */
-	public final Collection<Section> values() {
+	public final Collection < Section > values() {
 		return sectionMap.values();
 	}
 }

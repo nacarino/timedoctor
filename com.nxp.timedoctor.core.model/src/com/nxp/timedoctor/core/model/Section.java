@@ -37,14 +37,14 @@ public class Section {
 	 * order in which they were added.
 	 */
 	// checkstyle seems to not be updated for J2SE5 type parameterization.
-	private ArrayList<SampleLine> lines = new ArrayList<SampleLine>();
+	private ArrayList < SampleLine > lines = new ArrayList < SampleLine > ();
 
 	/**
 	 * HashMap for easy lookup of lines. Uses the integer hash code of the line
 	 * (constructed from line and CPU ids) as the lookup key.
 	 */
 	// checkstyle seems to not be updated for J2SE5 type parameterization.
-	private HashMap<Integer, ArrayList<SampleLine>> hash = new HashMap<Integer, ArrayList<SampleLine>>();
+	private HashMap < Integer, ArrayList < SampleLine > > hash = new HashMap < Integer, ArrayList < SampleLine > > ();
 
 	/**
 	 * The type of lines contained in this section.
@@ -70,7 +70,7 @@ public class Section {
 	 * 
 	 * @return ArrayList of lines
 	 */
-	public final ArrayList<SampleLine> getLines() {
+	public final ArrayList < SampleLine > getLines() {
 		return lines;
 	}
 
@@ -110,9 +110,9 @@ public class Section {
 	 */
 	public final void registerLine(final SampleLine line) {
 		int key = line.hashCode();
-		ArrayList<SampleLine> lineList = hash.get(key);
+		ArrayList < SampleLine > lineList = hash.get(key);
 		if (lineList == null) {
-			lineList = new ArrayList<SampleLine>();
+			lineList = new ArrayList < SampleLine > ();
 			hash.put(key, lineList);
 		}
 		lineList.add(line);
@@ -133,7 +133,7 @@ public class Section {
 	public final SampleLine getLine(final SampleCPU cpu, final int id,
 			final double time) {
 		int key = (cpu.getID() << KEY_CONSTANT) | id;
-		ArrayList<SampleLine> lineList = hash.get(key);
+		ArrayList < SampleLine > lineList = hash.get(key);
 		// MR hash.get will never return null but create a new entry if the key does not exist?
 		SampleLine activeLine = null;
 		if (lineList != null) {

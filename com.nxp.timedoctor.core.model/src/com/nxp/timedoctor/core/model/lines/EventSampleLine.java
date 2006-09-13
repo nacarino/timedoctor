@@ -28,7 +28,7 @@ public class EventSampleLine extends SampleLine {
 	 */
 	public EventSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.EVENT);
+		setType(LineType.EVENTS);
 	}
 
 	/**

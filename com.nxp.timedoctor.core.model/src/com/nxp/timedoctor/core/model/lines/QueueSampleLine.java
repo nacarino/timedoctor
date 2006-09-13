@@ -36,13 +36,13 @@ public class QueueSampleLine extends SampleLine {
 	 */
 	public QueueSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.QUEUE);
+		setType(LineType.QUEUES);
 	}
 
 	/**
 	 * Overrides method in super for type-specific behavior.
 	 * 
-	 * @param value
+	 * @param val
 	 *            the value to be converted
 	 * @return the index produced by the value
 	 */

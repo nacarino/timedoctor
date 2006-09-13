@@ -54,9 +54,9 @@ public class SampleCPU {
 	/**
 	 * Constructor for a new CPU.
 	 * 
-	 * @param mod
+	 * @param model
 	 *            the model with which the cpu is associated
-	 * @param intId
+	 * @param id
 	 *            the integer id of the cpu
 	 * @param name
 	 *            the name of the cpu
@@ -91,7 +91,7 @@ public class SampleCPU {
 	/**
 	 * Sets the id of the cpu.
 	 * 
-	 * @param intId
+	 * @param  id
 	 *            the id of the cpu
 	 */
 	public final void setID(final int id) {

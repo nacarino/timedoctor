@@ -42,7 +42,7 @@ public class TaskSampleLine extends SampleLine {
 	 */
 	public TaskSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.TASK);
+		setType(LineType.TASKS);
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class TaskSampleLine extends SampleLine {
 	 *            the type of sample
 	 * @param time
 	 *            the time at which it occurred
-	 * @param value
+	 * @param val
 	 *            the value associated with the sample
 	 */
 	public final void addSample(final SampleType type, final double time,

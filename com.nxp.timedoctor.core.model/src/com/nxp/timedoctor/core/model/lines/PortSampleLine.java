@@ -53,12 +53,12 @@ public class PortSampleLine extends SampleLine {
 	public PortSampleLine(final SampleCPU cpu, final int id,
 			final SampleLine prod, final SampleLine cons) {
 		super(cpu, id);
-		setType(LineType.PORT);
+		setType(LineType.PORTS);
 		prodLine = prod;
 		consLine = cons;
-		if (prodLine.getType() == LineType.QUEUE) {
+		if (prodLine.getType() == LineType.QUEUES) {
 			channelLine = prodLine;
-		} else if (consLine.getType() == LineType.QUEUE) {
+		} else if (consLine.getType() == LineType.QUEUES) {
 			channelLine = consLine;
 		} else {
 			channelLine = null;

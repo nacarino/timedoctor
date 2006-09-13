@@ -31,23 +31,32 @@ import com.nxp.timedoctor.core.model.lines.ValueSampleLine;
  */
 public abstract class SampleLine {
 	private static final int MAX_INIT = 5000;
+
 	private static final int D_MAX_INIT = 100;
 
 	/**
 	 * Ordinals used to convert integers to LineTypes.
 	 */
 	private static final int QUEUE_ORDINAL = 3;
+
 	private static final int EVENT_ORDINAL = 4;
+
 	private static final int VALUE_ORDINAL = 5;
+
 	private static final int CYCLES_ORDINAL = 6;
+
 	private static final int NOTE_ORDINAL = 7;
+
 	private static final int AGENT_ORDINAL = 8;
+
 	private static final int MEM_CYCLES_ORDINAL = 9;
+
 	/**
 	 * Ordinal used to convert integers to LineTypes. This type is deprecated --
 	 * use <code>QUEUE</code> instead.
 	 */
 	private static final int CHANNEL_ORDINAL = 10;
+
 	private static final int PORT_INT_VALUE = 11;
 
 	private static final int HASH_CONSTANT = 28;
@@ -57,26 +66,39 @@ public abstract class SampleLine {
 	 * and sample arrays when they fill up.
 	 */
 	private static final int MIN_DESCR_INCREASE = 100;
+
 	private static final int SAMPLE_ARRAY_INCREASE = 10000;
 
 	private TraceModel model;
+
 	private Section section = null;
+
 	private SampleCPU cpu;
+
 	private String name;
+
 	private LineType type;
+
 	private int id;
 
 	private int sampleCount = 0;
+
 	private int maxNrSamples = MAX_INIT;
+
 	private Sample[] samples = new Sample[maxNrSamples];
+
 	private double maxSampleValue = 0;
+
 	private double maxSampleDuration;
 
 	private int descCount = 0;
+
 	private int maxNrDesc = D_MAX_INIT;
+
 	private Description[] descriptions = new Description[maxNrDesc];
 
 	private double timeCreate = 0;
+
 	private double timeDelete = Double.MAX_VALUE;
 
 	/**
@@ -85,21 +107,20 @@ public abstract class SampleLine {
 	 * parsing).
 	 */
 	public enum LineType {
-		TASK,
-		ISR,
-		SEMAPHORE,
-		QUEUE,
-		EVENT,
-		VALUE,
-		CYCLES,
-		NOTE,
-		AGENT,
-		MEM_CYCLES,
+		TASKS,
+        ISRS,
+        SEMAPHORES,
+        QUEUES,
+        EVENTS,
+        VALUES,
+        CYCLES,
+        NOTES,
+        AGENTS,
+        MEM_CYCLES,
 		/**
 		 * @deprecated use QUEUE instead
 		 */
-		CHANNEL,
-		PORT;
+		CHANNEL, PORTS;
 
 		/**
 		 * Parses strings containing integers to their associated line types.
@@ -113,30 +134,30 @@ public abstract class SampleLine {
 		public static LineType parseType(final int type) {
 			switch (type) {
 			case 0:
-				return TASK;
+				return TASKS;
 			case 1:
-				return ISR;
+				return ISRS;
 			case 2:
-				return SEMAPHORE;
+				return SEMAPHORES;
 			case QUEUE_ORDINAL:
-				return QUEUE;
+				return QUEUES;
 			case EVENT_ORDINAL:
-				return EVENT;
+				return EVENTS;
 			case VALUE_ORDINAL:
-				return VALUE;
+				return VALUES;
 			case CYCLES_ORDINAL:
 				return CYCLES;
 			case NOTE_ORDINAL:
-				return NOTE;
+				return NOTES;
 			case AGENT_ORDINAL:
-				return AGENT;
+				return AGENTS;
 			case MEM_CYCLES_ORDINAL:
 				return MEM_CYCLES;
 				// MR remove
 			case CHANNEL_ORDINAL:
-				return QUEUE;
+				return QUEUES;
 			case PORT_INT_VALUE:
-				return PORT;
+				return PORTS;
 			default:
 				throw new IllegalArgumentException();
 			}
@@ -177,41 +198,41 @@ public abstract class SampleLine {
 			final LineType type, final int id, final double time) {
 		SampleLine line = null;
 		switch (type) {
-		case AGENT:
+		case AGENTS:
 			line = new AgentSampleLine(cpu, id);
 			break;
 		case CYCLES:
 			line = new CyclesSampleLine(cpu, id);
 			break;
-		case EVENT:
+		case EVENTS:
 			line = new EventSampleLine(cpu, id);
 			break;
-		case ISR:
+		case ISRS:
 			line = new ISRSampleLine(cpu, id);
 			break;
 		case MEM_CYCLES:
 			line = new MemCyclesSampleLine(cpu, id);
 			break;
-		case NOTE:
+		case NOTES:
 			line = new NoteSampleLine(cpu, id);
 			break;
 		// MR remove
 		case CHANNEL:
 			line = new QueueSampleLine(cpu, id);
 			break;
-		case PORT: // ONLY TO BE USED if a port line is used in a command
+		case PORTS: // ONLY TO BE USED if a port line is used in a command
 			// without prior CRE command
 			line = new PortSampleLine(cpu, id, null, null);
-		case QUEUE:
+		case QUEUES:
 			line = new QueueSampleLine(cpu, id);
 			break;
-		case SEMAPHORE:
+		case SEMAPHORES:
 			line = new SemaphoreSampleLine(cpu, id);
 			break;
-		case TASK:
+		case TASKS:
 			line = new TaskSampleLine(cpu, id);
 			break;
-		case VALUE:
+		case VALUES:
 			line = new ValueSampleLine(cpu, id);
 			break;
 		default:
@@ -413,8 +434,7 @@ public abstract class SampleLine {
 	 * @param time
 	 *            the time at which it occurred
 	 */
-	public final void addSample(final SampleType sampleType, 
-			final double time) {
+	public final void addSample(final SampleType sampleType, final double time) {
 		addSample(sampleType, time, -1d);
 	}
 
@@ -429,8 +449,8 @@ public abstract class SampleLine {
 	 * @param txt
 	 *            the text of the description
 	 */
-	public final void addDescription(final DescrType descType, final int descId,
-			final String txt) {
+	public final void addDescription(final DescrType descType,
+			final int descId, final String txt) {
 		if (descType == DescrType.STRING) {
 			addDescription(descType, descId, txt, 0);
 		}
@@ -447,8 +467,8 @@ public abstract class SampleLine {
 	 * @param value
 	 *            the value associated with the description
 	 */
-	public final void addDescription(final DescrType descType, final int descId,
-			final double value) {
+	public final void addDescription(final DescrType descType,
+			final int descId, final double value) {
 		if (descType != DescrType.STRING) {
 			addDescription(descType, descId, null, value);
 		}
@@ -466,21 +486,21 @@ public abstract class SampleLine {
 	 * @param value
 	 *            the value associated with the description (may be 0)
 	 */
-	public final void addDescription(final DescrType descType, final int descId,
-			final String txt, final double value) {
+	public final void addDescription(final DescrType descType,
+			final int descId, final String txt, final double value) {
 		if (sampleCount == 0) {
 			return;
 		}
 		// MR extract generic method to grow array
 		if (descCount == maxNrDesc) {
 			maxNrDesc += Math.max(maxNrDesc / 2, MIN_DESCR_INCREASE);
-			
+
 			Description[] tmp = new Description[maxNrDesc];
 			System.arraycopy(descriptions, 0, tmp, 0, descCount);
 			descriptions = tmp;
 		}
-		descriptions[descCount] = new Description(samples[sampleCount - 1].time, descId,
-				descType, txt, value);
+		descriptions[descCount] = new Description(
+				samples[sampleCount - 1].time, descId, descType, txt, value);
 		descCount++;
 	}
 
@@ -730,6 +750,7 @@ public abstract class SampleLine {
 	 *            the line type of the section to add the line to
 	 */
 	public final void addToSection(final LineType lineType) {
+
 		Section s = model.getSections().getSection(type);
 		if (s == null) {
 			s = new Section(model, type);

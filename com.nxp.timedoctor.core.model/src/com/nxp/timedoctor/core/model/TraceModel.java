@@ -13,7 +13,6 @@ package com.nxp.timedoctor.core.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 /**
  * The main TimeDoctor model class. Keeps track of all sections and cpus, as
  * well as having a registry of description names by id.
@@ -38,7 +37,7 @@ public class TraceModel {
 	 * ArrayList of all cpus in the model.
 	 */
 	// Checkstyle not updated for type parameterization in J2SE5
-	private ArrayList<SampleCPU> cpus = new ArrayList<SampleCPU>();
+	private ArrayList < SampleCPU > cpus = new ArrayList < SampleCPU > ();
 
 	// MR what does this do? Why not in the queue class?
 	/**
@@ -55,7 +54,7 @@ public class TraceModel {
 	/**
 	 * Hash table of description names keyed by description id.
 	 */
-	private HashMap<Integer, String> descrNames = new HashMap<Integer, String>();
+ 	private HashMap < Integer, String > descrNames = new HashMap < Integer, String > ();
 
 	// MR improve comment
 	/**
@@ -79,7 +78,8 @@ public class TraceModel {
 		}
 	}
 
-	// MR factor out into DescriptionList class (or at least do this consistently for all lists in the model)
+	// MR factor out into DescriptionList class (or at least do this
+	// consistently for all lists in the model)
 	/**
 	 * Adds a description name to the hash table, using its integer id as the
 	 * lookup key.
@@ -118,7 +118,7 @@ public class TraceModel {
 	 * 
 	 * @return ArrayList of cpus
 	 */
-	public final ArrayList<SampleCPU> getCPUs() {
+	public final ArrayList < SampleCPU > getCPUs() {
 		return cpus;
 	}
 
@@ -181,19 +181,20 @@ public class TraceModel {
 	 * variables.
 	 */
 	public final void computeMaxValues() {
-		Section queues = sections.getSection(SampleLine.LineType.QUEUE);
-		Section values = sections.getSection(SampleLine.LineType.VALUE);
+		Section queues = sections.getSection(SampleLine.LineType.QUEUES);
+		Section values = sections.getSection(SampleLine.LineType.VALUES);
 		// MR move functionality to section class, genneric implementation
 		if (queues != null) {
 			for (SampleLine line : queues.getLines()) {
-				maxQueuesSample = Math.max(line.getMaxSampleValue(), maxQueuesSample);
+				maxQueuesSample = Math.max(line.getMaxSampleValue(),
+						maxQueuesSample);
 			}
 		}
 		if (values != null) {
 			for (SampleLine line : values.getLines()) {
-				maxValuesSample = Math.max(line.getMaxSampleValue(), maxValuesSample);
+				maxValuesSample = Math.max(line.getMaxSampleValue(),
+						maxValuesSample);
 			}
 		}
 	}
-
 }

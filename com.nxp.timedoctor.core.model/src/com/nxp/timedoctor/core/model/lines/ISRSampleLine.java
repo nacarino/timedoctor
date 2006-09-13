@@ -41,7 +41,7 @@ public class ISRSampleLine extends SampleLine {
 	 */
 	public ISRSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.ISR);
+		setType(LineType.ISRS);
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class ISRSampleLine extends SampleLine {
 	 *            the type of sample to add
 	 * @param time
 	 *            the time at which the sample occured
-	 * @param value
+	 * @param val
 	 *            does nothing in an ISR
 	 */
 	@Override

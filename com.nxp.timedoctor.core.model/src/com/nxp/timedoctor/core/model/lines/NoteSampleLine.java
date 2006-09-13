@@ -30,7 +30,7 @@ public class NoteSampleLine extends SampleLine {
 	 */
 	public NoteSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.NOTE);
+		setType(LineType.NOTES);
 	}
 
 	/**

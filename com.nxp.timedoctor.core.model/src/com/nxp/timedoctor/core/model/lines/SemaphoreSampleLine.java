@@ -28,7 +28,7 @@ public class SemaphoreSampleLine extends SampleLine {
 	 */
 	public SemaphoreSampleLine(final SampleCPU cpu, final int id) {
 		super(cpu, id);
-		setType(LineType.SEMAPHORE);
+		setType(LineType.SEMAPHORES);
 	}
 
 	/**
