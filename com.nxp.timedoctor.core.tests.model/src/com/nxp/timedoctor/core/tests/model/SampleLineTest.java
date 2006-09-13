@@ -40,17 +40,17 @@ public class SampleLineTest extends TestCase {
 	 * 
 	 */
 	public final void testCreateLine() {
-		SampleLine line = SampleLine.createLine(cpu, SampleLine.LineType.AGENT,
+		SampleLine line = SampleLine.createLine(cpu, SampleLine.LineType.AGENTS,
 				0, 0.0);
 		System.out.println(line.getClass());
 		assertTrue(line instanceof AgentSampleLine);
-		assertEquals(SampleLine.LineType.AGENT, line.getType());
+		assertEquals(SampleLine.LineType.AGENTS, line.getType());
 		assertEquals(true, line.isValid(0.0));
 
-		line = SampleLine.createLine(cpu, SampleLine.LineType.TASK, 1, 2.0);
+		line = SampleLine.createLine(cpu, SampleLine.LineType.TASKS, 1, 2.0);
 		assertTrue(line instanceof TaskSampleLine);
 
-		line = SampleLine.createLine(cpu, SampleLine.LineType.PORT, 2, 2.4);
+		line = SampleLine.createLine(cpu, SampleLine.LineType.PORTS, 2, 2.4);
 		assertNull(line);
 	}
 
@@ -72,10 +72,10 @@ public class SampleLineTest extends TestCase {
 	 * 
 	 */
 	public final void testGetTimeCreate() {
-		SampleLine line = SampleLine.createLine(cpu, SampleLine.LineType.AGENT,
+		SampleLine line = SampleLine.createLine(cpu, SampleLine.LineType.AGENTS,
 				0, 0.0);
 		assertEquals(true, line.isValid(0.0));
-		line = SampleLine.createLine(cpu, SampleLine.LineType.TASK, 1, 3.0);
+		line = SampleLine.createLine(cpu, SampleLine.LineType.TASKS, 1, 3.0);
 		assertEquals(false, line.isValid(0.0));
 		assertEquals(true, line.isValid(3.0));
 	}
@@ -129,9 +129,9 @@ public class SampleLineTest extends TestCase {
 
 	public final void testGetType() {
 		SampleLine line = new TaskSampleLine(cpu, 0);
-		assertEquals(SampleLine.LineType.TASK, line.getType());
+		assertEquals(SampleLine.LineType.TASKS, line.getType());
 		line = new QueueSampleLine(cpu, 1);
-		assertEquals(SampleLine.LineType.QUEUE, line.getType());
+		assertEquals(SampleLine.LineType.QUEUES, line.getType());
 	}
 
 	public final void testGetID() {
@@ -179,7 +179,7 @@ public class SampleLineTest extends TestCase {
 	 */
 	public final void testGetSection() {
 		SampleLine line = new TaskSampleLine(cpu, 0);
-		Section section = model.getSections().getSection(SampleLine.LineType.TASK);
+		Section section = model.getSections().getSection(SampleLine.LineType.TASKS);
 		assertEquals(section.getLine(cpu, 0, 0.0),line);				
 	}
 

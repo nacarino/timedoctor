@@ -17,7 +17,7 @@ public class AgentSampleLineTest extends TestCase {
 
 	public void testAgentSampleLine() {
 		AgentSampleLine line = new AgentSampleLine(cpu, 0);
-		assertEquals(SampleLine.LineType.AGENT, line.getType());
+		assertEquals(SampleLine.LineType.AGENTS, line.getType());
 	}
 	
 	public void testHasSamples() {
