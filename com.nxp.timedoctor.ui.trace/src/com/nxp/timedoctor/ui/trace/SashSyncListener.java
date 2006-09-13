@@ -41,7 +41,7 @@ public class SashSyncListener implements SelectionListener, MouseListener {
 	 * ArrayList to keep track of this listener's clients.
 	 */
 	// Checkstyle incompatible with J2SE5 type parameterization
-	private ArrayList<ISashClient> clients;
+	private ArrayList < ISashClient > clients;
 
 	/**
 	 * Boolean indicating whether or not this sash has a minimum offset.
@@ -65,7 +65,7 @@ public class SashSyncListener implements SelectionListener, MouseListener {
 		constrained = hasMinOffset;
 
 		// Checkstyle incompatible with J2SE5 type parameterization.
-		clients = new ArrayList<ISashClient>();
+		clients = new ArrayList < ISashClient > ();
 	}
 
 	/**

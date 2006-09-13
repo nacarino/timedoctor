@@ -23,6 +23,7 @@ import com.nxp.timedoctor.ui.trace.Colors;
  * of queues.
  */
 public class QueueCanvas extends TraceCanvas {
+	
 	/**
 	 * The line of trace samples.
 	 */
@@ -45,9 +46,10 @@ public class QueueCanvas extends TraceCanvas {
 	public QueueCanvas(final Composite parent, final SampleLine sampleLine,
 			final ZoomModel data, final TraceModel model) {
 		super(parent, data);
-		line = sampleLine;
+		this.line = sampleLine;
 
 		addPaintListener(new QueuePaintListener(new Color(getDisplay(),
-				Colors.DARK_RED), line, data, model));
+				Colors.DARK_RED), new Color(getDisplay(), Colors.MISTY_ROSE),
+				line, data, model));
 	}
 }

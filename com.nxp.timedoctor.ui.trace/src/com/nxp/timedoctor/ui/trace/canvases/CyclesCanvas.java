@@ -11,10 +11,12 @@
 package com.nxp.timedoctor.ui.trace.canvases;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
  * Canvas for graphical display of <code>SampleLine</code>s of type
@@ -46,9 +48,9 @@ public class CyclesCanvas extends TraceCanvas {
 
 		setSize(computeSize(SWT.DEFAULT, INITIAL_HEIGHT));
 
-		addPaintListener(new CyclesPaintListener(getDisplay().getSystemColor(
-				SWT.COLOR_CYAN), getDisplay().getSystemColor(
-				SWT.COLOR_DARK_CYAN), line, data));
+		addPaintListener(new CounterPaintListener(new Color(getDisplay(),
+				Colors.DARK_CYAN), new Color(getDisplay(), Colors.LIGHT_CYAN),
+				line, data));
 	}
 
 }

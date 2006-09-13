@@ -10,15 +10,15 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
-import com.nxp.timedoctor.core.model.SampleLine;
-import com.nxp.timedoctor.core.model.Section;
-import com.nxp.timedoctor.core.model.TraceModel;
-import com.nxp.timedoctor.core.model.ZoomModel;
-
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
+
+import com.nxp.timedoctor.core.model.SampleLine;
+import com.nxp.timedoctor.core.model.Section;
+import com.nxp.timedoctor.core.model.TraceModel;
+import com.nxp.timedoctor.core.model.ZoomModel;
 
 /**
  * An instance of this class holds a number of trace lines of the same type
@@ -186,9 +186,11 @@ public class SectionViewer {
 	private void createTraceLines(final Composite labels,
 			final Composite traces, final TraceModel model) {
 		TraceLineViewer traceLine = null;
-		for (SampleLine line : section.getLines()) {
-			traceLine = new TraceLineViewer(traceLine, labels, traces, line,
-					zoomData, model);
+		for (SampleLine line : section.getLines()) {				
+			if (line.getCount() > 1) {
+                traceLine = new TraceLineViewer(traceLine, labels, traces,
+                        line, zoomData, model);
+            }
 		}
 	}
 }

@@ -19,6 +19,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 /**
+ * Canvas for drawing ISRs.
  */
 public class IsrCanvas extends TraceCanvas {
 

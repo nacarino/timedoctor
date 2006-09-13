@@ -10,14 +10,15 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
- * Skeleton file for canvas to draw sample lines of type <code>NOTE</code>.
- * Should instantiate the correct paint listener.
+ * Canvas to draw sample lines of type <code>NOTE</code>.
  */
 public class NoteCanvas extends TraceCanvas {
 
@@ -34,6 +35,9 @@ public class NoteCanvas extends TraceCanvas {
 	public NoteCanvas(final Composite parent, final SampleLine line,
 			final ZoomModel data) {
 		super(parent, data);
+		addPaintListener(new NotePaintListener(new Color(getDisplay(),
+				Colors.DARK_GOLDENROD), line, data));
+		
 	}
 
 }

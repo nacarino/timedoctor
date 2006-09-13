@@ -71,6 +71,6 @@ public class LabelSelectListener implements MouseListener {
 	 *            MouseEvent containing detailed information about the event
 	 */
 	public final void mouseDown(final MouseEvent e) {
-		select((Label) e.widget, e.display);
+		select((Label) e.widget, e.display);        
 	}
 }

@@ -10,14 +10,15 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
- * Skeleton file for a canvas to draw lines of type <code>MEM_CYCLES</code>.
- * Should instantiate and add a CyclesPaintListener with the correct color.
+ * Canvas to draw lines of type <code>MEM_CYCLES</code>.
  */
 public class MemCyclesCanvas extends TraceCanvas {
 
@@ -34,6 +35,9 @@ public class MemCyclesCanvas extends TraceCanvas {
 	public MemCyclesCanvas(final Composite parent, final SampleLine line,
 			final ZoomModel data) {
 		super(parent, data);
+		addPaintListener(new CounterPaintListener(new Color(getDisplay(),
+				Colors.DARK_CYAN), new Color(getDisplay(), Colors.LIGHT_CYAN),
+				line, data));
 	}
 
 }

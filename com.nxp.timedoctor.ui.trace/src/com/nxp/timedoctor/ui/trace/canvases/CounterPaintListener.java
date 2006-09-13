@@ -8,6 +8,7 @@
  * Contributors:
  *     Royal Philips Electronics NV. - initial API and implementation
  *******************************************************************************/
+
 package com.nxp.timedoctor.ui.trace.canvases;
 
 import org.eclipse.swt.SWT;
@@ -18,13 +19,32 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
-import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 
 /**
- * Contains the code to paint a queue.
+ * Contains the code to paint a value,cycle or memory cycle.
  */
-public class QueuePaintListener implements PaintListener {
+public class CounterPaintListener implements PaintListener {
+
+	/**
+	 * The color to use in painting the line.
+	 */
+	private Color color;
+
+	/**
+	 * The color to use in filling the line.
+	 */
+	private Color fillColor;
+
+	/**
+	 * <code>Observable</code> containing zoom and scroll data.
+	 */
+	private ZoomModel data;
+
+	/**
+	 * The line containing data to visualize.
+	 */
+	private SampleLine line;
 
 	/**
 	 * The minimum allowed x-value, for use in the <code>boundedInt</code>
@@ -44,65 +64,37 @@ public class QueuePaintListener implements PaintListener {
 	private static final int VERTICAL_PADDING = 2;
 
 	/**
-	 * Sapcing in pixels between grid lines.
-	 */
-	private static final int GRID_SPACING = 10;
-
-	/**
-	 * The model containing all trace data. Used to retrieve the end time of the
-	 * full trace, for use in full trace width calculations.
-	 */
-	private TraceModel model;
-
-	/**
-	 * The line containing data to visualize.
-	 */
-	private SampleLine line;
-
-	/**
-	 * The color to use in painting the line.
-	 */
-	private Color color;
-
-    /**
-     * The color used to fill the Queue.
-     */
-	private Color fillColor;
-
-	/**
-	 * <code>Observable</code> containing zoom and scroll data.
-	 */
-	private ZoomModel data;
-
-	/**
 	 * The starting time of the part of the line currently displayed, based on
 	 * scroll data.
 	 */
 	private double timeOffset;
 
 	/**
-	 * Constructs a new <code>TaskPaintListener</code> with the given color,
-	 * sample line, and source of zoom/scroll data.
+	 * Sapcing in pixels between grid lines.
+	 */
+	private static final int GRID_SPACING = 10;
+
+	/**
+	 * Constructs a new <code>CounterPaintListener</code> with the given
+	 * color,filling color, sample line, and source of zoom/scroll data.
 	 * 
 	 * @param col
-	 *            the color with which to pain the line
+	 *            the color with which to paint the line
+	 * @param fillCol
+	 *            the color used to fill the line
 	 * @param sampleLine
 	 *            contains the data to be displayed
 	 * @param zoomData
 	 *            contains data on the zoom/scroll state of the system
-	 * @param tdModel
-	 *            contains all trace data
-     *  @param fillCol
-     *            the color which is used to fill the rectangle 
 	 */
-	public QueuePaintListener(final Color col, final Color fillCol,
-			final SampleLine sampleLine, final ZoomModel zoomData,
-			final TraceModel tdModel) {
+
+	public CounterPaintListener(final Color col, final Color fillCol,
+			final SampleLine sampleLine, final ZoomModel zoomData) {
 		this.color = col;
 		this.fillColor = fillCol;
-		this.model = tdModel;
 		this.line = sampleLine;
 		this.data = zoomData;
+
 	}
 
 	/**
@@ -122,10 +114,7 @@ public class QueuePaintListener implements PaintListener {
 			Composite rightPane = section.getParent();
 			Composite scroll = rightPane.getParent();
 
-			// guarantees trace drawing is unaffected by appearance of vertical
-			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
-			// TODO calculate height for proportional queues
 			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
 			double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
 			final double drawStartTime = timeOffset + (e.x / zoom);
@@ -133,69 +122,83 @@ public class QueuePaintListener implements PaintListener {
 
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
+			
+			// Draw the bottom line
+			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
+			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
+			
+			for (int i = 0, y = fullHeight; y >= 0; i++, y -= GRID_SPACING) {
+				if (i == 0) {
+					e.gc.setForeground(e.display
+							.getSystemColor(SWT.COLOR_BLACK));
+				} else {
+					e.gc
+							.setForeground(e.display
+									.getSystemColor(SWT.COLOR_GRAY));
+				}
+				e.gc.drawLine(e.x, y, e.x + e.width, y);
+			}
 
-			drawGridLines(e, fullHeight);
+			e.gc.setForeground(color);
+			e.gc.setBackground(fillColor);
 
 			int index = line.binarySearch(drawStartTime);
 			index = Math.max(1, index);
-			for (int xOld = -1; index < line.getCount(); index++) {
+			for (int xOld = -1, yOld = 0; index < line.getCount(); index++) {
 				final int xStart = boundedInt((line.getSample(index - 1).time - timeOffset)
 						* zoom);
 				final int xEnd = boundedInt((line.getSample(index).time - timeOffset)
 						* zoom);
-				if (xEnd <= xOld) {
+				double timeDifference = line.getSample(index).time
+						- line.getSample(index - 1).time;
+				double valueDifference = line.getSample(index).val
+						- line.getSample(index - 1).val;
+				int verticalHeight;
+
+				if (line.getType() == SampleLine.LineType.VALUES) {
+					verticalHeight = Math.max(2,
+							(int) ((fullHeight) * (line
+									.getSample(index).val / line
+									.getMaxSampleValue())));
+				} else {
+					verticalHeight = fullHeight;
+				}
+
+				int fillHeight;
+
+				if (line.getType() == SampleLine.LineType.CYCLES
+						|| line.getType() == SampleLine.LineType.MEM_CYCLES) {
+					fillHeight = valueDifference == 0 ? 0
+							: (Math.max(1, (int) (verticalHeight
+									* valueDifference / (timeDifference * line
+									.getCPU().getClocksPerSec()))));
+				} else {
+					fillHeight = valueDifference == 0 ? 0 : Math.max(1,
+							(int) (verticalHeight * valueDifference / line
+									.getSample(index).val));
+				}
+
+				fillHeight = Math.min(verticalHeight, Math.max(0, fillHeight));
+				if (xEnd <= xOld && fillHeight <= yOld) {
 					continue;
 				}
 				xOld = xEnd;
-
-				e.gc.setForeground(color);
-				e.gc.setBackground(fillColor);
-				// MR hide >> 32 in model interface
-				double queueFilling = (double) (((long) line
-						.getSample(index - 1).val) >> 32);
-				double maxFilling = line.getMaxSampleValue();
-
-				// Get buffer filling in pixels, show at least one pixel if
-				// there is something in the queue
-				int fillHeight;
-				if (queueFilling == 0) {
-					fillHeight = 0;
-				} else {
-					fillHeight = Math.max(1,
-							(int) (fullHeight * queueFilling / maxFilling));
-				}
-
-				// Clip to max height
-				fillHeight = (int) Math.min(fullHeight, fillHeight);
-
+				yOld = fillHeight;
+				e.gc.fillRectangle(xStart, fullHeight - fillHeight,
+						xEnd - xStart, fillHeight);
 				if (xStart == xEnd) {
-					e.gc.drawLine(xStart, fullHeight - fillHeight, xEnd,
-							fillHeight);
+					e.gc.drawLine(xStart, fullHeight - fillHeight,
+							xStart, fullHeight);
 				} else {
-					e.gc.fillRectangle(xStart, fullHeight - fillHeight, xEnd
-							- xStart, fillHeight);
-					e.gc.drawRectangle(xStart, fullHeight - fillHeight, xEnd
-							- xStart, fillHeight);
+
+					e.gc.drawRectangle(xStart, fullHeight - fillHeight,
+							xEnd - xStart, fillHeight);
 				}
 
 				if (line.getSample(index).time > drawEndTime) {
 					break;
 				}
 			}
-		}
-	}
-
-	private void drawGridLines(final PaintEvent e, int height) {
-		for (int i = 0, y = height; y >= 0; i++, y -= GRID_SPACING) {
-			if (i == 0) {
-				e.gc.setForeground(e.display
-						.getSystemColor(SWT.COLOR_BLACK));
-			} else {
-				e.gc
-						.setForeground(e.display
-								.getSystemColor(SWT.COLOR_GRAY));
-			}
-			e.gc.drawLine(e.x, y, e.x + e.width, y);
 		}
 	}
 

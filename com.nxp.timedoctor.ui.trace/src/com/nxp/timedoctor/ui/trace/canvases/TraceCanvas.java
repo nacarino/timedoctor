@@ -13,14 +13,14 @@ package com.nxp.timedoctor.ui.trace.canvases;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Canvas;
+import org.eclipse.swt.widgets.Composite;
+
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Canvas;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * Abstract parent class for trace canvases. Contains a factory method to return
@@ -63,23 +63,23 @@ public abstract class TraceCanvas extends Canvas implements Observer {
 			final SampleLine line, final ZoomModel data, final TraceModel model) {
 		LineType type = line.getType();
 		switch (type) {
-		case TASK:
+		case TASKS:
 			return new TaskCanvas(parent, line, data, model);
-		case ISR:
+		case ISRS:
 			return new IsrCanvas(parent, line, data, model);
-		case SEMAPHORE:
+		case SEMAPHORES:
 			return new SemaphoreCanvas(parent, line, data);
-		case QUEUE:
+		case QUEUES:
 			return new QueueCanvas(parent, line, data, model);
-		case EVENT:
+		case EVENTS:
 			return new EventCanvas(parent, line, data);
-		case VALUE:
+		case VALUES:
 			return new ValueCanvas(parent, line, data);
 		case CYCLES:
 			return new CyclesCanvas(parent, line, data);
-		case NOTE:
+		case NOTES:
 			return new NoteCanvas(parent, line, data);
-		case AGENT:
+		case AGENTS:
 			return new AgentCanvas(parent, line, data, model);
 		case MEM_CYCLES:
 			return new MemCyclesCanvas(parent, line, data);

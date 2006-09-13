@@ -15,11 +15,6 @@ import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
-import com.nxp.timedoctor.core.model.Section;
-import com.nxp.timedoctor.core.model.TraceModel;
-import com.nxp.timedoctor.core.model.ZoomModel;
-import com.nxp.timedoctor.core.model.SampleLine.LineType;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ControlEvent;
@@ -29,7 +24,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -37,6 +31,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Slider;
+
+import com.nxp.timedoctor.core.model.Section;
+import com.nxp.timedoctor.core.model.TraceModel;
+import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.core.model.SampleLine.LineType;
 
 /**
  * The main view, containing sashes, sections, labels, and traces. Vertical
@@ -214,13 +213,13 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	private void createTraceLines(final Composite left, final Composite right) {
 
 		// Checkstyle incompatible with J2SE5 type parameterization
-		Collection<Section> sections = model.getSections().values();
+		Collection < Section > sections = model.getSections().values();
 		SectionViewer lastSection = null;
 		if (sections.size() != 0) {
-			Iterator<Section> iter = sections.iterator();
+			Iterator < Section > iter = sections.iterator();
 			for (int i = 0; i < sections.size(); i++) {
 				Section s = iter.next();
-				if (s.getType() != LineType.PORT) {
+				if (s.getType() != LineType.PORTS) {
 					boolean last = (i == (sections.size() - 1));
 					SectionViewer section = new SectionViewer(left, right,
 							lastSection, last, s, zoomData, model);

@@ -10,29 +10,35 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
  * Skeleton class for a canvas to display lines of type <code>SEMAPHORE</code>.
  */
 public class SemaphoreCanvas extends TraceCanvas {
 
-	/**
-	 * Creates a new semaphore canvas. Should instantiate and add the proper
-	 * paint listener to handle drawing.
-	 * 
-	 * @param parent
-	 *            the parent composite
-	 * @param line
-	 *            the line to display
-	 * @param data
-	 *            contains all zoom and scroll data
-	 */
-	public SemaphoreCanvas(Composite parent, SampleLine line, ZoomModel data) {
-		super(parent, data);
-	}
+    /**
+     * Creates a new semaphore canvas. Should instantiate and add the proper
+     * paint listener to handle drawing.
+     * 
+     * @param parent
+     *            the parent composite
+     * @param sampleLine
+     *            contains data about semaphore acquire and release timings
+     * @param data
+     *            contains all zoom and scroll data
+     */
+    public SemaphoreCanvas(final Composite parent, final SampleLine sampleLine,
+            final ZoomModel data) {
+        super(parent, data);
+        addPaintListener(new EventPaintListener(new Color(getDisplay(),
+                Colors.DARK_VIOLET), new Color(getDisplay(), Colors.THISTLE),
+                sampleLine, data));
+    }
 
 }

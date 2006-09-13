@@ -10,13 +10,15 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
- * Skeleton file for canvas to handle lines of type <code>EVENT</code>.
+ * Canvas to handle lines of type <code>EVENT</code>.
  */
 public class EventCanvas extends TraceCanvas {
 
@@ -34,6 +36,9 @@ public class EventCanvas extends TraceCanvas {
 	public EventCanvas(final Composite parent, final SampleLine line,
 			final ZoomModel data) {
 		super(parent, data);
+		addPaintListener(new EventPaintListener(new Color(getDisplay(),
+				Colors.DARK_MAGENTA),
+				new Color(getDisplay(), Colors.LIGHT_PINK), line, data));
 	}
 
 }

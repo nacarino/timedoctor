@@ -19,6 +19,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
+ * Canvas to draw tasks.
  */
 public class TaskCanvas extends TraceCanvas {
 
@@ -44,10 +45,9 @@ public class TaskCanvas extends TraceCanvas {
 	public TaskCanvas(final Composite parent, final SampleLine sampleLine,
 			final ZoomModel data, final TraceModel model) {
 		super(parent, data);
-		line = sampleLine;
+		this.line = sampleLine;
 
 		addPaintListener(new TaskPaintListener(new Color(getDisplay(),
 				Colors.DARK_BLUE), line, data, model));
 	}
-
 }

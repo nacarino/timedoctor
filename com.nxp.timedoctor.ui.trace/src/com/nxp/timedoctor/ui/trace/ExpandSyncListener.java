@@ -26,14 +26,14 @@ public class ExpandSyncListener implements SelectionListener {
 	 * Holds the ExpandClients associated with this listener.
 	 */
 	// Checkstyle not compatible with J2SE5 type parameterization
-	private ArrayList<IExpandClient> clients;
+	private ArrayList < IExpandClient > clients;
 
 	/**
 	 * Constructs an ExpandSyncListener, initializing the empty list of clients.
 	 */
 	// Checkstyle not compatible with J2SE5 type parameterization
 	public ExpandSyncListener() {
-		clients = new ArrayList<IExpandClient>();
+		clients = new ArrayList < IExpandClient > ();
 	}
 
 	/**
