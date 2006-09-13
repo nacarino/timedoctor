@@ -330,9 +330,9 @@ public class Parser extends Job {
 			}
 			SampleLine prod = null;
 			SampleLine cons = null;
-			Section tasks = model.getSections().getSection(LineType.TASK);
-			Section queues = model.getSections().getSection(LineType.QUEUE);
-			Section isrs = model.getSections().getSection(LineType.ISR);
+			Section tasks = model.getSections().getSection(LineType.TASKS);
+			Section queues = model.getSections().getSection(LineType.QUEUES);
+			Section isrs = model.getSections().getSection(LineType.ISRS);
 			if (tasks != null) {
 				prod = tasks.getLine(prodCpu, prodID, lastTime);
 			}
@@ -352,7 +352,7 @@ public class Parser extends Job {
 				cons = isrs.getLine(consCPU, consID, lastTime);
 			}
 			lastLine = new PortSampleLine(currentCPU, id, prod, cons);
-			lastLine.addToSection(LineType.PORT);
+			lastLine.addToSection(LineType.PORTS);
 			lastLine.setTimeCreate(lastTime);
 		} else {
 			LineType type = LineType.parseType(Integer.parseInt(tokens[TAG_ARG1_INDEX]));
@@ -416,7 +416,7 @@ public class Parser extends Job {
 		}
 		
 		lastLine.addSample(SampleType.START, lastTime, val);
-		if (type == LineType.TASK || type == LineType.ISR) {
+		if (type == LineType.TASKS || type == LineType.ISRS) {
 			handlePreemption(SampleType.SUSPEND, lastTime, lastLine);
 		}
 	}
@@ -444,7 +444,7 @@ public class Parser extends Job {
 		}
 		if (lastLine != null) {
 			lastLine.addSample(SampleType.STOP, lastTime, size);
-			if (type == LineType.TASK || type == LineType.ISR) {
+			if (type == LineType.TASKS || type == LineType.ISRS) {
 				handlePreemption(SampleType.RESUME, lastTime, lastLine);
 			}
 		}
@@ -633,11 +633,11 @@ public class Parser extends Job {
 	private void handlePreemption(final SampleType type, final double time,
 			final SampleLine line) {
 		// Assert(lineType == LineType.TASK || lineType == LineType.ISR)
-		addPreemptionSamples(line, type, time, LineType.TASK);
+		addPreemptionSamples(line, type, time, LineType.TASKS);
 
 		// Tasks cannot interrupt ISRs
-		if (line.getType() == LineType.ISR) {
-			addPreemptionSamples(line, type, time, LineType.ISR);
+		if (line.getType() == LineType.ISRS) {
+			addPreemptionSamples(line, type, time, LineType.ISRS);
 		}
 	}
 
