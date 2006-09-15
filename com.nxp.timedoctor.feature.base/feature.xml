@@ -14,28 +14,24 @@
          id="com.nxp.timedoctor.core.model"
          download-size="0"
          install-size="0"
-         version="1.1.0"
-         unpack="false"/>
+         version="1.1.0"/>
 
    <plugin
          id="com.nxp.timedoctor.core.parser"
          download-size="0"
          install-size="0"
-         version="1.1.0"
-         unpack="false"/>
+         version="1.1.0"/>
 
    <plugin
          id="com.nxp.timedoctor.ui"
          download-size="0"
          install-size="0"
-         version="1.1.0"
-         unpack="false"/>
+         version="1.1.0"/>
 
    <plugin
          id="com.nxp.timedoctor.ui.trace"
          download-size="0"
          install-size="0"
-         version="1.1.0"
-         unpack="false"/>
+         version="1.1.0"/>
 
 </feature>
