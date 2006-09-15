@@ -21,12 +21,17 @@ public class Colors {
 	 * RGB object to create dark blue for tasks.
 	 */
 	public static final RGB DARK_BLUE = new RGB(0x0, 0x0, 0x8B);
-
+	
+    /** 
+     * RGB object to create light blue for tasks.
+     */
+	public static final RGB  LIGHT_BLUE = new RGB(0xE7, 0xC6, 0xF2);
+	
 	/**
 	 * RGB object to create dark green for isrs.
 	 */
 	public static final RGB DARK_GREEN = new RGB(0x0, 0x64, 0x0);
-
+	
 	/**
 	 * RGB object to create dark color for counters.
 	 */

@@ -8,9 +8,11 @@
  * Contributors:
  *     Royal Philips Electronics NV. - initial API and implementation
  *******************************************************************************/
+
 package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DragSourceAdapter;
@@ -23,6 +25,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -59,7 +62,7 @@ public class TraceLineViewer {
 	/**
 	 * The label containing the name of the line.
 	 */
-	private Label label;
+	private CLabel label;
 
 	/**
 	 * Separator below the label, used for drag & drop.
@@ -83,7 +86,7 @@ public class TraceLineViewer {
 	private SampleLine line;
 
 	/**
-	 * The model component containing zoom/scroll values.
+	 * The model component containing zoom/scroll values
 	 */
 	private ZoomModel zoom;
 
@@ -104,10 +107,12 @@ public class TraceLineViewer {
 	 * @param model
 	 *            model containing data on the whole trace
 	 */
+
 	public TraceLineViewer(final TraceLineViewer topLine,
 			final Composite sectionLabel, final Composite sectionTrace,
 			final SampleLine sampleLine, final ZoomModel zoomData,
 			final TraceModel model) {
+
 		this.line = sampleLine;
 		this.zoom = zoomData;
 		this.model = model;
@@ -126,6 +131,7 @@ public class TraceLineViewer {
 			// something that traces can be moved below during drag & drop.
 			topSeparator.setData("trace", topPadding);
 		} else {
+
 			createLabel(sectionLabel);
 			label.setData("top", topLine.bottomSeparator);
 			topLine.bottomSeparator.setData("bottom", label);
@@ -145,10 +151,26 @@ public class TraceLineViewer {
 	 *            the labels composite
 	 */
 	private void createLabel(final Composite sectionLabel) {
-		label = new Label(sectionLabel, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		Image icon = null;
+		String cpuName = null;
 
+		if (line.getCPU() != null)
+		{
+			cpuName = line.getCPU().getName();
+		}
+		if (cpuName != null) {
+			CpuLabel cpuLabel = new CpuLabel(sectionLabel, line.getType(), cpuName);
+			icon = cpuLabel.getImage();
+		}
+
+		label = new CLabel(sectionLabel, SWT.NONE);
+		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		label.setBackground(sectionLabel.getDisplay().getSystemColor(
+				SWT.COLOR_WHITE));
+
+		label.setImage(icon);
 		label.setText(line.getName());
+
 		// Small text font to allow minimal trace line height
 		label.setFont(new Font(sectionLabel.getDisplay(), "Arial",
 				LABEL_FONT_SIZE, SWT.NORMAL));
@@ -168,8 +190,13 @@ public class TraceLineViewer {
 	 *            the labels composite
 	 * @return the created separator
 	 */
+
 	private Label createSeparator(final Composite sectionLabel) {
 		Label separator = new Label(sectionLabel, SWT.HORIZONTAL);
+		separator.setBackground(sectionLabel.getDisplay().getSystemColor(
+				SWT.COLOR_WHITE));
+		separator.setForeground(sectionLabel.getDisplay().getSystemColor(
+				SWT.COLOR_WHITE));
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
 		data.heightHint = SEPARATOR_HEIGHT;
 		separator.setLayoutData(data);
@@ -265,9 +292,8 @@ public class TraceLineViewer {
 		DragSourceAdapter dragListener = new DragSourceAdapter() {
 			public final void dragSetData(final DragSourceEvent event) {
 				// Provide the transfer data of the requested type
-				if (TextTransfer.getInstance()
-						.isSupportedType(event.dataType)) {
-					Label sourceLabel = ((Label) ((DragSource) event.widget)
+				if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
+					CLabel sourceLabel = ((CLabel) ((DragSource) event.widget)
 							.getControl());
 					event.data = sourceLabel.getText(); // Transfer the label's
 					// text for now
@@ -300,6 +326,7 @@ public class TraceLineViewer {
 
 			public final void dragLeave(final DropTargetEvent event) {
 				deselectDropTarget(getTargetSeparator(event));
+
 			}
 
 			public final void dragOver(final DropTargetEvent event) {
@@ -320,19 +347,18 @@ public class TraceLineViewer {
 			private Control getTargetSeparator(final DropTargetEvent event) {
 				Control targetLabel = getTargetLabel(event);
 				Control targetSeparator;
-				if (targetLabel.getLocation().y
-						< dragSourceLabel.getLocation().y) {
+				if (targetLabel.getLocation().y < dragSourceLabel.getLocation().y) {
 					targetSeparator = (Control) targetLabel.getData("top");
 				} else {
 					targetSeparator = (Control) targetLabel.getData("bottom");
+
 				}
 				return targetSeparator;
 			}
 
 			private boolean dropValid(final DropTargetEvent event) {
 				Control targetLabel = getTargetLabel(event);
-				return ((dragSourceLabel.getParent() == targetLabel.getParent())
-						&& (dragSourceLabel != targetLabel));
+				return ((dragSourceLabel.getParent() == targetLabel.getParent()) && (dragSourceLabel != targetLabel));
 			}
 		};
 
@@ -379,10 +405,12 @@ public class TraceLineViewer {
 				if (!dropValid(event)) {
 					event.detail = DND.DROP_NONE;
 				}
+
 			}
 
 			public final void dragLeave(final DropTargetEvent event) {
 				deselectDropTarget(getTargetSeparator(event));
+
 			}
 
 			public final void dragOver(final DropTargetEvent event) {
@@ -392,7 +420,9 @@ public class TraceLineViewer {
 			}
 
 			public final void drop(final DropTargetEvent event) {
+
 				moveBelow(getTargetSeparator(event));
+
 			}
 
 			private boolean dropValid(final DropTargetEvent event) {
@@ -401,13 +431,13 @@ public class TraceLineViewer {
 				Control bottom = (Control) dragSourceLabel.getData("bottom");
 				return ((dragSourceLabel.getParent() == targetSeparator
 						.getParent())
-						&& (top != targetSeparator)
-						&& (bottom != targetSeparator));
+						&& (top != targetSeparator) && (bottom != targetSeparator));
 			}
 
 			private Control getTargetSeparator(final DropTargetEvent event) {
 				DropTarget target = (DropTarget) event.widget;
 				return (Control) target.getControl();
+
 			}
 		};
 
@@ -425,6 +455,7 @@ public class TraceLineViewer {
 		// Receive data in Text format
 		target.setTransfer(types);
 		target.addDropListener(dropListener);
+
 	}
 
 	/**
@@ -445,8 +476,9 @@ public class TraceLineViewer {
 	 *            the selected separator
 	 */
 	private void deselectDropTarget(final Control targetSeparator) {
-		targetSeparator.setBackground(targetSeparator.getParent()
-				.getBackground());
+		targetSeparator.setBackground(targetSeparator.getDisplay()
+				.getSystemColor(SWT.COLOR_WHITE));
+
 	}
 
 	/**

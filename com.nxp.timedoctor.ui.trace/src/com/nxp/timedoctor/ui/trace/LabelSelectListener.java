@@ -8,13 +8,14 @@
  * Contributors:
  *     Royal Philips Electronics NV. - initial API and implementation
  *******************************************************************************/
+
 package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 
 /**
  * Listener to handle the selection of labels.
@@ -24,7 +25,7 @@ public class LabelSelectListener implements MouseListener {
 	/**
 	 * Static variable to track which label in the entire editor is selected.
 	 */
-	private static Label selected = null;
+	private static CLabel selected = null;
 
 	/**
 	 * Sets line selection to the line associated with the given label.
@@ -36,10 +37,11 @@ public class LabelSelectListener implements MouseListener {
 	 * @param display
 	 *            the display object associated with the label
 	 */
-	public static void select(final Label label, final Display display) {
+	public static void select(final CLabel label, final Display display) {
 		if (selected != null) {
-			selected.setBackground(selected.getParent().getBackground());
+			selected.setBackground(selected.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
 			selected.setForeground(selected.getParent().getForeground());
+			
 		}
 		label.setBackground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
 		label.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
@@ -63,7 +65,6 @@ public class LabelSelectListener implements MouseListener {
 	 */
 	public final void mouseUp(final MouseEvent e) {
 	}
-
 	/**
 	 * Selects the label of a mouseDown event.
 	 * 
@@ -71,6 +72,6 @@ public class LabelSelectListener implements MouseListener {
 	 *            MouseEvent containing detailed information about the event
 	 */
 	public final void mouseDown(final MouseEvent e) {
-		select((Label) e.widget, e.display);        
+		select((CLabel) e.widget, e.display);        
 	}
 }
