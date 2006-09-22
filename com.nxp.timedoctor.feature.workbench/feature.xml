@@ -19,21 +19,20 @@
    </license>
 
    <includes
-         id="org.eclipse.rcp"
-         version="0.0.0"
-         name="Eclipse RCP Base"/>
+         id="com.nxp.timedoctor.feature.base"
+         version="1.2.0"/>
 
    <includes
-         id="com.nxp.timedoctor.feature.base"
+         id="org.eclipse.rcp"
          version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.core.runtime" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.help" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
-      <import plugin="com.nxp.timedoctor.core.model"/>
-      <import plugin="com.nxp.timedoctor.core.parser"/>
-      <import plugin="com.nxp.timedoctor.ui.trace"/>
+      <import plugin="com.nxp.timedoctor.core.model" version="1.2.0" match="compatible"/>
+      <import plugin="com.nxp.timedoctor.core.parser" version="1.2.0" match="compatible"/>
+      <import plugin="com.nxp.timedoctor.ui.trace" version="1.2.0" match="compatible"/>
       <import feature="org.eclipse.rcp" version="3.2.0.v20060609m-SVDNgVrNoh-MeGG"/>
    </requires>
 
