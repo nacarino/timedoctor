@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.workbench"
       label="%featureName"
-      version="1.1.0"
+      version="1.2.0"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.workbench">
 
@@ -48,12 +48,12 @@
          id="com.nxp.timedoctor.product.workbench"
          download-size="0"
          install-size="0"
-         version="1.1.0"/>
+         version="1.2.0"/>
 
    <plugin
          id="com.nxp.timedoctor.ui.workbench"
          download-size="0"
          install-size="0"
-         version="1.1.0"/>
+         version="1.2.0"/>
 
 </feature>
