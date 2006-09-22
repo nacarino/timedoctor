@@ -20,7 +20,7 @@
 
    <includes
          id="com.nxp.timedoctor.feature.base"
-         version="0.0.0"/>
+         version="1.2.0"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>
