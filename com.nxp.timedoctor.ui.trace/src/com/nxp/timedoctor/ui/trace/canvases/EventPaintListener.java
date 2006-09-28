@@ -134,7 +134,7 @@ public class EventPaintListener implements PaintListener {
 			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
 			
 			e.gc.setForeground(color);
-			for (int xOld = -1; index < line.getCount(); index++) {
+			for (int xOld = -1; index < line.getCount() - 1; index++) {
 
 				if (line.getSample(index).time > drawEndTime) {
 					break;
@@ -150,9 +150,7 @@ public class EventPaintListener implements PaintListener {
 				}
 				xOld = xEnd;
 
-				if (xStart == xEnd) {
-					e.gc.drawLine(xStart, 0, xEnd, fullHeight);
-				} else if (line.getSample(index).type == SampleType.START) {
+				if (line.getSample(index).type == SampleType.START) {
 					sampleFlag.draw(e, color, color, xStart, 0, fullHeight);
 					e.gc.setBackground(fillColor);
 					e.gc.fillRectangle(xStart, fullHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
