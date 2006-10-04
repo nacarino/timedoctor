@@ -49,13 +49,13 @@ public class QueuePaintListener implements PaintListener {
 	private static final int GRID_SPACING = 10;
 
 	/**
-	 * The model containing all trace data. Used to retrieve the end time of the
+	 * The model containing all trace zoom. Used to retrieve the end time of the
 	 * full trace, for use in full trace width calculations.
 	 */
 	private TraceModel model;
 
 	/**
-	 * The line containing data to visualize.
+	 * The line containing zoom to visualize.
 	 */
 	private SampleLine line;
 
@@ -70,39 +70,33 @@ public class QueuePaintListener implements PaintListener {
 	private Color fillColor;
 
 	/**
-	 * <code>Observable</code> containing zoom and scroll data.
+	 * <code>Observable</code> containing zoom and scroll zoom.
 	 */
-	private ZoomModel data;
-
-	/**
-	 * The starting time of the part of the line currently displayed, based on
-	 * scroll data.
-	 */
-	private double timeOffset;
+	private ZoomModel zoom;
 
 	/**
 	 * Constructs a new <code>TaskPaintListener</code> with the given color,
-	 * sample line, and source of zoom/scroll data.
+	 * sample line, and source of zoom/scroll zoom.
 	 * 
-	 * @param col
+	 * @param color
 	 *            the color with which to pain the line
-	 * @param sampleLine
-	 *            contains the data to be displayed
-	 * @param zoomData
-	 *            contains data on the zoom/scroll state of the system
-	 * @param tdModel
-	 *            contains all trace data
-     *  @param fillCol
+     *  @param fillColor
      *            the color which is used to fill the rectangle 
+	 * @param sampleLine
+	 *            contains the zoom to be displayed
+	 * @param zoom
+	 *            contains the zoom/scroll state of the system
+	 * @param tdModel
+	 *            contains all trace zoom
 	 */
-	public QueuePaintListener(final Color col, final Color fillCol,
-			final SampleLine sampleLine, final ZoomModel zoomData,
+	public QueuePaintListener(final Color color, final Color fillColor,
+			final SampleLine sampleLine, final ZoomModel zoom,
 			final TraceModel tdModel) {
-		this.color = col;
-		this.fillColor = fillCol;
+		this.color = color;
+		this.fillColor = fillColor;
 		this.model = tdModel;
 		this.line = sampleLine;
-		this.data = zoomData;
+		this.zoom = zoom;
 	}
 
 	/**
@@ -115,8 +109,7 @@ public class QueuePaintListener implements PaintListener {
 	 * @see PaintListener#paintControl(PaintEvent)
 	 */
 	public final void paintControl(final PaintEvent e) {
-		if (data.getStartTime() != data.getEndTime()) {
-			timeOffset = data.getStartTime();
+		if (zoom.getStartTime() != zoom.getEndTime()) {
 			Canvas canvas = ((Canvas) e.widget);
 			Composite section = canvas.getParent();
 			Composite rightPane = section.getParent();
@@ -127,60 +120,93 @@ public class QueuePaintListener implements PaintListener {
 			int fullWidth = scroll.getBounds().width;
 			// TODO calculate height for proportional queues
 			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
-			double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
-			final double drawStartTime = timeOffset + (e.x / zoom);
-			final double drawEndTime = drawStartTime + (e.width / zoom);
+			double startTime = zoom.getStartTime();
+			double endTime = zoom.getEndTime();
+			double pixelsPerSec = fullWidth / (endTime - startTime);
+			double drawStartTime = startTime + (((double)e.x) / pixelsPerSec);
+			double drawEndTime = drawStartTime + (((double)e.width) / pixelsPerSec);
+			double maxFilling = line.getMaxSampleValue();
 
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
 
 			drawGridLines(e, fullHeight);
 
-			int index = line.binarySearch(drawStartTime);
-			index = Math.max(1, index);
-			for (int xOld = -1; index < line.getCount(); index++) {
-				final int xStart = boundedInt((line.getSample(index - 1).time - timeOffset)
-						* zoom);
-				final int xEnd = boundedInt((line.getSample(index).time - timeOffset)
-						* zoom);
-				if (xEnd <= xOld) {
+			int index = Math.max(1, line.binarySearch(drawStartTime));
+			double curMaxFilling = 0;
+			double curMinFilling = 0;
+			for (; index < line.getCount(); index++) {
+				int xCur = boundedInt((line.getSample(index - 1).time - startTime) * pixelsPerSec);
+				int xNext = boundedInt((line.getSample(index).time - startTime) * pixelsPerSec);
+
+				// TODO hide >> 32 in model interface
+				double curFilling = (double) (((long) line.getSample(index - 1).val) >> 32);
+				
+				// Compute maximum and minimum over the last queue events that fall within the same pixel
+				// Always at least include the previous queue event to ensure the contour line is
+				// continuous (the queue event typically occurs somewhere within a pixel, 
+				// not on the exact pixel boundary).
+				curMaxFilling = Math.max(curMaxFilling, curFilling);
+				curMinFilling = Math.min(curMinFilling, curFilling);
+				
+				if (xNext == xCur && index < line.getCount()) {
 					continue;
 				}
-				xOld = xEnd;
+				
+				// Get current buffer filling in pixels
+				int curFillHeight = 0;
+				if (curFilling > 0) {
+					// Show at least one pixel if there is something in the queue
+					curFillHeight = Math.max(1, (int) (fullHeight * curFilling / maxFilling));
+				}
 
+				// Get min buffer filling in pixels
+				int minFillHeight = 0;
+				if (curMinFilling > 0) {
+					// Show at least one pixel if there is something in the queue
+					minFillHeight = Math.max(1, (int) (fullHeight * curMinFilling / maxFilling));
+				}
+
+				// Get max buffer filling in pixels
+				int maxFillHeight = (int) (fullHeight * curMaxFilling / maxFilling);
+
+				// Note: fillRectangle is drawn (verified for MS Windows) from the left-upper origin
+				// including the origin, up to (excluding) width, height
+				// Note that the origin stays upper-left, even when height is negative
+				// Lines are drawn including the start and end point
+				// A line with the same start and end point draws a point
+				
 				e.gc.setForeground(color);
 				e.gc.setBackground(fillColor);
-				// MR hide >> 32 in model interface
-				double queueFilling = (double) (((long) line
-						.getSample(index - 1).val) >> 32);
-				double maxFilling = line.getMaxSampleValue();
+					
+				// Draw rectangle with actual value
+				// Set height origin to fullHeight + 1 to include drawing at fullHeight
+				e.gc.fillRectangle(xCur, fullHeight + 1, 
+						xNext - xCur, - curFillHeight);
+				// Draw top line on top of rectangle
+				e.gc.drawLine(xCur, fullHeight - curFillHeight, 
+						xNext, fullHeight - curFillHeight);
 
-				// Get buffer filling in pixels, show at least one pixel if
-				// there is something in the queue
-				int fillHeight;
-				if (queueFilling == 0) {
-					fillHeight = 0;
-				} else {
-					fillHeight = Math.max(1,
-							(int) (fullHeight * queueFilling / maxFilling));
-				}
+				// Draw min line
+				e.gc.setForeground(fillColor);
+				e.gc.drawLine(xCur, fullHeight, 
+						xCur, fullHeight - minFillHeight);
 
-				// Clip to max height
-				fillHeight = (int) Math.min(fullHeight, fillHeight);
-
-				if (xStart == xEnd) {
-					e.gc.drawLine(xStart, fullHeight - fillHeight, xEnd,
-							fillHeight);
-				} else {
-					e.gc.fillRectangle(xStart, fullHeight - fillHeight, xEnd
-							- xStart, fillHeight);
-					e.gc.drawRectangle(xStart, fullHeight - fillHeight, xEnd
-							- xStart, fillHeight);
-				}
+				// Draw max line on top of min line
+				// Drawing after the drawing of min line ensures that if max=min=0
+				// only the contour is drawn (one pixel for the max line is visible)
+				e.gc.setForeground(color);
+				e.gc.drawLine(xCur, fullHeight - minFillHeight, 
+						xCur, fullHeight - maxFillHeight);
 
 				if (line.getSample(index).time > drawEndTime) {
 					break;
 				}
+
+				// Include the previouse sample in the min/max computations
+				// for the next sample
+				curMaxFilling = curFilling;
+				curMinFilling = curFilling;
 			}
 		}
 	}
