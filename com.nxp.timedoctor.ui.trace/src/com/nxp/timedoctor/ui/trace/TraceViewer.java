@@ -77,7 +77,9 @@ public class TraceViewer {
 	private void createContents(final Composite parent) {
 		parent.setLayout(new FormLayout());
 
-		HeaderViewer header = new HeaderViewer(parent, zoomData);
+		TraceCursorFactory traceCursorFactory = new TraceCursorFactory(zoomData);
+
+		HeaderViewer header = new HeaderViewer(parent, traceCursorFactory, zoomData);
 		FormData data = new FormData();
 		data.left = new FormAttachment(0);
 		data.right = new FormAttachment(FORMLAYOUT_FULL);
@@ -85,7 +87,7 @@ public class TraceViewer {
 		data.height = HEADER_HEIGHT;
 		header.setLayoutData(data);
 
-		MainViewer main = new MainViewer(parent, model, zoomData);
+		MainViewer main = new MainViewer(parent, traceCursorFactory, model, zoomData);
 		data = new FormData();
 		data.left = new FormAttachment(0);
 		data.right = new FormAttachment(FORMLAYOUT_FULL);

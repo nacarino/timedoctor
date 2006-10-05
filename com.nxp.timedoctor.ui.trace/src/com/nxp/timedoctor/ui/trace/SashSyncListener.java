@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Control;
 public class SashSyncListener implements SelectionListener, MouseListener {
 
 	/**
-	 * Reference control fro calculation of current and minimum sash positions.
+	 * Reference control for calculation of current and minimum sash positions.
 	 */
 	private Control reference;
 

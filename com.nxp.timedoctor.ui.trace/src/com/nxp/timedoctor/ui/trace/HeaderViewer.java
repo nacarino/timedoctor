@@ -66,11 +66,13 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 * @param data
 	 *            <code>Observable</code> containing zoom and scroll data
 	 */
-	public HeaderViewer(final Composite parent, final ZoomModel data) {
+	public HeaderViewer(final Composite parent, 
+			final TraceCursorFactory traceCursorFactory,
+			final ZoomModel data) {
 		super(parent, SWT.NONE);
 
 		setLayout(new FormLayout());
-		createContents(parent, data);
+		createContents(parent, traceCursorFactory, data);
 
 		data.addObserver(this);
 	}
@@ -85,6 +87,7 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 *            data
 	 */
 	private void createContents(final Composite parent,
+			final TraceCursorFactory traceCursorFactory,
 			final ZoomModel zoomData) {
 		logo = new Canvas(this, SWT.NONE);
 		FormData data = new FormData();
@@ -106,9 +109,22 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 		sashListener.addClient(this);
 
 		// Ruler pane
-		ruler = new Canvas(this, SWT.DOUBLE_BUFFERED);
+		Composite rulerPane = new Composite(this, SWT.NONE);
+		rulerPane.setLayout(new FormLayout());
+
 		data = new FormData();
 		data.left = new FormAttachment(headerSash);
+		data.right = new FormAttachment(FORMLAYOUT_FULL);
+		data.top = new FormAttachment(0);
+		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
+		rulerPane.setLayoutData(data);
+		
+		traceCursorFactory.setRulerPane(rulerPane);
+
+		// ruler
+		ruler = new Canvas(rulerPane, SWT.DOUBLE_BUFFERED);
+		data = new FormData();
+		data.left = new FormAttachment(0);
 		data.right = new FormAttachment(FORMLAYOUT_FULL);
 		data.top = new FormAttachment(0);
 		data.bottom = new FormAttachment(FORMLAYOUT_FULL);

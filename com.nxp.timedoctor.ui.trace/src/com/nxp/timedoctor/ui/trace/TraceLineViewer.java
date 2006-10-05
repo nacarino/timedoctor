@@ -111,7 +111,7 @@ public class TraceLineViewer {
 	public TraceLineViewer(final TraceLineViewer topLine,
 			final Composite sectionLabel, final Composite sectionTrace,
 			final SampleLine sampleLine, final ZoomModel zoomData,
-			final TraceModel model) {
+			final TraceModel model, TraceCursorListener traceCursorListener) {
 
 		this.line = sampleLine;
 		this.zoom = zoomData;
@@ -141,7 +141,7 @@ public class TraceLineViewer {
 		bottomSeparator = createSeparator(sectionLabel);
 		label.setData("bottom", bottomSeparator);
 
-		createTrace(sectionTrace);
+		createTrace(sectionTrace, traceCursorListener);
 	}
 
 	/**
@@ -230,7 +230,8 @@ public class TraceLineViewer {
 	 * @param sectionTrace
 	 *            the traces composite
 	 */
-	private void createTrace(final Composite sectionTrace) {
+	private void createTrace(final Composite sectionTrace, 
+			TraceCursorListener traceCursorListener) {
 		// Add padding on top to ensure alignment of traces and labels
 		if (sectionTrace.getChildren().length == 0) {
 			Label topPadding = new Label(sectionTrace, SWT.NONE);
@@ -259,9 +260,6 @@ public class TraceLineViewer {
 			}
 		};
 
-		// Changes cursor to a line with an arrow
-		TraceCursorListener cursorListener = new TraceCursorListener();
-
 		trace = TraceCanvas.createCanvas(sectionTrace, line, zoom, model);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		// Since the labels define the height of the trace section,
@@ -277,8 +275,10 @@ public class TraceLineViewer {
 		// }
 
 		trace.addMouseListener(selectListener);
-		trace.addMouseMoveListener(cursorListener);
-
+		trace.addMouseMoveListener(traceCursorListener);
+		trace.addMouseTrackListener(traceCursorListener);	
+		trace.addMouseListener(traceCursorListener);
+		
 		// Used for drag & drop
 		label.setData("trace", trace);
 		bottomSeparator.setData("trace", trace);

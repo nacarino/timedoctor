@@ -36,6 +36,7 @@ import com.nxp.timedoctor.core.model.Section;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
+import com.nxp.timedoctor.ui.trace.TraceCursorFactory.CursorType;
 
 /**
  * The main view, containing sashes, sections, labels, and traces. Vertical
@@ -48,7 +49,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * full right or bottom.
 	 */
 	private static final int FORMLAYOUT_FULL = 100;
-
+	
 	/**
 	 * Horizontal scrollbar settings.
 	 * Use a large number for the maximum range for accuracy in translating to time units
@@ -103,8 +104,8 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * Model component containing data on the zoom factor and horizontal offset
 	 * due to scrolling of trace lines.
 	 */
-	private ZoomModel zoomData;
-
+	private ZoomModel zoom;
+		
 	/** 
 	 * Zoom factor multiplied by MAX_HOR_SCROLL.
 	 * Used to check if the zoomFactor has changed 
@@ -120,20 +121,22 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 *            the parent composite
 	 * @param model
 	 *            the model containing trace data to display
-	 * @param data
+	 * @param zoom
 	 *            the model component containing zoom data for this trace
 	 */
-	public MainViewer(final Composite parent, final TraceModel model,
-			final ZoomModel data) {
+	public MainViewer(final Composite parent, 
+			TraceCursorFactory traceCursorFactory,
+			final TraceModel model,
+			final ZoomModel zoom) {
 		super(parent, SWT.NONE);
 
 		this.model = model;
-		this.zoomData = data;
+		this.zoom = zoom;
 		
-		zoomData.setTimes(0, model.getEndTime() / 2);
-		zoomData.addObserver(this);
+		zoom.setTimes(0, model.getEndTime() / 2);
+		zoom.addObserver(this);
 
-		createContents(parent);
+		createContents(parent, traceCursorFactory);
 	}
 
 	/**
@@ -142,9 +145,10 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * @param parent
 	 *            the parent composite
 	 */
-	private void createContents(final Composite parent) {
+	private void createContents(final Composite parent,
+			TraceCursorFactory traceCursorFactory) {
 		setLayout(new FormLayout());
-
+		
 		leftPane = new Composite(this, SWT.NONE);
 		leftPane.setLayout(new FormLayout());
 
@@ -195,9 +199,15 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		rightContent = new Composite(rightScroll, SWT.NONE);
 		rightContent.setLayout(new FormLayout());
 
-		createTraceLines(leftPane, rightContent);
+		// Create cursor and baseline
+		traceCursorFactory.setTracePane(rightContent);
+		TimeLine traceCursor = traceCursorFactory.createTraceCursor(CursorType.CURSOR);
+		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
+		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoom);
+				
+		createTraceLines(leftPane, rightContent, traceCursorListener);
 
-		initializeScrollbars();
+		initializeScrollbars();		
 	}
 
 	// Handle sash between left and right panes
@@ -210,8 +220,9 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * @param right
 	 *            the right (canvas) composite
 	 */
-	private void createTraceLines(final Composite left, final Composite right) {
-
+	private void createTraceLines(final Composite left,
+			final Composite right,
+			final TraceCursorListener traceCursorListener) {
 		// Checkstyle incompatible with J2SE5 type parameterization
 		Collection < Section > sections = model.getSections().values();
 		SectionViewer lastSection = null;
@@ -222,7 +233,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 				if (s.getType() != LineType.PORTS) {
 					boolean last = (i == (sections.size() - 1));
 					SectionViewer section = new SectionViewer(left, right,
-							lastSection, last, s, zoomData, model);
+							lastSection, last, s, zoom, model, traceCursorListener);
 					LineType type = s.getType();
 					section.setHeaderText(type.toString());
 					section.setHeaderColor(new Color(getDisplay(), COLORS[type
@@ -303,14 +314,14 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 
 				int selection = slider.getSelection();
 
-				// Update zoomData with selection
-				double oldStartTime = zoomData.getStartTime();
-				double oldEndTime = zoomData.getEndTime();
+				// Update zoom with selection
+				double oldStartTime = zoom.getStartTime();
+				double oldEndTime = zoom.getEndTime();
 				double interval = oldEndTime - oldStartTime;
 				
 				double startTime = selection * model.getEndTime() / ((double) HOR_SCROLL_MAX);
 				double endTime = startTime + interval;
-				zoomData.setTimes(startTime, endTime);
+				zoom.setTimes(startTime, endTime);
 			}
 		});
 	}
@@ -363,8 +374,8 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	private void setHorizontalScroll() {
 		// MR would be more accurate and faster to store the zoom factor in the zoomModel
 		double modelEndTime = model.getEndTime();
-		double zoomEndTime = zoomData.getEndTime();
-		double zoomStartTime = zoomData.getStartTime();
+		double zoomEndTime = zoom.getEndTime();
+		double zoomStartTime = zoom.getStartTime();
 		double zoomInterval = zoomEndTime - zoomStartTime;		
 		double zoomFactor = zoomInterval / modelEndTime;
 		int newZoomPercentage = (int) (zoomFactor * ((double) HOR_SCROLL_MAX));

@@ -14,6 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -74,6 +75,23 @@ public class RulerPaintListener implements PaintListener {
 	 * ZoomModel instance containing zoom and scroll information.
 	 */
 	private ZoomModel data;
+	
+	/**
+	 * Canvas created by setting the ruler as the parent.
+	 */
+
+	private static Canvas rulerCanvas;
+	
+	/**
+	 * Previous x-position used in drawing the time in ruler.
+	 */
+	private static int prevXposition = 0;
+
+	/**
+	 * which holds the previous time value.
+	 */
+	private static String prevTime = "0s";
+
 
 	/**
 	 * Constructs a new <code>RulerPaintListener</code> with zoom/scroll data
@@ -102,7 +120,7 @@ public class RulerPaintListener implements PaintListener {
 		}
 
 		Rectangle bounds = ((Canvas) e.widget).getClientArea();
-
+		rulerCanvas = (Canvas) e.widget;
 		double zoom = bounds.width / (endTime - startTime);
 
 		// Make ruler background white
@@ -172,5 +190,4 @@ public class RulerPaintListener implements PaintListener {
 		}
 		font.dispose();
 	}
-
 }

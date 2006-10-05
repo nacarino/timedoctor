@@ -85,9 +85,14 @@ public class SectionViewer {
 	 * @param model
 	 *            the model containing data for the whole trace
 	 */
-	public SectionViewer(final Composite leftPane, final Composite rightPane,
-			final SectionViewer topSection, final boolean lastSection,
-			final Section section, final ZoomModel zoomData, final TraceModel model) {
+	public SectionViewer(final Composite leftPane, 
+			final Composite rightPane,
+			final SectionViewer topSection, 
+			final boolean lastSection,
+			final Section section, 
+			final ZoomModel zoomData, 
+			final TraceModel model, 
+			TraceCursorListener traceCursorListener) {
 		this.top = topSection;
 		this.last = lastSection;
 		this.section = section;
@@ -97,7 +102,7 @@ public class SectionViewer {
 		createTraceView(rightPane);
 
 		createTraceLines(sectionLabel.getContent(), sectionTrace.getContent(),
-				model);
+				model, traceCursorListener);
 
 		sectionTrace.addSashClient(sectionLabel);
 		sectionLabel.addExpandClient(sectionTrace);
@@ -184,12 +189,14 @@ public class SectionViewer {
 	 *            the model containing data on the whole trace
 	 */
 	private void createTraceLines(final Composite labels,
-			final Composite traces, final TraceModel model) {
+			final Composite traces, 
+			final TraceModel model, 
+			TraceCursorListener traceCursorListener) {
 		TraceLineViewer traceLine = null;
 		for (SampleLine line : section.getLines()) {				
 			if (line.getCount() > 1) {
                 traceLine = new TraceLineViewer(traceLine, labels, traces,
-                        line, zoomData, model);
+                        line, zoomData, model, traceCursorListener);
             }
 		}
 	}
