@@ -58,6 +58,11 @@ public class ZoomModel extends Observable {
     private int stackCount = 0;
 
     /**
+     * Time set by the baseline cursor
+     */
+    private double selectTime = -1;
+    
+    /**
      * Sets the zoom and updates all observers with the new value.
      *
      * @param time
@@ -81,6 +86,14 @@ public class ZoomModel extends Observable {
         notifyObservers();
     }
 
+    public final void setSelectTime(final double time) {
+    	selectTime = time;
+    }
+
+    public final double getSelectTime() {
+    	return selectTime;
+    }
+    
     /**
      * Sets the start and end times of the visible portion of the trace, and
      * updates all observers.
