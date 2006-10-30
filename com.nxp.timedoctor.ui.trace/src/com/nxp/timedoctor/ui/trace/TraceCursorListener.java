@@ -68,13 +68,13 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	}
 
 	public void mouseDown(MouseEvent e) {
-	}
-
-	public void mouseUp(MouseEvent e) {
 		baseLine.setCursor(e.x);
 		baseLine.setVisible(true);
 		
 		// Baseline time is stored to be used in zoom actions, etc.
 		zoom.setSelectTime(baseLine.getTime());
+	}
+
+	public void mouseUp(MouseEvent e) {
 	}
 }
