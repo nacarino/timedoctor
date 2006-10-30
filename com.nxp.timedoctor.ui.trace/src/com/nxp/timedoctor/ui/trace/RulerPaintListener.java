@@ -14,7 +14,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
@@ -74,34 +73,17 @@ public class RulerPaintListener implements PaintListener {
 	/**
 	 * ZoomModel instance containing zoom and scroll information.
 	 */
-	private ZoomModel data;
-	
-	/**
-	 * Canvas created by setting the ruler as the parent.
-	 */
-
-	private static Canvas rulerCanvas;
-	
-	/**
-	 * Previous x-position used in drawing the time in ruler.
-	 */
-	private static int prevXposition = 0;
+	private ZoomModel zoomModel;
 
 	/**
-	 * which holds the previous time value.
-	 */
-	private static String prevTime = "0s";
-
-
-	/**
-	 * Constructs a new <code>RulerPaintListener</code> with zoom/scroll data
+	 * Constructs a new <code>RulerPaintListener</code> with zoom/scroll zoomModel
 	 * automatically updated by the <code>ZoomModel</code> instance.
 	 * 
-	 * @param zoomData
-	 *            <code>Observable</code> to update zoom/scroll data
+	 * @param zoomModel
+	 *            <code>Observable</code> to update zoom/scroll zoomModel
 	 */
-	public RulerPaintListener(final ZoomModel zoomData) {
-		this.data = zoomData;
+	public RulerPaintListener(final ZoomModel zoomModel) {
+		this.zoomModel = zoomModel;
 	}
 
 	/**
@@ -114,14 +96,13 @@ public class RulerPaintListener implements PaintListener {
 
 		double startTime = 0;
 		double endTime = DEFAULT_END_TIME;
-		if (data.getStartTime() != data.getEndTime()) {
-			startTime = data.getStartTime();
-			endTime = data.getEndTime();
+		if (zoomModel.getStartTime() != zoomModel.getEndTime()) {
+			startTime = zoomModel.getStartTime();
+			endTime = zoomModel.getEndTime();
 		}
 
 		Rectangle bounds = ((Canvas) e.widget).getClientArea();
-		rulerCanvas = (Canvas) e.widget;
-		double zoom = bounds.width / (endTime - startTime);
+		double pixelsPerTime = bounds.width / (endTime - startTime);
 
 		// Make ruler background white
 		e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
@@ -134,11 +115,11 @@ public class RulerPaintListener implements PaintListener {
 
 		Font font = new Font(e.display, "Arial", FONT_SIZE, SWT.NORMAL);
 
-		double drawStartTime = startTime + (e.x / zoom);
-		double drawEndTime = drawStartTime + (e.width / zoom);
+		double drawStartTime = startTime + (e.x / pixelsPerTime);
+		double drawEndTime = drawStartTime + (e.width / pixelsPerTime);
 
 		double interval = INITIAL_INTERVAL;
-		double width = INITIAL_INTERVAL * zoom;
+		double width = INITIAL_INTERVAL * pixelsPerTime;
 		int count = DEFAULT_TICKS_PER_UNIT;
 		
 		// these numbers seem clear enough to leave here
@@ -159,12 +140,14 @@ public class RulerPaintListener implements PaintListener {
 		double accuracy = interval;
 		interval /= count;
 
+		zoomModel.setTimeDisplayAccuracy(accuracy);
+
 		double time = accuracy * Math.floor(drawStartTime / accuracy);
 		int pos;
 		String s;
 
 		while (true) {
-			pos = (int) ((time - startTime) * zoom);
+			pos = (int) ((time - startTime) * pixelsPerTime);
 			e.gc.drawLine(pos, bounds.height - VERTICAL_PADDING, pos,
 					bounds.height - VERTICAL_PADDING - MAIN_TICK_HEIGHT);
 			s = Times.timeToString(time, accuracy);
@@ -182,7 +165,7 @@ public class RulerPaintListener implements PaintListener {
 				break;
 			}
 			for (int i = 0; i < count - 1; i++) {
-				pos = (int) ((time - startTime) * zoom);
+				pos = (int) ((time - startTime) * pixelsPerTime);
 				e.gc.drawLine(pos, bounds.height - VERTICAL_PADDING, pos,
 						bounds.height - VERTICAL_PADDING - TICK_HEIGHT);
 				time += interval;
