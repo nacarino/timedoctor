@@ -203,9 +203,18 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		traceCursorFactory.setTracePane(rightContent);
 		TimeLine traceCursor = traceCursorFactory.createTraceCursor(CursorType.CURSOR);
 		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
+		
+		//Create listeners and add it to TraceListeners
 		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoom);
-				
-		createTraceLines(leftPane, rightContent, traceCursorListener);
+		TraceZoomListener traceZoomListener = new TraceZoomListener(zoom);
+		TraceToolTipListener traceToolTipListener = new TraceToolTipListener(zoom);
+		
+		TraceListeners listeners = new TraceListeners();
+		listeners.addListener(traceCursorListener);
+		listeners.addListener(traceZoomListener);
+		listeners.addListener(traceToolTipListener);
+		
+		createTraceLines(leftPane, rightContent, listeners);
 
 		initializeScrollbars();		
 	}
@@ -222,7 +231,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 */
 	private void createTraceLines(final Composite left,
 			final Composite right,
-			final TraceCursorListener traceCursorListener) {
+			final TraceListeners listeners) {
 		// Checkstyle incompatible with J2SE5 type parameterization
 		Collection < Section > sections = model.getSections().values();
 		SectionViewer lastSection = null;
@@ -233,7 +242,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 				if (s.getType() != LineType.PORTS) {
 					boolean last = (i == (sections.size() - 1));
 					SectionViewer section = new SectionViewer(left, right,
-							lastSection, last, s, zoom, model, traceCursorListener);
+							lastSection, last, s, zoom, model, listeners);
 					LineType type = s.getType();
 					section.setHeaderText(type.toString());
 					section.setHeaderColor(new Color(getDisplay(), COLORS[type
