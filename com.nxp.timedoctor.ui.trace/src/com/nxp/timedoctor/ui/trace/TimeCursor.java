@@ -31,7 +31,7 @@ public class TimeCursor extends TimeLine {
 	}
 	
 	protected void setTimeLabel(final double time) {
-		double accuracy = 100; // TODO read from zoom model, updated by ruler call
+		double accuracy = zoom.getTimeDisplayAccuracy();
 		String timeString = Times.timeToString(time, accuracy);
 		
 		// If zoom select time (from baseline) is set,
