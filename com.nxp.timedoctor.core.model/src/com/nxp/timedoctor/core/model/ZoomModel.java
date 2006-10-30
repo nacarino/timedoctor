@@ -61,6 +61,12 @@ public class ZoomModel extends Observable {
      * Time set by the baseline cursor
      */
     private double selectTime = -1;
+
+    /**
+	 * Accuracy of the time to be displayed.
+	 */
+	private double timeDisplayAccuracy = 0.0;
+
     
     /**
      * Sets the zoom and updates all observers with the new value.
@@ -69,7 +75,7 @@ public class ZoomModel extends Observable {
      *            the new start time
      */
     public final void setStartTime(final double time) {
-        startTime = time;
+        this.startTime = time;
         setChanged();
         notifyObservers();
     }
@@ -81,13 +87,13 @@ public class ZoomModel extends Observable {
      *            the new offset value
      */
     public final void setEndTime(final double time) {
-        endTime = time;
+        this.endTime = time;
         setChanged();
         notifyObservers();
     }
 
     public final void setSelectTime(final double time) {
-    	selectTime = time;
+    	this.selectTime = time;
     }
 
     public final double getSelectTime() {
@@ -105,8 +111,8 @@ public class ZoomModel extends Observable {
      */
     // MR improve name (what times?)
     public final void setTimes(final double start, final double end) {
-        startTime = start;
-        endTime = end;
+        this.startTime = start;
+        this.endTime = end;
         setChanged();
         notifyObservers();
     }
@@ -167,4 +173,23 @@ public class ZoomModel extends Observable {
         zoom[1] = endStack[stackCount];
         return zoom;
     }
+    
+    /**
+	 * Sets the accuracy value of the ruler
+	 * 
+	 * @param accuracy
+	 *            the new accuracy value
+	 */
+	public final void setTimeDisplayAccuracy(double accuracy) {
+		this.timeDisplayAccuracy = accuracy;
+	}
+	
+	/**
+	 * Returns the current accuracy value
+	 * 
+	 * @return the accuracy value
+	 */
+	public final double getTimeDisplayAccuracy() {
+		return timeDisplayAccuracy;
+	}
 }
