@@ -192,4 +192,29 @@ public class ZoomModel extends Observable {
 	public final double getTimeDisplayAccuracy() {
 		return timeDisplayAccuracy;
 	}
+
+	/**
+	 * Returns the current ZoomFactor
+	 * 
+	 * @param width
+	 *            The width of the widget
+	 * @return The zoom-factor
+	 */
+	public double getZoomFactor(final int width) {
+		double timeRange = endTime - startTime;
+		return width / timeRange;
+	}
+
+	/**
+	 * Returns the time for the given width and position x
+	 * 
+	 * @param x
+	 *            The x-position of the cursor
+	 * @param width
+	 *            The width of the widget
+	 * @return The time at position x
+	 */
+	public double getTimeAtPosition(final int x, final int width) {
+		return startTime + (x / getZoomFactor(width));
+	}
 }
