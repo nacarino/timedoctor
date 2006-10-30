@@ -228,6 +228,8 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 *            the left (label) composite
 	 * @param right
 	 *            the right (canvas) composite
+	 * @param listeners
+	 * 			  collection of (mouse) listeners for the trace lines
 	 */
 	private void createTraceLines(final Composite left,
 			final Composite right,
