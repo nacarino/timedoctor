@@ -25,29 +25,23 @@ import com.nxp.timedoctor.ui.trace.Colors;
 public class QueueCanvas extends TraceCanvas {
 	
 	/**
-	 * The line of trace samples.
-	 */
-	private final SampleLine line;
-
-	/**
 	 * Constructs a new QueueCanvas in the given composite. QueueCanvases
 	 * automatically use style <code>SWT.DOUBLE_BUFFERED</code> to smooth
 	 * redrawing.
 	 * 
 	 * @param parent
 	 *            the parent composite
-	 * @param sampleLine
+	 * @param line
 	 *            the line of samples to draw
 	 * @param data
 	 *            model part containing zoom and scroll data
 	 * @param model
 	 *            model containing all trace information
 	 */
-	public QueueCanvas(final Composite parent, final SampleLine sampleLine,
+	public QueueCanvas(final Composite parent, final SampleLine line,
 			final ZoomModel data, final TraceModel model) {
 		super(parent, data);
-		this.line = sampleLine;
-
+		
 		addPaintListener(new QueuePaintListener(new Color(getDisplay(),
 				Colors.DARK_RED), new Color(getDisplay(), Colors.MISTY_ROSE),
 				line, data, model));

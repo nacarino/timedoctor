@@ -8,7 +8,6 @@
  * Contributors:
  *     Royal Philips Electronics NV. - initial API and implementation
  *******************************************************************************/
-
 package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.swt.SWT;
@@ -105,14 +104,12 @@ public class TraceLineViewer {
 	 *            the observable model part containing zoom/scroll data
 	 * @param model
 	 *            model containing data on the whole trace
-	 * @param listeners
-	 * 			  collection of (mouse) listeners for the trace lines
 	 */
 	public TraceLineViewer(final TraceLineViewer topLine,
 			final Composite sectionLabel, final Composite sectionTrace,
 			final SampleLine sampleLine, final ZoomModel zoomData,
-			final TraceModel model, 
-			final TraceListeners listeners) {
+			final TraceModel model, TraceCursorListener traceCursorListener) {
+
 		this.line = sampleLine;
 		this.zoom = zoomData;
 		this.model = model;
@@ -141,7 +138,7 @@ public class TraceLineViewer {
 		bottomSeparator = createSeparator(sectionLabel);
 		label.setData("bottom", bottomSeparator);
 
-		createTrace(sectionTrace, listeners);
+		createTrace(sectionTrace, traceCursorListener);
 	}
 
 	/**
@@ -228,11 +225,9 @@ public class TraceLineViewer {
 	 * 
 	 * @param sectionTrace
 	 *            the traces composite
-	 * @param listeners
-	 *            collectio of (mouse) listeners for the trace line
 	 */
-	private void createTrace(final Composite sectionTrace,
-			final TraceListeners listeners) {
+	private void createTrace(final Composite sectionTrace, 
+			TraceCursorListener traceCursorListener) {
 		// Add padding on top to ensure alignment of traces and labels
 		if (sectionTrace.getChildren().length == 0) {
 			Label topPadding = new Label(sectionTrace, SWT.NONE);
@@ -276,16 +271,12 @@ public class TraceLineViewer {
 		// }
 
 		trace.addMouseListener(selectListener);
-		TraceCursorListener traceCursorListener = (TraceCursorListener)listeners.getListener(TraceCursorListener.class);
-		TraceZoomListener traceZoomListener = (TraceZoomListener)listeners.getListener(TraceZoomListener.class);
-		TraceToolTipListener traceToolTipListener = (TraceToolTipListener)listeners.getListener(TraceToolTipListener.class);
-		
 		trace.addMouseMoveListener(traceCursorListener);
 		trace.addMouseTrackListener(traceCursorListener);	
 		trace.addMouseListener(traceCursorListener);
-		trace.addMouseListener(traceZoomListener);
-		trace.addMouseTrackListener(traceToolTipListener);
-
+		trace.addMouseListener(new TraceZoomListener(zoom));
+		//trace.addMouseTrackListener(new TraceToolTipListener(line, zoom));
+		
 		// Used for drag & drop
 		label.setData("trace", trace);
 		bottomSeparator.setData("trace", trace);

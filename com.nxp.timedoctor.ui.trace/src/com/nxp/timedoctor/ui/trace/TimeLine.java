@@ -14,6 +14,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -79,6 +81,17 @@ public class TimeLine implements Observer {
 		cursorSash.setLayoutData(cursorSashData);
 		
 		cursorSash.setVisible(false);
+		
+		// Handle window resize and maximize events
+		// (Only one needed, either in ruler or trace area)
+		parent.addControlListener(new ControlListener(){
+			public void controlMoved(ControlEvent e) {
+			}
+
+			public void controlResized(ControlEvent e) {
+				updatePositionAndLabel();
+			}
+		});
 	}
 	
 	private void createTraceContents(final Composite parent, final int color)
@@ -118,7 +131,7 @@ public class TimeLine implements Observer {
 	public void setCursor(final int x) {
 		int width = cursorLabel.getParent().getBounds().width;
 		setPosition(x, width);
-		cursorTime = getTime(x, width);
+		cursorTime = zoom.getTimeAtPosition(x, width);
 		setTimeLabel(cursorTime);
 	}
 
@@ -149,8 +162,7 @@ public class TimeLine implements Observer {
 	}
 	
 	protected void setTimeLabel(final double time) {
-		double accuracy = 100; // TODO read from zoom model, updated by ruler call
-		String timeString = Times.timeToString(time, accuracy);
+		String timeString = Times.timeToString(time, zoom.getTimeDisplayAccuracy());
 		
 		cursorLabel.setText(timeString);
 		cursorLabel.setToolTipText(timeString);
@@ -169,7 +181,10 @@ public class TimeLine implements Observer {
 	 *            has no effect
 	 */
 	public final void update(final Observable o, final Object data) {
+		updatePositionAndLabel();
+	}
 
+	private void updatePositionAndLabel() {
 		double startTime = zoom.getStartTime();
 		double endTime = zoom.getEndTime();
 		double timeRange = endTime - startTime;
@@ -178,13 +193,5 @@ public class TimeLine implements Observer {
 		
 		setPosition(x, width);
 		setTimeLabel(cursorTime);
-	}
-	
-	private double getTime(final int x, final int width) {
-		double startTime = zoom.getStartTime();
-		double endTime = zoom.getEndTime();
-		double timeRange = endTime - startTime;
-		double time = startTime + (x * timeRange/width);
-		return time;
 	}
 }

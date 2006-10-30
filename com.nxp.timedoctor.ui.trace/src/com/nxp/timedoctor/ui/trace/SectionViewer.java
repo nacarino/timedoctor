@@ -84,8 +84,6 @@ public class SectionViewer {
 	 *            <code>Observable</code> containing current zoom/scroll data
 	 * @param model
 	 *            the model containing data for the whole trace
-	 * @param listeners
-	 * 			  collection of (mouse) listeners for the trace lines
 	 */
 	public SectionViewer(final Composite leftPane, 
 			final Composite rightPane,
@@ -94,7 +92,7 @@ public class SectionViewer {
 			final Section section, 
 			final ZoomModel zoomData, 
 			final TraceModel model, 
-			TraceListeners listeners) {
+			TraceCursorListener traceCursorListener) {
 		this.top = topSection;
 		this.last = lastSection;
 		this.section = section;
@@ -104,7 +102,7 @@ public class SectionViewer {
 		createTraceView(rightPane);
 
 		createTraceLines(sectionLabel.getContent(), sectionTrace.getContent(),
-				model, listeners);
+				model, traceCursorListener);
 
 		sectionTrace.addSashClient(sectionLabel);
 		sectionLabel.addExpandClient(sectionTrace);
@@ -138,7 +136,7 @@ public class SectionViewer {
 	 *            section true if this is the last section, false otherwise
 	 */
 	public final void setLast(final boolean lastSection) {
-		this.last = lastSection;
+		last = lastSection;
 	}
 
 	/**
@@ -149,6 +147,7 @@ public class SectionViewer {
 	 *            the left pane of the window
 	 */
 	private void createLabelView(final Composite parent) {
+
 		sectionLabel = new SectionLabelViewer(parent);
 
 		FormData data = new FormData();
@@ -188,18 +187,16 @@ public class SectionViewer {
 	 *            the trace view to populate
 	 * @param model
 	 *            the model containing data on the whole trace
-	 * @param listeners
-	 * 			  collection of (mouse) listeners for the trace lines
 	 */
 	private void createTraceLines(final Composite labels,
 			final Composite traces, 
 			final TraceModel model, 
-			TraceListeners listeners) {
+			TraceCursorListener traceCursorListener) {
 		TraceLineViewer traceLine = null;
 		for (SampleLine line : section.getLines()) {				
 			if (line.getCount() > 1) {
                 traceLine = new TraceLineViewer(traceLine, labels, traces,
-                        line, zoomData, model, listeners);
+                        line, zoomData, model, traceCursorListener);
             }
 		}
 	}
