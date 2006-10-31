@@ -56,6 +56,11 @@ public class TimeLine implements Observer {
 		createTraceContents(tracePane, color);
 	}
 
+	// Ensure that zoom does not call a deleted observer
+	public void dispose() {
+		zoom.deleteObserver(this);		
+	}
+	
 	private void createRulerContents(final Composite parent, 
 			final int color, 
 			final int offset) {
