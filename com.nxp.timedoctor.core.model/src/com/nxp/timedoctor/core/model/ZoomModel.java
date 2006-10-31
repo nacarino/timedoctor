@@ -111,10 +111,12 @@ public class ZoomModel extends Observable {
      */
     // MR improve name (what times?)
     public final void setTimes(final double start, final double end) {
-        this.startTime = start;
-        this.endTime = end;
-        setChanged();
-        notifyObservers();
+    	if (start != end) {
+    		this.startTime = start;
+    		this.endTime = end;
+    		setChanged();
+    		notifyObservers();
+    	}
     }
 
     /**
@@ -164,9 +166,11 @@ public class ZoomModel extends Observable {
      * @return an array representing the top zoom
      */
     public final double[] popZoom() {
-        if (stackCount > 0) {
-            stackCount--;
-        }
+    	if ( stackCount == 0 ) {
+    		return null;
+    	}
+        
+        stackCount--;
 
         double[] zoom = new double[2];
         zoom[0] = startStack[stackCount];
