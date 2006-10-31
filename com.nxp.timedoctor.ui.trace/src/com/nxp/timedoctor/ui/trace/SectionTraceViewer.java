@@ -174,7 +174,6 @@ public class SectionTraceViewer implements IExpandClient {
 		updateVerticalScrollBar();
 
 		updateLeftScroll();
-
 	}
 
 	/**
@@ -217,8 +216,8 @@ public class SectionTraceViewer implements IExpandClient {
 			bottomComp.setLayoutData(data);
 		}
 		sash.setEnabled(true);
-		sashListener = new SashSyncListener(sectionTrace, SWT.HORIZONTAL, true);
-		sashListener.addClient(new ISashClient() {
+
+		ISashClient client = new ISashClient() {
 			public int getMinSashOffset() {
 				return sectionTrace.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 			}
@@ -231,7 +230,12 @@ public class SectionTraceViewer implements IExpandClient {
 				updateVerticalScrollBar();
 				updateLeftScroll();
 			}
-		});
+
+			public void update() {	
+			}
+		};
+		sashListener = new SashSyncListener(client, sectionTrace, SWT.HORIZONTAL, true);
+
 		sash.addSelectionListener(sashListener);
 		sash.addMouseListener(sashListener);
 	}

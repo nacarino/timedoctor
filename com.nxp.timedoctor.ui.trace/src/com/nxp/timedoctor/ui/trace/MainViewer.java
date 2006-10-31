@@ -165,10 +165,9 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
 		mainSash.setLayoutData(data);
 
-		sashListener = new SashSyncListener(null, SWT.VERTICAL, false);
+		sashListener = new SashSyncListener(this, null, SWT.VERTICAL, false);
 		mainSash.addSelectionListener(sashListener);
 		mainSash.addMouseListener(sashListener);
-		sashListener.addClient(this);
 
 		Composite rightPane = new Composite(this, SWT.NONE);
 		data = new FormData();
@@ -354,8 +353,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 */
 	public final void setSashOffset(final int offset) {
 		((FormData) leftPane.getLayoutData()).width = offset;
-		layout();
-		update();
+		layout(true);
 	}
 
 	/**

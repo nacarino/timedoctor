@@ -48,6 +48,8 @@ public class SashSyncListener implements SelectionListener, MouseListener {
 	 */
 	private boolean constrained;
 
+	private ISashClient thisClient;
+	
 	/**
 	 * Constructs a SashSyncListener with the given properties.
 	 * 
@@ -58,14 +60,16 @@ public class SashSyncListener implements SelectionListener, MouseListener {
 	 * @param hasMinOffset
 	 *            whether or not it has a minumum offset
 	 */
-	public SashSyncListener(final Control refControl, final int sashStyle,
+	public SashSyncListener(final ISashClient client, final Control refControl, final int sashStyle,
 			final boolean hasMinOffset) {
-		reference = refControl;
-		style = sashStyle;
-		constrained = hasMinOffset;
+		this.reference = refControl;
+		this.style = sashStyle;
+		this.constrained = hasMinOffset;
+		this.thisClient = client;
 
 		// Checkstyle incompatible with J2SE5 type parameterization.
 		clients = new ArrayList < ISashClient > ();
+		addClient(client);
 	}
 
 	/**
@@ -76,7 +80,9 @@ public class SashSyncListener implements SelectionListener, MouseListener {
 	 */
 	public final void addClient(final ISashClient client) {
 		clients.add(client);
-		setSashOffset(getMinSashOffset());
+		if (client != reference) {
+			setSashOffset(getMinSashOffset());
+		}
 	}
 
 	/**
@@ -162,13 +168,20 @@ public class SashSyncListener implements SelectionListener, MouseListener {
 	 *            the new offset in pixels
 	 */
 	private void setSashOffset(final int offset) {
-
-		// if (offset != currentOffset) { // only update if needed to avoid
-		// flickering sash when it cannot move
+		// First relayout all clients
 		for (int i = 0; i < clients.size(); i++) {
 			clients.get(i).setSashOffset(offset);
 		}
-		// }
+		// Then notify them that their drawing needs to be updated
+		// This ensures that all parts are redrawn at the same time
+		for (int i = 0; i < clients.size(); i++) {
+			ISashClient client = clients.get(i);
+			// The client that called for the update is updated automatically
+			// Avoid a superfluous update() call.
+			if (client != thisClient) {
+				client.update();
+			}
+		}
 	}
 
 	/**

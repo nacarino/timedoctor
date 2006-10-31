@@ -26,4 +26,6 @@ public interface ISashClient {
 	 * @param offset the new offset value
 	 */
 	void setSashOffset(int offset);
+	
+	void update();
 }

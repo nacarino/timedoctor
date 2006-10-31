@@ -103,10 +103,9 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
 		headerSash.setLayoutData(data);
 
-		sashListener = new SashSyncListener(null, SWT.VERTICAL, false);
+		sashListener = new SashSyncListener(this, null, SWT.VERTICAL, false);
 		headerSash.addSelectionListener(sashListener);
 		headerSash.addMouseListener(sashListener);
-		sashListener.addClient(this);
 
 		// Ruler pane
 		Composite rulerPane = new Composite(this, SWT.NONE);
@@ -166,8 +165,7 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 */
 	public final void setSashOffset(final int offset) {
 		((FormData) logo.getLayoutData()).width = offset;
-		this.layout();
-		this.update();
+		layout(true);
 	}
 
 	/**
