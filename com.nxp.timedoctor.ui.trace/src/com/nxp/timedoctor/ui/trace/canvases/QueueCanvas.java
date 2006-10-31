@@ -17,6 +17,7 @@ import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
+import com.nxp.timedoctor.ui.trace.descriptions.QueueSampleInfo;
 
 /**
  * Canvas that adds to itself a paint listener to correctly handle the drawing
@@ -33,17 +34,19 @@ public class QueueCanvas extends TraceCanvas {
 	 *            the parent composite
 	 * @param line
 	 *            the line of samples to draw
-	 * @param data
+	 * @param zoom
 	 *            model part containing zoom and scroll data
 	 * @param model
 	 *            model containing all trace information
 	 */
-	public QueueCanvas(final Composite parent, final SampleLine line,
-			final ZoomModel data, final TraceModel model) {
-		super(parent, data);
+	public QueueCanvas(final Composite parent, 
+			final SampleLine line,
+			final ZoomModel zoom, 
+			final TraceModel model) {
+		super(parent, zoom, new QueueSampleInfo(line));
 		
 		addPaintListener(new QueuePaintListener(new Color(getDisplay(),
 				Colors.DARK_RED), new Color(getDisplay(), Colors.MISTY_ROSE),
-				line, data, model));
+				line, zoom, model));
 	}
 }

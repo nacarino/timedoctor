@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
+import com.nxp.timedoctor.ui.trace.descriptions.CycleSampleInfo;
 
 /**
  * Canvas for graphical display of <code>SampleLine</code>s of type
@@ -39,18 +40,19 @@ public class CyclesCanvas extends TraceCanvas {
 	 * @param line
 	 *            the line of type <code>CYCLES</code> containing the data to
 	 *            be displayed
-	 * @param data
+	 * @param zoom
 	 *            model part containing zoom/scroll data
 	 */
-	public CyclesCanvas(final Composite parent, final SampleLine line,
-			final ZoomModel data) {
-		super(parent, data);
+	public CyclesCanvas(final Composite parent, 
+			final SampleLine line,
+			final ZoomModel zoom) {
+		super(parent, zoom, new CycleSampleInfo(line, zoom));
 
 		setSize(computeSize(SWT.DEFAULT, INITIAL_HEIGHT));
 
 		addPaintListener(new CounterPaintListener(new Color(getDisplay(),
 				Colors.DARK_CYAN), new Color(getDisplay(), Colors.LIGHT_CYAN),
-				line, data));
+				line, zoom));
 	}
 
 }

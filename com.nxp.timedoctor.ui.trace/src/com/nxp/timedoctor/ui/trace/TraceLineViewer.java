@@ -275,7 +275,7 @@ public class TraceLineViewer {
 		trace.addMouseTrackListener(traceCursorListener);	
 		trace.addMouseListener(traceCursorListener);
 		trace.addMouseListener(new TraceZoomListener(zoom));
-		//trace.addMouseTrackListener(new TraceToolTipListener(line, zoom));
+		trace.addMouseMoveListener(new TraceToolTipListener(line, zoom));
 		
 		// Used for drag & drop
 		label.setData("trace", trace);

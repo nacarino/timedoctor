@@ -21,6 +21,7 @@ import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
+import com.nxp.timedoctor.ui.trace.descriptions.SampleInfo;
 
 /**
  * Abstract parent class for trace canvases. Contains a factory method to return
@@ -29,7 +30,9 @@ import com.nxp.timedoctor.core.model.SampleLine.LineType;
  * style <code>SWT.DOUBLE_BUFFERED</code>
  */
 public abstract class TraceCanvas extends Canvas implements Observer {
-
+	
+	private SampleInfo sampleInfo;
+	
 	/**
 	 * Constructs a new double-buffered canvas, and adds this
 	 * <code>TraceCanvas</code> to <code>data</code>.
@@ -39,9 +42,13 @@ public abstract class TraceCanvas extends Canvas implements Observer {
 	 * @param data
 	 *            <code>Observable</code> containing all zoom and scroll data
 	 */
-	public TraceCanvas(final Composite parent, final ZoomModel data) {
+	protected TraceCanvas(final Composite parent, 
+			final ZoomModel zoom,
+			final SampleInfo sampleInfo) {
 		super(parent, SWT.DOUBLE_BUFFERED);
-		data.addObserver(this);
+		
+		this.sampleInfo = sampleInfo;
+		zoom.addObserver(this);		
 	}
 
 	/**
@@ -105,4 +112,11 @@ public abstract class TraceCanvas extends Canvas implements Observer {
 		update();
 	}
 
+	public void showSampleInfo(int sampleIndex) {
+		if (sampleIndex >= 0) {
+			setToolTipText(sampleInfo.getInfoStr(sampleIndex));
+		} else {
+			setToolTipText(null);
+		}
+	}
 }

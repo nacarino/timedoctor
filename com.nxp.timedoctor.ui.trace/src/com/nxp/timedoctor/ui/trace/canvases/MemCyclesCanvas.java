@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
+import com.nxp.timedoctor.ui.trace.descriptions.CycleSampleInfo;
 
 /**
  * Canvas to draw lines of type <code>MEM_CYCLES</code>.
@@ -29,15 +30,17 @@ public class MemCyclesCanvas extends TraceCanvas {
 	 *            the parent composite
 	 * @param line
 	 *            <code>SampleLine</code> to draw
-	 * @param data
+	 * @param zoom
 	 *            <code>ZoomModel</code> containing all zoom and scroll data
 	 */
-	public MemCyclesCanvas(final Composite parent, final SampleLine line,
-			final ZoomModel data) {
-		super(parent, data);
+	public MemCyclesCanvas(final Composite parent, 
+			final SampleLine line,
+			final ZoomModel zoom) {
+		super(parent, zoom, new CycleSampleInfo(line, zoom));
+		
 		addPaintListener(new CounterPaintListener(new Color(getDisplay(),
 				Colors.DARK_CYAN), new Color(getDisplay(), Colors.LIGHT_CYAN),
-				line, data));
+				line, zoom));
 	}
 
 }

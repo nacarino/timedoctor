@@ -10,13 +10,14 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Composite;
+
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
-
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Composite;
+import com.nxp.timedoctor.ui.trace.descriptions.TaskSampleInfo;
 
 /**
  * Canvas for drawing ISRs.
@@ -30,18 +31,20 @@ public class IsrCanvas extends TraceCanvas {
 	 *            the parent composite
 	 * @param line
 	 *            <code>SampleLine</code> to be drawn
-	 * @param data
+	 * @param zoom
 	 *            <code>ZoomModel</code> containing all zoom and scroll
 	 *            information
 	 * @param model
 	 *            model containing information on the full trace
 	 */
-	public IsrCanvas(final Composite parent, final SampleLine line,
-			final ZoomModel data, final TraceModel model) {
-		super(parent, data);
+	public IsrCanvas(final Composite parent, 
+			final SampleLine line,
+			final ZoomModel zoom,
+			final TraceModel model) {
+		super(parent, zoom, new TaskSampleInfo(line));
 
 		addPaintListener(new TaskPaintListener(new Color(getDisplay(),
-				Colors.DARK_GREEN), line, data, model));
+				Colors.DARK_GREEN), line, zoom, model));
 	}
 
 }

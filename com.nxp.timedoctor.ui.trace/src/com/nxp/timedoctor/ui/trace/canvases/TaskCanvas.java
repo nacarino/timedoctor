@@ -17,6 +17,7 @@ import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
+import com.nxp.timedoctor.ui.trace.descriptions.TaskSampleInfo;
 
 /**
  * Canvas to draw tasks.
@@ -32,16 +33,18 @@ public class TaskCanvas extends TraceCanvas {
 	 *            the parent composite
 	 * @param line
 	 *            the line of samples to draw
-	 * @param data
+	 * @param zoom
 	 *            contains zoom and scroll data
 	 * @param model
 	 *            contains all trace data
 	 */
-	public TaskCanvas(final Composite parent, final SampleLine line,
-			final ZoomModel data, final TraceModel model) {
-		super(parent, data);
+	public TaskCanvas(final Composite parent, 
+			final SampleLine line,
+			final ZoomModel zoom, 
+			final TraceModel model) {
+		super(parent, zoom, new TaskSampleInfo(line));
 		
 		addPaintListener(new TaskPaintListener(new Color(getDisplay(),
-				Colors.DARK_BLUE), line, data, model));
+				Colors.DARK_BLUE), line, zoom, model));
 	}
 }

@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Composite;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
+import com.nxp.timedoctor.ui.trace.descriptions.NoteSampleInfo;
 
 /**
  * Canvas to draw sample lines of type <code>NOTE</code>.
@@ -29,14 +30,15 @@ public class NoteCanvas extends TraceCanvas {
 	 *            the parent composite
 	 * @param line
 	 *            <code>SampleLine</code> to be drawn
-	 * @param data
+	 * @param zoom
 	 *            <code>ZoomModel</code> containing zoom and scroll data
 	 */
-	public NoteCanvas(final Composite parent, final SampleLine line,
-			final ZoomModel data) {
-		super(parent, data);
+	public NoteCanvas(final Composite parent, 
+			final SampleLine line,
+			final ZoomModel zoom) {
+		super(parent, zoom, new NoteSampleInfo(line));
 		addPaintListener(new NotePaintListener(new Color(getDisplay(),
-				Colors.DARK_GOLDENROD), line, data));
+				Colors.DARK_GOLDENROD), line, zoom));
 		
 	}
 
