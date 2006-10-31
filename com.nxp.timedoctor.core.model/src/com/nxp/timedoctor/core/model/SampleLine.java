@@ -584,8 +584,10 @@ public abstract class SampleLine {
 			pivot = (low + high) >> 1;
 			if (samples[pivot].time < time) {
 				low = pivot;
-			} else if (samples[pivot].time >= time) {
+			} else if (samples[pivot].time > time) {
 				high = pivot;
+			} else {
+				return pivot;
 			}
 		}
 		return low;
