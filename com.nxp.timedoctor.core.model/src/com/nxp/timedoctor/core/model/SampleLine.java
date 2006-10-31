@@ -538,22 +538,31 @@ public abstract class SampleLine {
 		/*
 		 * Create description string
 		 */
+		String modelDescString;
 		String s = "";
+
 		for (; low < descCount && descriptions[low].time == time; low++) {
+			s += "\n";
+			
+			modelDescString = model.findDescrName(descriptions[low].id);
+			if (modelDescString == null) {
+				s += "String (" + descriptions[low].id + ")";
+			} else {
+				s += modelDescString;
+			}
+
 			switch (descriptions[low].type) {
 			case STRING:
-				s += "\n" + model.findDescrName(descriptions[low].id) + "= "
-						+ descriptions[low].text;
+				s += " = " + descriptions[low].text;
 				break;
 			case NUMBER:
-				s += "\n" + model.findDescrName(descriptions[low].id) + "= "
-						+ descriptions[low].value;
+				s += " = " + (int) descriptions[low].value;
 				break;
 			case CYCLES:
-				s += "\n" + model.findDescrName(descriptions[low].id) + "= "
-						+ Times.timeToString(descriptions[low].value);
+				s += " = " + Times.timeToString(descriptions[low].value);
+				break;				
 			default:
-				s = null;
+				s = "";
 			}
 		}
 		return s;
@@ -600,7 +609,7 @@ public abstract class SampleLine {
 	 */
 	// MR add description of what the function does/is used for
 	public final double[] getCounterDifference(final double from,
-			final double to, final double time, final double value) {
+			final double to) {
 		double[] result = new double[2];
 		int ff = binarySearch(from);
 		int tt = binarySearch(to);
