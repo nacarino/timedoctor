@@ -41,7 +41,9 @@ public class TimeMarker extends TimeLine {
 	/**
 	 * Dispose method, needed to get rid of markers upon double click
 	 */
-	private void dispose() {
+	public void dispose() {
+		super.dispose();
+		
 		cursorSash.dispose();
 		cursorLabel.dispose();
 		cursorLine.dispose();
