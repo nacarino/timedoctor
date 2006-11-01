@@ -14,7 +14,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Composite;
@@ -29,14 +28,10 @@ import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.parser.Parser;
 import com.nxp.timedoctor.ui.trace.TraceViewer;
-import com.nxp.timedoctor.ui.trace.actions.ZoomBackAction;
-import com.nxp.timedoctor.ui.trace.actions.ZoomFitAction;
-import com.nxp.timedoctor.ui.trace.actions.ZoomInAction;
-import com.nxp.timedoctor.ui.trace.actions.ZoomOutAction;
 
 /**
  * The main editor for TimeDoctor. Created upon open of a .tdi file, calls a parser on
- * the file and creates a model, then creates and populates all subelements
+ * the file and creates a traceModel, then creates and populates all subelements
  * necessary to display and manipulate the data.
  */
 public class TraceEditor extends EditorPart {
@@ -46,15 +41,15 @@ public class TraceEditor extends EditorPart {
 	/**
 	 * The view that holds all actual GUI elements.
 	 */
-	private TraceViewer traceView;
+	private TraceViewer traceViewer;
 
 	/**
-	 * The model in which to store data during parsing, and retrieve during
+	 * The traceModel in which to store data during parsing, and retrieve during
 	 * creation and manipulation of the view.
 	 */
-	private TraceModel model;
+	private TraceModel traceModel;
 
-	private ZoomModel zoomData = new ZoomModel();
+	private ZoomModel zoomModel;
 
 	/**
 	 * *.tdi files cannot be saved. Throws an UnsupportedOperationException if
@@ -100,11 +95,13 @@ public class TraceEditor extends EditorPart {
 		
 		super.setPartName(input.getName());
 
-		model = new TraceModel();
+		traceModel = new TraceModel();
+		zoomModel = new ZoomModel();
+		
 		IPathEditorInput iPath = (IPathEditorInput)input;
 		File ioFile = iPath.getPath().toFile();
 		
-		final Parser parser = new Parser("Opening trace", model, ioFile);
+		final Parser parser = new Parser("Opening trace", traceModel, ioFile);
 
 		// Non-threaded execution
 		IWorkbenchWindow window = this.getSite().getWorkbenchWindow();
@@ -159,23 +156,7 @@ public class TraceEditor extends EditorPart {
 	 */
 	@Override
 	public final void createPartControl(final Composite parent) {
-		hookGlobalActions();
-
-		traceView = new TraceViewer(parent, model, zoomData);
-	}
-
-	private void hookGlobalActions() {
-		IAction zoomInAction = new ZoomInAction(zoomData);
-		getEditorSite().getActionBars().setGlobalActionHandler(ZoomInAction.ID, zoomInAction);
-
-		IAction zoomOutAction = new ZoomOutAction(zoomData);
-		getEditorSite().getActionBars().setGlobalActionHandler(ZoomOutAction.ID, zoomOutAction);
-
-		IAction zoomFitAction = new ZoomFitAction(model, zoomData);
-		getEditorSite().getActionBars().setGlobalActionHandler(ZoomFitAction.ID, zoomFitAction);
-
-		IAction zoomBackAction = new ZoomBackAction(zoomData);
-		getEditorSite().getActionBars().setGlobalActionHandler(ZoomBackAction.ID, zoomBackAction);
+		traceViewer = new TraceViewer(parent, traceModel, zoomModel);
 	}
 
 	/**
@@ -191,16 +172,16 @@ public class TraceEditor extends EditorPart {
 	 * 
 	 * @return this editor's <code>ZoomModel</code>
 	 */
-	public final ZoomModel getZoomData() {
-		return zoomData;
+	public final ZoomModel getZoomModel() {
+		return zoomModel;
 	}
 
 	/**
-	 * Returns the model associated with this editor, for use by actions.
+	 * Returns the <code>TraceModel</code> associated with this editor, for use by actions.
 	 * 
-	 * @return this editor's associated model
+	 * @return this editor's associated <code>TraceModel</code>
 	 */
-	public final TraceModel getModel() {
-		return model;
+	public final TraceModel getTraceModel() {
+		return traceModel;
 	}
 }

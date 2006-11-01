@@ -11,5 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  com.nxp.timedoctor.core.model,
  com.nxp.timedoctor.core.parser,
- com.nxp.timedoctor.ui.trace
+ com.nxp.timedoctor.ui.trace,
+ org.eclipse.core.expressions
 Eclipse-LazyStart: false

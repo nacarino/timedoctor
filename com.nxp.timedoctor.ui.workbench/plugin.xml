@@ -5,6 +5,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="com.nxp.timedoctor.internal.ui.TraceEditor"
+            contributorClass="com.nxp.timedoctor.internal.ui.TraceEditorActionBars"
             default="false"
             extensions="tdi"
             icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
