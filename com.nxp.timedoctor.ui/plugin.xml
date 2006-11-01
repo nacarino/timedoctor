@@ -2,51 +2,6 @@
 <?eclipse version="3.2"?>
 <plugin>
   <extension
-        point="org.eclipse.ui.actionSets">
-     <actionSet
-           id="com.nxp.timedoctor.ui.TraceEditorActions"
-           label="TimeDoctor"
-           visible="true">
-        <menu
-              id="com.nxp.timedoctor.ui.menus.Trace"
-              label="&amp;Trace">
-           <groupMarker name="content"/>
-           <separator name="additions"/>
-        </menu>
-        <action
-              definitionId="com.nxp.timedoctor.ui.commands.ZoomBack"
-              id="com.nxp.timedoctor.ui.actions.ZoomBack"
-              label="Zoom &amp;Back"
-              menubarPath="com.nxp.timedoctor.ui.menus.Trace/content"
-              retarget="true"
-              style="push"/>
-        <action
-              definitionId="com.nxp.timedoctor.ui.commands.ZoomFit"
-              id="com.nxp.timedoctor.ui.actions.ZoomFit"
-              label="Zoom to &amp;Fit"
-              menubarPath="com.nxp.timedoctor.ui.menus.Trace/content"
-              retarget="true"
-              style="push"
-              tooltip="Zoom to fit in window"/>
-        <action
-              definitionId="com.nxp.timedoctor.ui.commands.ZoomOut"
-              id="com.nxp.timedoctor.ui.actions.ZoomOut"
-              label="Zoom &amp;Out"
-              menubarPath="com.nxp.timedoctor.ui.menus.Trace/content"
-              retarget="true"
-              style="push"
-              tooltip="Zoom out on the current trace (50%)"/>
-        <action
-              definitionId="com.nxp.timedoctor.ui.commands.ZoomIn"
-              id="com.nxp.timedoctor.ui.actions.ZoomIn"
-              label="Zoom &amp;In"
-              menubarPath="com.nxp.timedoctor.ui.menus.Trace/content"
-              retarget="true"
-              style="push"
-              tooltip="Zoom in on the current trace (200%)"/>
-     </actionSet>
-  </extension>     
-  <extension
         point="org.eclipse.ui.commands">
      <category
            description="TimeDoctor Commands"
@@ -68,6 +23,18 @@
            categoryId="com.nxp.timedoctor.ui.commands"
            id="com.nxp.timedoctor.ui.commands.ZoomBack"
            name="Zoom Back"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.Next"
+           name="Next"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.Previous"
+           name="Previous"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.GoToTime"
+           name="Goto Time"/>
   </extension>
   <extension
         point="org.eclipse.ui.bindings">
@@ -94,6 +61,21 @@
            contextId="org.eclipse.ui.contexts.window"
            schemeId="com.nxp.timedoctor.ui.keyConfiguration"
            sequence="F4"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.GoToTime"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="CTRL+G"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.Next"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F10"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.Previous"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F9"/>
   </extension>
   
 </plugin>
