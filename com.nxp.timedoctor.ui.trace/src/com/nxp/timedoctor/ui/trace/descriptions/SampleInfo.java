@@ -20,11 +20,11 @@ public class SampleInfo {
 	private double clockFrequency;
 	
 	protected SampleInfo(SampleLine line) {
-		if (line.getType() == LineType.CYCLES) {
-			this.clockFrequency = line.getCPU().getClocksPerSec();
-		}
-		else if (line.getType() == LineType.MEM_CYCLES) {
+		if (line.getType() == LineType.MEM_CYCLES) {
 			this.clockFrequency = line.getCPU().getMemClocksPerSec();
+		}
+		else {
+			this.clockFrequency = line.getCPU().getClocksPerSec();
 		}
 	}
 	
