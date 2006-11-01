@@ -203,7 +203,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		TimeLine traceCursor = traceCursorFactory.createTraceCursor(CursorType.CURSOR);
 		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
 		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoom);
-				
+		
 		createTraceLines(leftPane, rightContent, traceCursorListener);
 
 		initializeScrollbars();		
@@ -218,6 +218,8 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 *            the left (label) composite
 	 * @param right
 	 *            the right (canvas) composite
+	 * @param traceSelectListener 
+	 * 			  The TraceSelectListener object
 	 */
 	private void createTraceLines(final Composite left,
 			final Composite right,
@@ -377,21 +379,21 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		double zoomInterval = zoomEndTime - zoomStartTime;		
 		double zoomFactor = zoomInterval / modelEndTime;
 		int newZoomPercentage = (int) (zoomFactor * ((double) HOR_SCROLL_MAX));
+		int selection = (int) (zoomStartTime * ((double) HOR_SCROLL_MAX) / modelEndTime);
 		
 		// Should only be executed on zoom, not on scroll to 
 		// avoid ping-pong between update and the scrollbar selection listener
 		if (newZoomPercentage != zoomPercentage) {
 			zoomPercentage = newZoomPercentage;
-			int selection = (int) (zoomStartTime * ((double) HOR_SCROLL_MAX) / modelEndTime);
 			if (zoomPercentage >= HOR_SCROLL_MAX) {
 				horizontalScroll.setVisible(false);
 			} else {
 				horizontalScroll.setVisible(true);
-				
-				// Side effect: calls scrollbar selection listener
-				horizontalScroll.setThumb(zoomPercentage);
-				horizontalScroll.setSelection(selection);
 			}
 		}
+		
+		// Side effect: calls scrollbar selection listener
+		horizontalScroll.setThumb(zoomPercentage);
+		horizontalScroll.setSelection(selection);		
 	}
 }

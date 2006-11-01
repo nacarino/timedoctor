@@ -21,13 +21,12 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -88,6 +87,11 @@ public class TraceLineViewer {
 	 */
 	private ZoomModel zoom;
 
+	/**
+	 * Static variable to track which label in the entire editor is selected.
+	 */
+	private static CLabel selectedLabel = null;
+	
 	/**
 	 * Constructs a new TraceLineViewer.
 	 * 
@@ -172,8 +176,7 @@ public class TraceLineViewer {
 		label.setFont(new Font(sectionLabel.getDisplay(), "Arial",
 				LABEL_FONT_SIZE, SWT.NORMAL));
 
-		final LabelSelectListener selectListener = new LabelSelectListener();
-		label.addMouseListener(selectListener);
+		label.addMouseListener(new TraceLineSelectListener(this, line, zoom));
 
 		setupLabelDND();
 	}
@@ -239,23 +242,6 @@ public class TraceLineViewer {
 					SWT.COLOR_WHITE));
 		}
 
-		/*
-		 * Enables line selection from canvas by using a label linked to the
-		 * canvas by alling getData, the setting (if the label is not null) that
-		 * label to be selected.
-		 */
-		MouseListener selectListener = new MouseListener() {
-			public void mouseDoubleClick(final MouseEvent e) {
-			}
-
-			public void mouseDown(final MouseEvent e) {
-				LabelSelectListener.select(label, e.display);
-			}
-
-			public void mouseUp(final MouseEvent e) {
-			}
-		};
-
 		trace = TraceCanvas.createCanvas(sectionTrace, line, zoom, model);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		// Since the labels define the height of the trace section,
@@ -270,7 +256,7 @@ public class TraceLineViewer {
 		// // label.getParent().getParent().layout();
 		// }
 
-		trace.addMouseListener(selectListener);
+		trace.addMouseListener(new TraceLineSelectListener(this, line, zoom));
 		trace.addMouseMoveListener(traceCursorListener);
 		trace.addMouseTrackListener(traceCursorListener);	
 		trace.addMouseListener(traceCursorListener);
@@ -324,7 +310,6 @@ public class TraceLineViewer {
 
 			public final void dragLeave(final DropTargetEvent event) {
 				deselectDropTarget(getTargetSeparator(event));
-
 			}
 
 			public final void dragOver(final DropTargetEvent event) {
@@ -453,7 +438,6 @@ public class TraceLineViewer {
 		// Receive data in Text format
 		target.setTransfer(types);
 		target.addDropListener(dropListener);
-
 	}
 
 	/**
@@ -476,7 +460,6 @@ public class TraceLineViewer {
 	private void deselectDropTarget(final Control targetSeparator) {
 		targetSeparator.setBackground(targetSeparator.getDisplay()
 				.getSystemColor(SWT.COLOR_WHITE));
-
 	}
 
 	/**
@@ -518,5 +501,27 @@ public class TraceLineViewer {
 		Control sourceTrace = (Control) dragSourceLabel.getData("trace");
 		sourceTrace.moveBelow(targetTrace);
 		targetTrace.getParent().layout();
+	}
+	
+	/**
+	 * Sets line selection to the line associated with the given label.
+	 * Unselects whichever label is stored in <code>selected</code>, and sets
+	 * <code>selected</code> to be <code>label</code>.
+	 * 
+	 * @param label
+	 *            the label to be set as selected
+	 * @param display
+	 *            the display object associated with the label
+	 */
+	public void selectLine(final Display display) {
+		// Check if the selected label still exists, it may belong to a
+		// label of another editor that has been closed in the meantime
+		if (selectedLabel != null && !selectedLabel.isDisposed()) {
+			selectedLabel.setBackground(selectedLabel.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
+			selectedLabel.setForeground(selectedLabel.getParent().getForeground());			
+		}
+		label.setBackground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
+		label.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
+		selectedLabel = label;
 	}
 }

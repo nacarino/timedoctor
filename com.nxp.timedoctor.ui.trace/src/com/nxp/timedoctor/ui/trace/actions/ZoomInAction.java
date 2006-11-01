@@ -10,35 +10,39 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.actions;
 
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-
-import com.nxp.timedoctor.core.model.ZoomModel;
-
-public class ZoomInAction extends Action implements IWorkbenchAction {
-	public static final String ID = "com.nxp.timedoctor.ui.actions.ZoomIn";
-
-	private ZoomModel zoomData;
-	
-	public ZoomInAction(final ZoomModel zoomData) {
-		this.zoomData = zoomData;
+/**
+ * This class performs zoomIn operation
+ */
+public class ZoomInAction extends TraceAction {
+	public final static String ID = "com.nxp.timedoctor.ui.actions.ZoomIn";
+    
+	/**
+	 * Constructor
+	 * @param label
+	 * 			   Name of the action
+	 */
+	public ZoomInAction(String label) {
+		super(label);
 	}
-
-	public void run() {
-		double startTime = zoomData.getStartTime();
-		double endTime = zoomData.getEndTime();
+		
+ 	public void run() {
+		double startTime = zoomModel.getStartTime();
+		double endTime = zoomModel.getEndTime();
 		double interval = endTime - startTime;
-		zoomData.pushZoom(startTime, endTime);
+		zoomModel.pushZoom(startTime, endTime);
 		double newInterval = interval / 2;
 		double change = (interval - newInterval) / 2;
 		startTime += change;
 		endTime -= change;
-		zoomData.setTimes(startTime, endTime);
-	}
-
-	public void dispose() {
-		// TODO Auto-generated method stub
 		
+		final double time = zoomModel.getSelectTime();
+		
+		if (time > 0) {
+			startTime = Math.max(0, time - change);
+			endTime = startTime + newInterval;
+			zoomModel.setTimes(startTime, endTime);
+		} else {
+			zoomModel.setTimes(startTime, endTime);
+		}
 	}
 }

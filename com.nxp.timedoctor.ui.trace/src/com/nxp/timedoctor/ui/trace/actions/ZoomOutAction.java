@@ -10,26 +10,26 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.actions;
 
-
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-
-import com.nxp.timedoctor.core.model.ZoomModel;
-
-//TODO handle enable/disable depending on zoom back/out/fit
-public class ZoomOutAction extends Action implements IWorkbenchAction {
+/**
+ * This class performs the zoom out operation.
+ */
+// TODO handle enable/disable depending on zoom back/out/fit
+public class ZoomOutAction extends TraceAction {
 	public static final String ID = "com.nxp.timedoctor.ui.actions.ZoomOut";
 	
-	private ZoomModel zoomData;
-	
-	public ZoomOutAction(final ZoomModel zoomData) {
-		this.zoomData = zoomData;
+	/**
+	 * Constructor
+	 * @param label
+	 * 			   Name of the action
+	 */
+	public ZoomOutAction(String label) {
+		super(label);
 	}
-
+	
 	public void run() {
-		double startTime = zoomData.getStartTime();
-		double endTime = zoomData.getEndTime();
-		zoomData.pushZoom(startTime, endTime);
+		double startTime = zoomModel.getStartTime();
+		double endTime = zoomModel.getEndTime();
+		zoomModel.pushZoom(startTime, endTime);
 		double interval = endTime - startTime;
 		double newInterval = interval * 2;
 		double change = (newInterval - interval) / 2;
@@ -39,10 +39,6 @@ public class ZoomOutAction extends Action implements IWorkbenchAction {
 			endTime += -startTime;
 			startTime = 0;
 		}
-		zoomData.setTimes(startTime, endTime);
-	}
-
-	public void dispose() {
-		// TODO Auto-generated method stub
+		zoomModel.setTimes(startTime, endTime);
 	}
 }

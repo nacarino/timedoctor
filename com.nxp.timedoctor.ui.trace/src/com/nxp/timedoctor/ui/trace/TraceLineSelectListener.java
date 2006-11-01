@@ -11,43 +11,31 @@
 
 package com.nxp.timedoctor.ui.trace;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.widgets.Display;
+
+import com.nxp.timedoctor.core.model.SampleLine;
+import com.nxp.timedoctor.core.model.ZoomModel;
 
 /**
  * Listener to handle the selection of labels.
  */
-public class LabelSelectListener implements MouseListener {
+public class TraceLineSelectListener implements MouseListener {
 
-	/**
-	 * Static variable to track which label in the entire editor is selected.
-	 */
-	private static CLabel selected = null;
+	private TraceLineViewer traceLineViewer;
 
-	/**
-	 * Sets line selection to the line associated with the given label.
-	 * Unselects whichever label is stored in <code>selected</code>, and sets
-	 * <code>selected</code> to be <code>label</code>.
-	 * 
-	 * @param label
-	 *            the label to be set as selected
-	 * @param display
-	 *            the display object associated with the label
-	 */
-	public static void select(final CLabel label, final Display display) {
-		if (selected != null) {
-			selected.setBackground(selected.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
-			selected.setForeground(selected.getParent().getForeground());
-			
-		}
-		label.setBackground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
-		label.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-		selected = label;
+	private SampleLine line = null;
+	
+	private ZoomModel zoom;
+	
+	public TraceLineSelectListener(final TraceLineViewer traceLineViewer, 
+			final SampleLine line, 
+			final ZoomModel zoom) {
+		this.traceLineViewer = traceLineViewer;		
+		this.line = line;
+		this.zoom = zoom;
 	}
-
+	
 	/**
 	 * Label does nothing on double-click.
 	 * 
@@ -65,6 +53,7 @@ public class LabelSelectListener implements MouseListener {
 	 */
 	public final void mouseUp(final MouseEvent e) {
 	}
+	
 	/**
 	 * Selects the label of a mouseDown event.
 	 * 
@@ -72,6 +61,7 @@ public class LabelSelectListener implements MouseListener {
 	 *            MouseEvent containing detailed information about the event
 	 */
 	public final void mouseDown(final MouseEvent e) {
-		select((CLabel) e.widget, e.display);        
+		zoom.setSelectedLine(line); 
+		traceLineViewer.selectLine(e.display);		
 	}
 }

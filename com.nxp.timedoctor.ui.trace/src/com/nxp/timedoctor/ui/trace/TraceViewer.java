@@ -87,15 +87,15 @@ public class TraceViewer {
 		data.height = HEADER_HEIGHT;
 		header.setLayoutData(data);
 
-		MainViewer main = new MainViewer(parent, traceCursorFactory, model, zoomData);
+		MainViewer mainViewer = new MainViewer(parent, traceCursorFactory, model, zoomData);
 		data = new FormData();
 		data.left = new FormAttachment(0);
 		data.right = new FormAttachment(FORMLAYOUT_FULL);
 		data.top = new FormAttachment(header);
 		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		main.setLayoutData(data);
+		mainViewer.setLayoutData(data);
 
-		main.addSashClient(header);
-		header.addSashClient(main);
+		mainViewer.addSashClient(header);
+		header.addSashClient(mainViewer);
 	}
 }

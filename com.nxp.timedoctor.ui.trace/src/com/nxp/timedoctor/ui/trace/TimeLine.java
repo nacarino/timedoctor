@@ -94,7 +94,7 @@ public class TimeLine implements Observer {
 			}
 
 			public void controlResized(ControlEvent e) {
-				updatePositionAndLabel();
+				updatePositionAndLabel(cursorTime);
 			}
 		});
 	}
@@ -185,18 +185,17 @@ public class TimeLine implements Observer {
 	 * @param data
 	 *            has no effect
 	 */
-	public final void update(final Observable o, final Object data) {
-		updatePositionAndLabel();
+	public void update(final Observable o, final Object data) {
+		updatePositionAndLabel(cursorTime);
 	}
 
-	private void updatePositionAndLabel() {
+	protected void updatePositionAndLabel(double time) {
 		double startTime = zoom.getStartTime();
-		double endTime = zoom.getEndTime();
-		double timeRange = endTime - startTime;
 		int width = cursorLabel.getParent().getBounds().width;
-		int x = (int) ((cursorTime - startTime) * ((double)width) / timeRange);
-		
+		double zoomFactor = zoom.getPixelsPerTime(width);
+	
+		int x = (int) ((time - startTime) * zoomFactor);		
 		setPosition(x, width);
-		setTimeLabel(cursorTime);
+		setTimeLabel(time);
 	}
 }

@@ -10,30 +10,31 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.actions;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-
-import com.nxp.timedoctor.core.model.ZoomModel;
-
-// TODO handle enable/disable depending on zoom stack status
-public class ZoomBackAction extends Action implements IWorkbenchAction {
+/**
+ * This class switch backs to the previous state of the zoom action.
+ */
+public class ZoomBackAction extends TraceAction {
 	public static final String ID = "com.nxp.timedoctor.ui.actions.ZoomBack";
 
-	private ZoomModel zoomData;
-	
-	public ZoomBackAction(final ZoomModel zoomData) {
-		this.zoomData = zoomData;
+	/**
+	 * Constructor
+	 * @param label
+	 * 			   Name of the action
+	 */
+	public ZoomBackAction(String label) {
+		super(label);
 	}
-
+	
 	public void run() {
-		double[] zoom = zoomData.popZoom();
+		double[] zoom = zoomModel.popZoom();
+		
+		if ( zoom == null ) {
+			//No zoom in/out performed
+			return;
+		}
+		
 		double startTime = zoom[0];
 		double endTime = zoom[1];
-		zoomData.setTimes(startTime, endTime);
-	}
-
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		zoomModel.setTimes(startTime, endTime);
 	}
 }

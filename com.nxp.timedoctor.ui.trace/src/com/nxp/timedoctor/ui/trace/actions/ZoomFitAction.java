@@ -10,35 +10,27 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.actions;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-
-import com.nxp.timedoctor.core.model.TraceModel;
-import com.nxp.timedoctor.core.model.ZoomModel;
-
-//TODO handle enable/disable depending on zoom out/in/back
-public class ZoomFitAction extends Action implements IWorkbenchAction {
+/**
+ * This class fits the trace models window with in the trace editor.
+ */
+// TODO handle enable/disable depending on zoom out/in/back
+public class ZoomFitAction extends TraceAction {
 	public static final String ID = "com.nxp.timedoctor.ui.actions.ZoomFit";
 
-	private TraceModel model;
-	private ZoomModel zoomData;
-		
-	public ZoomFitAction(final TraceModel model,
-			final ZoomModel zoomData) {
-		this.model = model;
-		this.zoomData = zoomData;
+	/**
+	 * Constructor
+	 * @param label
+	 * 			   Name of the action
+	 */
+	public ZoomFitAction(String label) {
+		super(label);
 	}
-
+		
 	public void run() {
-		double oldStart = zoomData.getStartTime();
-		double oldEnd = zoomData.getEndTime();
-		zoomData.pushZoom(oldStart, oldEnd);
-		double endTime = model.getEndTime();
-		zoomData.setTimes(0, endTime);
-	}
-
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
+		double oldStart = zoomModel.getStartTime();
+		double oldEnd = zoomModel.getEndTime();
+		zoomModel.pushZoom(oldStart, oldEnd);
+		double endTime = traceModel.getEndTime();
+		zoomModel.setTimes(0, endTime);
 	}
 }

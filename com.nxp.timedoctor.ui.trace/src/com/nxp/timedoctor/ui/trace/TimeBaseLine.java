@@ -10,6 +10,8 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import java.util.Observable;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -32,6 +34,21 @@ public class TimeBaseLine extends TimeLine {
 		super(rulerPane, tracePane, zoom, SWT.COLOR_GREEN, OFFSET);
 		
 		addSelectionListener();
+	}
+
+	/**
+	 * Called when the zoom or scroll changes to redraw the ruler.
+	 * Override from the TimeLine implementation to ensure this class
+	 * uses the selectTime stored in the model.
+	 * (needed for goToTime, Next, Prev, etc.)
+	 * 
+	 * @param o
+	 *            the <code>Observable</code> calling the update
+	 * @param data
+	 *            has no effect
+	 */
+	public void update(final Observable o, final Object data) {
+		updatePositionAndLabel(zoom.getSelectTime());
 	}
 
 	private void addSelectionListener() {

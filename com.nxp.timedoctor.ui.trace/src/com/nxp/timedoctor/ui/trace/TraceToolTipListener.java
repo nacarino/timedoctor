@@ -57,7 +57,7 @@ public class TraceToolTipListener implements MouseMoveListener {
 
 	private int getSampleIndex(MouseEvent e) {
 		int width = getWidth(e);
-		double zoomFactor = zoom.getZoomFactor(width);
+		double zoomFactor = zoom.getPixelsPerTime(width);
 		double time = zoom.getTimeAtPosition(e.x, width);
 
 		int index = line.binarySearch(time);
