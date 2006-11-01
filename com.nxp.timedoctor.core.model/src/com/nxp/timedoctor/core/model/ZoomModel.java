@@ -67,6 +67,7 @@ public class ZoomModel extends Observable {
 	 */
 	private double timeDisplayAccuracy = 0.0;
 
+    private SampleLine selectedLine =  null;
     
     /**
      * Sets the zoom and updates all observers with the new value.
@@ -93,7 +94,11 @@ public class ZoomModel extends Observable {
     }
 
     public final void setSelectTime(final double time) {
-    	this.selectTime = time;
+    	if (time != selectTime) {
+    		this.selectTime = time;
+    		setChanged();
+    		notifyObservers();
+    	}
     }
 
     public final double getSelectTime() {
@@ -198,13 +203,13 @@ public class ZoomModel extends Observable {
 	}
 
 	/**
-	 * Returns the current ZoomFactor
+	 * Returns the factor of pixels per time unit
 	 * 
 	 * @param width
 	 *            The width of the widget
-	 * @return The zoom-factor
+	 * @return The pixels per time unit factor
 	 */
-	public double getZoomFactor(final int width) {
+	public double getPixelsPerTime(final int width) {
 		double timeRange = endTime - startTime;
 		return width / timeRange;
 	}
@@ -219,6 +224,14 @@ public class ZoomModel extends Observable {
 	 * @return The time at position x
 	 */
 	public double getTimeAtPosition(final int x, final int width) {
-		return startTime + (x / getZoomFactor(width));
+		return startTime + (x / getPixelsPerTime(width));
+	}
+	
+	public void setSelectedLine(SampleLine line) {
+		this.selectedLine = line;
+	}
+	
+	public SampleLine getSelectedLine() {
+		return selectedLine;
 	}
 }
