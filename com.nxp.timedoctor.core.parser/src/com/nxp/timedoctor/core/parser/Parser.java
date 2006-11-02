@@ -133,20 +133,20 @@ public class Parser extends Job {
 		try {
 			file = new BufferedReader(new FileReader(ioFile));
 
-			String parseLine = file.readLine();
+			String parseLine;
 			String[] tokens = new String[MAX_TAG_ARGS];
-			while (parseLine != null) {
+			while ((parseLine = file.readLine())!= null) {
 				// Although it is deprecated, use a StringTokenizer
 				// instead of String.split(), for increased performance
 				// in simple splitting of strings separated by whitespaces
-				tokenLength = 0;
 				StringTokenizer tokenizer = new StringTokenizer(parseLine);
 		        for (tokenLength = 0; tokenizer.hasMoreTokens(); tokenLength++) {
 		            tokens[tokenLength] = tokenizer.nextToken();
 		        }
 				
-				parseLine(tokens);
-				parseLine = file.readLine();
+		        if (tokenLength > 0) {
+		        	parseLine(tokens);
+		        }
 			}
 		} catch (FileNotFoundException e) {
 			// how to pop up an error? no shell accessible, can't throw the
