@@ -63,48 +63,48 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 	private PreviousAction previousHandler;
 	private ActionHandler previousCommandHandler;
 	
-	private RetargetAction goToTimeAction;
-	private TraceAction goToTimeHandler;
+	private TraceAction goToTimeAction;
 	private ActionHandler goToTimeCommandHandler;
 
 	/**
 	 * Constructor for TraceEditorActionBars.
 	 */
 	public TraceEditorActionBars() {
-		zoomInHandler = new ZoomInAction("Zoom In");
+		// Retargetable editor actions
 		zoomInAction = new RetargetAction(ZoomInAction.ID, "Zoom In");
-		zoomInAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomIn");
+		zoomInHandler = new ZoomInAction("Zoom In");		
+		zoomInHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomIn");
 		zoomInCommandHandler = new ActionHandler(zoomInHandler);
 		
-		zoomOutHandler = new ZoomOutAction("Zoom Out");
 		zoomOutAction = new RetargetAction(ZoomOutAction.ID, "Zoom Out");
-		zoomOutAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomOut");
+		zoomOutHandler = new ZoomOutAction("Zoom Out");		
+		zoomOutHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomOut");
 		zoomOutCommandHandler = new ActionHandler(zoomOutHandler);
 		
-		zoomBackHandler = new ZoomBackAction("Zoom Back");
 		zoomBackAction = new RetargetAction(ZoomBackAction.ID, "Zoom Back");
-		zoomBackAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomBack");
+		zoomBackHandler = new ZoomBackAction("Zoom Back");
+		zoomBackHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomBack");
 		zoomBackCommandHandler = new ActionHandler(zoomBackHandler);
 		
-		zoomFitHandler = new ZoomFitAction("Zoom Fit");
 		zoomFitAction = new RetargetAction(ZoomFitAction.ID, "Zoom Fit");
-		zoomFitAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomFit");
+		zoomFitHandler = new ZoomFitAction("Zoom Fit");
+		zoomFitHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomFit");
 		zoomFitCommandHandler = new ActionHandler(zoomFitHandler);
 		
-		nextHandler = new NextAction("Next Event");
 		nextAction = new RetargetAction(NextAction.ID, "Next Event");
-		nextAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Next");
+		nextHandler = new NextAction("Next Event");		
+		nextHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Next");
 		nextCommandHandler = new ActionHandler(nextHandler);
 		
-		previousHandler = new PreviousAction("Previous Event");
 		previousAction = new RetargetAction(PreviousAction.ID, "Previous Event");
-		previousAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Previous");
+		previousHandler = new PreviousAction("Previous Event");
+		previousHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Previous");
 		previousCommandHandler = new ActionHandler(previousHandler);
 		
-		goToTimeHandler = new GoToTimeAction("Goto Time");
-		goToTimeAction = new RetargetAction(GoToTimeAction.ID, "Goto Time");
+		// Editor actions
+		goToTimeAction = new GoToTimeAction("Goto Time");		
 		goToTimeAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".GoToTime");
-		goToTimeCommandHandler = new ActionHandler(goToTimeHandler);
+		goToTimeCommandHandler = new ActionHandler(goToTimeAction);
 	}
 
 	public void contributeToMenu(IMenuManager menuManager) {
@@ -115,13 +115,13 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 				traceMenu);
 		MenuManager zoomMenu = new MenuManager("&Zoom", "Zoom");
 		traceMenu.add(zoomMenu);
-		zoomMenu.add(zoomInHandler);
-		zoomMenu.add(zoomOutHandler);
-		zoomMenu.add(zoomBackHandler);
-		zoomMenu.add(zoomFitHandler);
-		traceMenu.add(nextHandler);
-		traceMenu.add(previousHandler);
-		traceMenu.add(goToTimeHandler);
+		zoomMenu.add(zoomInAction);
+		zoomMenu.add(zoomOutAction);
+		zoomMenu.add(zoomBackAction);
+		zoomMenu.add(zoomFitAction);
+		traceMenu.add(nextAction);
+		traceMenu.add(previousAction);
+		traceMenu.add(goToTimeAction);
 	}
 
 	public void dispose() {		
@@ -131,7 +131,6 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		getPage().removePartListener(zoomFitAction);		
 		getPage().removePartListener(nextAction);
 		getPage().removePartListener(previousAction);
-		getPage().removePartListener(goToTimeAction);
 	}
 
 	public void init(IActionBars bars, IWorkbenchPage page) {
@@ -143,7 +142,6 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		page.addPartListener(zoomFitAction);		
 		page.addPartListener(nextAction);
 		page.addPartListener(previousAction);
-		page.addPartListener(goToTimeAction);
 		
 		IWorkbenchPart activePart = page.getActivePart();
 		if (activePart != null) {
@@ -153,7 +151,6 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 			zoomBackAction.partActivated(activePart);
 			nextAction.partActivated(activePart);
 			previousAction.partActivated(activePart);
-			goToTimeAction.partActivated(activePart);
 		}
 	}
 
@@ -171,25 +168,17 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		zoomFitHandler.updateModel(traceModel, zoomModel);		
 		nextHandler.updateModel(traceModel, zoomModel);
 		previousHandler.updateModel(traceModel, zoomModel);
-		goToTimeHandler.updateModel(traceModel, zoomModel);
+		goToTimeAction.updateModel(traceModel, zoomModel);
 		
-		zoomFitHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomFit");
-		zoomBackHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomBack");
-		zoomInHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomIn");
-		zoomOutHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomOut");
-		goToTimeHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".GoToTime");
-		nextHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Next");
-		previousHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Previous");
-
 		final IHandlerService service = (IHandlerService) editor
 				.getEditorSite().getService(IHandlerService.class);
 		
-		service.activateHandler(zoomInAction.getActionDefinitionId(), zoomInCommandHandler);
-		service.activateHandler(zoomOutAction.getActionDefinitionId(),zoomOutCommandHandler);
-		service.activateHandler(zoomBackAction.getActionDefinitionId(), zoomBackCommandHandler);
-		service.activateHandler(zoomFitAction.getActionDefinitionId(), zoomFitCommandHandler);
-		service.activateHandler(nextAction.getActionDefinitionId(), nextCommandHandler);
-		service.activateHandler(previousAction.getActionDefinitionId(), previousCommandHandler);
+		service.activateHandler(zoomInHandler.getActionDefinitionId(), zoomInCommandHandler);
+		service.activateHandler(zoomOutHandler.getActionDefinitionId(),zoomOutCommandHandler);
+		service.activateHandler(zoomBackHandler.getActionDefinitionId(), zoomBackCommandHandler);
+		service.activateHandler(zoomFitHandler.getActionDefinitionId(), zoomFitCommandHandler);
+		service.activateHandler(nextHandler.getActionDefinitionId(), nextCommandHandler);
+		service.activateHandler(previousHandler.getActionDefinitionId(), previousCommandHandler);
 		service.activateHandler(goToTimeAction.getActionDefinitionId(), goToTimeCommandHandler);
 	}
 }
