@@ -646,7 +646,7 @@ public class Parser extends Job {
 		Section section = model.getSections().getSection(lineType);
 		if (section != null) {
 			for (SampleLine l : section.getLines()) {
-				if (line != line) {
+				if (l != line) {
 					l.addSample(type, time);
 				}
 			}
