@@ -17,8 +17,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.actions.RetargetAction;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorActionBarContributor;
 
@@ -34,33 +32,27 @@ import com.nxp.timedoctor.ui.trace.actions.ZoomInAction;
 import com.nxp.timedoctor.ui.trace.actions.ZoomOutAction;
 
 /**
- * This class performes retargetable actions for menu items.
+ * This class performs retargetable actions for menu items.
  */
 public class TraceEditorActionBars extends EditorActionBarContributor {
 	private final static String PLUGIN_COMMAND_ID = "com.nxp.timedoctor.ui.commands";
 
-	private ZoomInAction zoomInHandler;
-	private RetargetAction zoomInAction;
+	private ZoomInAction zoomInAction;
 	private ActionHandler zoomInCommandHandler;
 	
-	private ZoomOutAction zoomOutHandler;
-	private RetargetAction zoomOutAction;
+	private ZoomOutAction zoomOutAction;
 	private ActionHandler zoomOutCommandHandler;
 	
-	private RetargetAction zoomBackAction;
-	private ZoomBackAction zoomBackHandler;
+	private ZoomBackAction zoomBackAction;
 	private ActionHandler zoomBackCommandHandler;
 	
-	private RetargetAction zoomFitAction;
-	private ZoomFitAction zoomFitHandler;
+	private ZoomFitAction zoomFitAction;
 	private ActionHandler zoomFitCommandHandler;
 	
-	private RetargetAction nextAction;
-	private TraceAction nextHandler;
+	private TraceAction nextAction;
 	private ActionHandler nextCommandHandler;
 	
-	private RetargetAction previousAction;
-	private PreviousAction previousHandler;
+	private PreviousAction previousAction;
 	private ActionHandler previousCommandHandler;
 	
 	private TraceAction goToTimeAction;
@@ -70,36 +62,31 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 	 * Constructor for TraceEditorActionBars.
 	 */
 	public TraceEditorActionBars() {
-		// Retargetable editor actions
-		zoomInAction = new RetargetAction(ZoomInAction.ID, "Zoom In");
-		zoomInHandler = new ZoomInAction("Zoom In");		
-		zoomInHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomIn");
-		zoomInCommandHandler = new ActionHandler(zoomInHandler);
+		// Should be retargetable editor actions,
+		// must be updated to Eclipse 3.2 new command handler way of working
+		zoomInAction = new ZoomInAction("Zoom In");		
+		zoomInAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomIn");
+		zoomInCommandHandler = new ActionHandler(zoomInAction);
 		
-		zoomOutAction = new RetargetAction(ZoomOutAction.ID, "Zoom Out");
-		zoomOutHandler = new ZoomOutAction("Zoom Out");		
-		zoomOutHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomOut");
-		zoomOutCommandHandler = new ActionHandler(zoomOutHandler);
+		zoomOutAction = new ZoomOutAction("Zoom Out");		
+		zoomOutAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomOut");
+		zoomOutCommandHandler = new ActionHandler(zoomOutAction);
 		
-		zoomBackAction = new RetargetAction(ZoomBackAction.ID, "Zoom Back");
-		zoomBackHandler = new ZoomBackAction("Zoom Back");
-		zoomBackHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomBack");
-		zoomBackCommandHandler = new ActionHandler(zoomBackHandler);
+		zoomBackAction = new ZoomBackAction("Zoom Back");
+		zoomBackAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomBack");
+		zoomBackCommandHandler = new ActionHandler(zoomBackAction);
 		
-		zoomFitAction = new RetargetAction(ZoomFitAction.ID, "Zoom Fit");
-		zoomFitHandler = new ZoomFitAction("Zoom Fit");
-		zoomFitHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomFit");
-		zoomFitCommandHandler = new ActionHandler(zoomFitHandler);
+		zoomFitAction = new ZoomFitAction("Zoom Fit");
+		zoomFitAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomFit");
+		zoomFitCommandHandler = new ActionHandler(zoomFitAction);
 		
-		nextAction = new RetargetAction(NextAction.ID, "Next Event");
-		nextHandler = new NextAction("Next Event");		
-		nextHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Next");
-		nextCommandHandler = new ActionHandler(nextHandler);
+		nextAction = new NextAction("Next Event");		
+		nextAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Next");
+		nextCommandHandler = new ActionHandler(nextAction);
 		
-		previousAction = new RetargetAction(PreviousAction.ID, "Previous Event");
-		previousHandler = new PreviousAction("Previous Event");
-		previousHandler.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Previous");
-		previousCommandHandler = new ActionHandler(previousHandler);
+		previousAction = new PreviousAction("Previous Event");
+		previousAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Previous");
+		previousCommandHandler = new ActionHandler(previousAction);
 		
 		// Editor actions
 		goToTimeAction = new GoToTimeAction("Goto Time");		
@@ -125,33 +112,10 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 	}
 
 	public void dispose() {		
-		getPage().removePartListener(zoomInAction);
-		getPage().removePartListener(zoomOutAction);
-		getPage().removePartListener(zoomBackAction);
-		getPage().removePartListener(zoomFitAction);		
-		getPage().removePartListener(nextAction);
-		getPage().removePartListener(previousAction);
 	}
 
 	public void init(IActionBars bars, IWorkbenchPage page) {
 		super.init(bars, page);
-		
-		page.addPartListener(zoomInAction);
-		page.addPartListener(zoomBackAction);
-		page.addPartListener(zoomOutAction);
-		page.addPartListener(zoomFitAction);		
-		page.addPartListener(nextAction);
-		page.addPartListener(previousAction);
-		
-		IWorkbenchPart activePart = page.getActivePart();
-		if (activePart != null) {
-			zoomInAction.partActivated(activePart);
-			zoomOutAction.partActivated(activePart);
-			zoomFitAction.partActivated(activePart);
-			zoomBackAction.partActivated(activePart);
-			nextAction.partActivated(activePart);
-			previousAction.partActivated(activePart);
-		}
 	}
 
 	public void setActiveEditor(IEditorPart editor) {
@@ -162,23 +126,23 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		ZoomModel zoomModel = traceEditor.getZoomModel();
 		TraceModel traceModel = traceEditor.getTraceModel();
 		
-		zoomInHandler.updateModel(traceModel, zoomModel);
-		zoomOutHandler.updateModel(traceModel, zoomModel);
-		zoomBackHandler.updateModel(traceModel, zoomModel);
-		zoomFitHandler.updateModel(traceModel, zoomModel);		
-		nextHandler.updateModel(traceModel, zoomModel);
-		previousHandler.updateModel(traceModel, zoomModel);
+		zoomInAction.updateModel(traceModel, zoomModel);
+		zoomOutAction.updateModel(traceModel, zoomModel);
+		zoomBackAction.updateModel(traceModel, zoomModel);
+		zoomFitAction.updateModel(traceModel, zoomModel);		
+		nextAction.updateModel(traceModel, zoomModel);
+		previousAction.updateModel(traceModel, zoomModel);
 		goToTimeAction.updateModel(traceModel, zoomModel);
 		
 		final IHandlerService service = (IHandlerService) editor
 				.getEditorSite().getService(IHandlerService.class);
-		
-		service.activateHandler(zoomInHandler.getActionDefinitionId(), zoomInCommandHandler);
-		service.activateHandler(zoomOutHandler.getActionDefinitionId(),zoomOutCommandHandler);
-		service.activateHandler(zoomBackHandler.getActionDefinitionId(), zoomBackCommandHandler);
-		service.activateHandler(zoomFitHandler.getActionDefinitionId(), zoomFitCommandHandler);
-		service.activateHandler(nextHandler.getActionDefinitionId(), nextCommandHandler);
-		service.activateHandler(previousHandler.getActionDefinitionId(), previousCommandHandler);
+
+		service.activateHandler(zoomInAction.getActionDefinitionId(), zoomInCommandHandler);
+		service.activateHandler(zoomOutAction.getActionDefinitionId(),zoomOutCommandHandler);
+		service.activateHandler(zoomBackAction.getActionDefinitionId(), zoomBackCommandHandler);
+		service.activateHandler(zoomFitAction.getActionDefinitionId(), zoomFitCommandHandler);
+		service.activateHandler(nextAction.getActionDefinitionId(), nextCommandHandler);
+		service.activateHandler(previousAction.getActionDefinitionId(), previousCommandHandler);
 		service.activateHandler(goToTimeAction.getActionDefinitionId(), goToTimeCommandHandler);
 	}
 }
