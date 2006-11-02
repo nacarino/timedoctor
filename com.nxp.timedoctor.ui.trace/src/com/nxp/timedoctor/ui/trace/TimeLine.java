@@ -40,7 +40,7 @@ public class TimeLine implements Observer {
 	protected Sash cursorSash;
 	protected Composite cursorLine;
 	
-	private double cursorTime = 0;
+	private double cursorTime = -1;
 	
 	public TimeLine(final Composite rulerPane, 
 			final Composite tracePane, 
@@ -190,12 +190,15 @@ public class TimeLine implements Observer {
 	}
 
 	protected void updatePositionAndLabel(double time) {
-		double startTime = zoom.getStartTime();
-		int width = cursorLabel.getParent().getBounds().width;
-		double zoomFactor = zoom.getPixelsPerTime(width);
-	
-		int x = (int) ((time - startTime) * zoomFactor);		
-		setPosition(x, width);
-		setTimeLabel(time);
+		if (time >= 0d) {
+			double startTime = zoom.getStartTime();
+			int width = cursorLabel.getParent().getBounds().width;
+			double zoomFactor = zoom.getPixelsPerTime(width);
+
+			int x = (int) ((time - startTime) * zoomFactor);
+			setPosition(x, width);
+			setTimeLabel(time);
+			setVisible(true);
+		}
 	}
 }
