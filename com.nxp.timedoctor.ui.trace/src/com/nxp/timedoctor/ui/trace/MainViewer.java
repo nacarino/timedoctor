@@ -10,8 +10,6 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -33,6 +31,7 @@ import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Slider;
 
 import com.nxp.timedoctor.core.model.Section;
+import com.nxp.timedoctor.core.model.SectionList;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
@@ -224,22 +223,26 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	private void createTraceLines(final Composite left,
 			final Composite right,
 			final TraceCursorListener traceCursorListener) {
-		// Checkstyle incompatible with J2SE5 type parameterization
-		Collection < Section > sections = model.getSections().values();
-		SectionViewer lastSection = null;
-		if (sections.size() != 0) {
-			Iterator < Section > iter = sections.iterator();
-			for (int i = 0; i < sections.size(); i++) {
-				Section s = iter.next();
-				if (s.getType() != LineType.PORTS) {
-					boolean last = (i == (sections.size() - 1));
-					SectionViewer section = new SectionViewer(left, right,
-							lastSection, last, s, zoom, model, traceCursorListener);
-					LineType type = s.getType();
+		final LineType[] values = LineType.values();
+		final SectionList sectionList = model.getSections();
+		final int numberOfSections = sectionList.values().size();
+
+		SectionViewer previousSection = null;
+		int sectionCounter = 0;
+
+		// Create sections in the order of LineType
+		for (LineType type : values) {
+			if (type != LineType.PORTS) {
+				Section s = sectionList.getSection(type);				
+				if (s != null) {
+					sectionCounter++;
+					boolean lastSection = (sectionCounter == numberOfSections);
+
+					SectionViewer section = new SectionViewer(left, right, previousSection, lastSection, s, zoom, model, traceCursorListener);
 					section.setHeaderText(type.toString());
-					section.setHeaderColor(new Color(getDisplay(), COLORS[type
-							.ordinal()]));
-					lastSection = section;
+					section.setHeaderColor(new Color(getDisplay(), COLORS[type.ordinal()]));
+
+					previousSection = section;
 				}
 			}
 		}
