@@ -181,7 +181,6 @@ public class TaskPaintListener implements PaintListener {
 						if (line.getSample(index).type == SampleType.RESUME) {
 							colorIndex = (int) line.getSample(index).val;
 						} else {
-
 							colorIndex = (int) line.getSample((int) line
 									.getSample(index).val).val;
 						}
@@ -203,6 +202,8 @@ public class TaskPaintListener implements PaintListener {
 									xEnd - xStart - 1, fullHeight - 1);
 						}
 					} else if (line.getSample(index).type == SampleType.SUSPEND) {
+						// Handle preemption by another task or ISR
+						
 						final int j = (int) line.getSample(index).val;
 						if (line.getSample(j).time < drawStartTime) {
 							index = j - 1;
