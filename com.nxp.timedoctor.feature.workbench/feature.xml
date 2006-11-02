@@ -37,13 +37,6 @@
    </requires>
 
    <plugin
-         id="org.eclipse.ui.views"
-         download-size="0"
-         install-size="0"
-         version="3.2.0.I20060605-1400"
-         unpack="false"/>
-
-   <plugin
          id="com.nxp.timedoctor.product.workbench"
          download-size="0"
          install-size="0"
@@ -54,5 +47,12 @@
          download-size="0"
          install-size="0"
          version="1.2.0"/>
+
+   <plugin
+         id="org.eclipse.ui.views"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
