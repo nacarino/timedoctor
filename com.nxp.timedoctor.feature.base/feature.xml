@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.base"
       label="TimeDoctor Base Feature"
-      version="1.2.0"
+      version="1.3.0"
       provider-name="Royal Philips Electronics NV.">
 
    <requires>
@@ -14,24 +14,24 @@
          id="com.nxp.timedoctor.core.model"
          download-size="0"
          install-size="0"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
    <plugin
          id="com.nxp.timedoctor.core.parser"
          download-size="0"
          install-size="0"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
    <plugin
          id="com.nxp.timedoctor.ui"
          download-size="0"
          install-size="0"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
    <plugin
          id="com.nxp.timedoctor.ui.trace"
          download-size="0"
          install-size="0"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
 </feature>
