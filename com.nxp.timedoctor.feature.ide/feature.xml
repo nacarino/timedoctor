@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.ide"
       label="%featureName"
-      version="1.2.0"
+      version="1.3.0"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.ide">
 
@@ -20,11 +20,12 @@
 
    <includes
          id="com.nxp.timedoctor.feature.base"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.expressions"/>
       <import plugin="com.nxp.timedoctor.core.model"/>
       <import plugin="com.nxp.timedoctor.core.parser"/>
       <import plugin="com.nxp.timedoctor.ui.trace"/>
@@ -34,12 +35,12 @@
          id="com.nxp.timedoctor.product.ide"
          download-size="0"
          install-size="0"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
    <plugin
          id="com.nxp.timedoctor.ui.workbench"
          download-size="0"
          install-size="0"
-         version="1.2.0"/>
+         version="1.3.0"/>
 
 </feature>
