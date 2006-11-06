@@ -39,7 +39,7 @@ public class CounterPaintListener implements PaintListener {
 	/**
 	 * <code>Observable</code> containing zoom and scroll data.
 	 */
-	private ZoomModel data;
+	private ZoomModel zoom;
 
 	/**
 	 * The line containing data to visualize.
@@ -74,6 +74,8 @@ public class CounterPaintListener implements PaintListener {
 	 */
 	private static final int GRID_SPACING = 10;
 
+	private double frequency;
+	
 	/**
 	 * Constructs a new <code>CounterPaintListener</code> with the given
 	 * color,filling color, sample line, and source of zoom/scroll data.
@@ -93,8 +95,14 @@ public class CounterPaintListener implements PaintListener {
 		this.color = col;
 		this.fillColor = fillCol;
 		this.line = sampleLine;
-		this.data = zoomData;
-
+		this.zoom = zoomData;
+		
+		if (line.getType() == SampleLine.LineType.MEM_CYCLES) {
+			this.frequency = line.getCPU().getMemClocksPerSec();
+		}
+		else {
+			this.frequency = line.getCPU().getClocksPerSec();
+		}		
 	}
 
 	/**
@@ -107,19 +115,24 @@ public class CounterPaintListener implements PaintListener {
 	 * @see PaintListener#paintControl(PaintEvent)
 	 */
 	public final void paintControl(final PaintEvent e) {
-		if (data.getStartTime() != data.getEndTime()) {
-			timeOffset = data.getStartTime();
+		if (zoom.getStartTime() != zoom.getEndTime()) {
 			Canvas canvas = ((Canvas) e.widget);
 			Composite section = canvas.getParent();
 			Composite rightPane = section.getParent();
 			Composite scroll = rightPane.getParent();
 
+			// guarantees trace drawing is unaffected by appearance of vertical
+			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
+			// TODO calculate height for proportional counters
 			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
-			double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
-			final double drawStartTime = timeOffset + (e.x / zoom);
-			final double drawEndTime = drawStartTime + (e.width / zoom);
-
+			double startTime = zoom.getStartTime();
+			double endTime = zoom.getEndTime();
+			double pixelsPerSec = fullWidth / (endTime - startTime);
+			double drawStartTime = startTime + (((double)e.x) / pixelsPerSec);
+			double drawEndTime = drawStartTime + (((double)e.width) / pixelsPerSec);
+			double maxFilling = line.getMaxSampleValue();
+			
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
 			
@@ -127,81 +140,114 @@ public class CounterPaintListener implements PaintListener {
 			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
 			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
 			
-			for (int i = 0, y = fullHeight; y >= 0; i++, y -= GRID_SPACING) {
-				if (i == 0) {
-					e.gc.setForeground(e.display
-							.getSystemColor(SWT.COLOR_BLACK));
-				} else {
-					e.gc
-							.setForeground(e.display
-									.getSystemColor(SWT.COLOR_GRAY));
-				}
-				e.gc.drawLine(e.x, y, e.x + e.width, y);
-			}
+			drawGridLines(e, fullHeight);
 
 			e.gc.setForeground(color);
 			e.gc.setBackground(fillColor);
 
-			int index = line.binarySearch(drawStartTime);
-			index = Math.max(1, index);
-			for (int xOld = -1, yOld = 0; index < line.getCount(); index++) {
-				final int xStart = boundedInt((line.getSample(index - 1).time - timeOffset)
-						* zoom);
-				final int xEnd = boundedInt((line.getSample(index).time - timeOffset)
-						* zoom);
+			int index = Math.max(1, line.binarySearch(drawStartTime));
+			double curMaxFilling = 0;
+			double curMinFilling = 0;
+			for (; index < line.getCount(); index++) {
+				int xCur = boundedInt((line.getSample(index - 1).time - startTime) * pixelsPerSec);
+				int xNext = boundedInt((line.getSample(index).time - startTime) * pixelsPerSec);
+
 				double timeDifference = line.getSample(index).time
-						- line.getSample(index - 1).time;
+					- line.getSample(index - 1).time;
 				double valueDifference = line.getSample(index).val
-						- line.getSample(index - 1).val;
-				int verticalHeight;
-
-				if (line.getType() == SampleLine.LineType.VALUES) {
-					verticalHeight = Math.max(2,
-							(int) ((fullHeight) * (line
-									.getSample(index).val / line
-									.getMaxSampleValue())));
-				} else {
-					verticalHeight = fullHeight;
-				}
-
-				int fillHeight;
-
+					- line.getSample(index - 1).val;
+				
+				double curFilling;
 				if (line.getType() == SampleLine.LineType.CYCLES
 						|| line.getType() == SampleLine.LineType.MEM_CYCLES) {
-					fillHeight = valueDifference == 0 ? 0
-							: (Math.max(1, (int) (verticalHeight
-									* valueDifference / (timeDifference * line
-									.getCPU().getClocksPerSec()))));
+					curFilling = valueDifference / (timeDifference * frequency);					
 				} else {
-					fillHeight = valueDifference == 0 ? 0 : Math.max(1,
-							(int) (verticalHeight * valueDifference / line
-									.getSample(index).val));
+					curFilling = valueDifference / maxFilling;
 				}
-
-				fillHeight = Math.min(verticalHeight, Math.max(0, fillHeight));
-				if (xEnd <= xOld && fillHeight <= yOld) {
+				
+				// Compute maximum and minimum over the last events that fall within the same pixel
+				// Always at least include the previous event to ensure the contour line is
+				// continuous (the event typically occurs somewhere within a pixel, 
+				// not on the exact pixel boundary).
+				curMaxFilling = Math.max(curMaxFilling, curFilling);
+				curMinFilling = Math.min(curMinFilling, curFilling);
+				
+				if (xNext == xCur && index < line.getCount()) {
 					continue;
 				}
-				xOld = xEnd;
-				yOld = fillHeight;
-				e.gc.fillRectangle(xStart, fullHeight - fillHeight,
-						xEnd - xStart, fillHeight);
-				if (xStart == xEnd) {
-					e.gc.drawLine(xStart, fullHeight - fillHeight,
-							xStart, fullHeight);
-				} else {
-
-					e.gc.drawRectangle(xStart, fullHeight - fillHeight,
-							xEnd - xStart, fillHeight);
+				
+				// Get current filling in pixels
+				int curFillHeight = 0;
+				if (curFilling > 0) {
+					// Show at least one pixel if there is something in the counter
+					curFillHeight = Math.max(1, (int) (fullHeight * curFilling));
 				}
+
+				// Get min filling in pixels
+				int minFillHeight = 0;
+				if (curMinFilling > 0) {
+					// Show at least one pixel if there is something in the counter
+					minFillHeight = Math.max(1, (int) (fullHeight * curMinFilling));
+				}
+
+				// Get max buffer filling in pixels
+				int maxFillHeight = (int) (fullHeight * curMaxFilling);
+
+				// Note: fillRectangle is drawn (verified for MS Windows) from the left-upper origin
+				// including the origin, up to (excluding) width, height
+				// Note that the origin stays upper-left, even when height is negative
+				// Lines are drawn including the start and end point
+				// A line with the same start and end point draws a point
+				
+				e.gc.setForeground(color);
+				e.gc.setBackground(fillColor);
+					
+				// Draw rectangle with actual value
+				// Set height origin to fullHeight + 1 to include drawing at fullHeight
+				e.gc.fillRectangle(xCur, fullHeight + 1, 
+						xNext - xCur, - curFillHeight);
+				// Draw top line on top of rectangle
+				e.gc.drawLine(xCur, fullHeight - curFillHeight, 
+						xNext, fullHeight - curFillHeight);
+
+				// Draw min line
+				e.gc.setForeground(fillColor);
+				e.gc.drawLine(xCur, fullHeight, 
+						xCur, fullHeight - minFillHeight);
+
+				// Draw max line on top of min line
+				// Drawing after the drawing of min line ensures that if max=min=0
+				// only the contour is drawn (one pixel for the max line is visible)
+				e.gc.setForeground(color);
+				e.gc.drawLine(xCur, fullHeight - minFillHeight, 
+						xCur, fullHeight - maxFillHeight);
 
 				if (line.getSample(index).time > drawEndTime) {
 					break;
 				}
+
+				// Include the previouse sample in the min/max computations
+				// for the next sample
+				curMaxFilling = curFilling;
+				curMinFilling = curFilling;
 			}
-		}
+		}			
 	}
 
+	private void drawGridLines(final PaintEvent e, int height) {
+		for (int i = 0, y = height; y >= 0; i++, y -= GRID_SPACING) {
+			if (i == 0) {
+				e.gc.setForeground(e.display
+						.getSystemColor(SWT.COLOR_BLACK));
+			} else {
+				e.gc
+						.setForeground(e.display
+								.getSystemColor(SWT.COLOR_GRAY));
+			}
+			e.gc.drawLine(e.x, y, e.x + e.width, y);
+		}
+	}
+	
 	/**
 	 * Ensures the given value is within the valid x-values and casts it to an
 	 * int. If the value is too low, returns <code>X_MIN</code>. If it's too
