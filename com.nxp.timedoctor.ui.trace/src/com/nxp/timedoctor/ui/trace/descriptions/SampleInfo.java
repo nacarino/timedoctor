@@ -46,13 +46,12 @@ public class SampleInfo {
 	
 	protected String timeIntervalToCyclesStr(double startTime, double endTime) {
 		double cycles = (endTime - startTime) * clockFrequency;
-		String text = doubleToIntStr(cycles) + " cycles";
-		return text;
+		return doubleToIntStr(cycles) + " cycles";
 	}	
 	
-	protected String cyclesToFrequencyStr(double cycles, double totalCycles) {
-		double frequency = cycles /(1000000 * clockFrequency);
-		return Times.timeToString(frequency) + " MCy/s";
+	protected String cyclesToFrequencyStr(double cycles, double timeInterval) {
+		double frequency = cycles /(1000000 * timeInterval);
+		return doubleToIntStr(frequency) + " MCy/s";
 	}
 	
 	protected String cyclesToPercentageStr(double cycles, double totalCycles) {

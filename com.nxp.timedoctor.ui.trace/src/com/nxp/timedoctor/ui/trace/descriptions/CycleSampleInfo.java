@@ -40,10 +40,10 @@ public class CycleSampleInfo extends SampleInfo {
 		double avgValueDifference = result[1];
 		
 		String text = timeBoundsToStr(startTime, endTime);
-		text += " ( " + timeIntervalToStr(startTime, endTime) + ")\n";
+		text += " (" + timeIntervalToStr(startTime, endTime) + ")\n";
 		text += doubleToIntStr(valueDifference) + " cycles";
 		text += " / ";
-		text = cyclesToPercentageStr(valueDifference, timeInterval);
+		text += cyclesToPercentageStr(valueDifference, timeInterval);
 		text += " / ";
 		text += cyclesToFrequencyStr(valueDifference, timeInterval);
 		text += "\nAvg: " + doubleToIntStr(avgValueDifference) + " cycles";

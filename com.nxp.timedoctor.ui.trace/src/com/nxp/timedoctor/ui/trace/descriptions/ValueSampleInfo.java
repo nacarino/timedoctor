@@ -36,7 +36,7 @@ public class ValueSampleInfo extends SampleInfo {
 		double avgValueDifference = result[1];
 		
 		String text = timeBoundsToStr(startTime, endTime);
-		text += " ( " + timeIntervalToStr(startTime, endTime) + ")\n";
+		text += " (" + timeIntervalToStr(startTime, endTime) + ")\n";
 		text += doubleToIntStr(valueDifference);
 		text += "\nAvg: " + doubleToIntStr(avgValueDifference)  + " #";
 		text += " / ";
