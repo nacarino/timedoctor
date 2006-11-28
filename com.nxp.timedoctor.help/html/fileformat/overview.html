@@ -1,0 +1,41 @@
+<html>
+<head>
+<meta name="copyright" content="Copyright (c) NXP Semiconductors B.V. , 2006. makes available all Content under the terms and conditions of the 
+Eclipse Public License, version 1.0 (EPL). " >
+ <link rel="stylesheet" href="../../style.css" charset="ISO-8859-1" type="text/css">
+<title>File Format Help  for  TimeDoctor</title>
+</head>
+<body>
+<h2>
+TimeDoctor File Format
+</h2>
+<p>
+ The default extension of a TimeDoctor trace file is  *.tdi.
+ A TimeDoctor trace file consists of a number of lines, 
+ each starting with a tag and followed by tag parameters.
+ Since the files are computer generated, 
+ the parser is optimized for speed, and is very picky about syntax and file consistency. 
+ Any errors in the input file may generate unpredictable results in the viewer. 
+</p>
+
+<a name="constraints"></a>
+<h2>
+Constraints and interpretations
+</h2>
+This section describes the various constraints and interpretations of 
+the sample sequence in the file in random order:
+<ul>
+       <li> When sampling is started after execution has already started and many task have been created, some artifacts may occur. These are the result of STO samples without corresponding STA samples.  TimeDoctor will essentially ignore these STO samples. </li>
+
+       <li> TimeDoctor assumes that always exactly one task is active per CPU. It is possible, but not recommended to have 0 tasks active. This means that a context switch should always specify a STO &lttask1&gt / STA &lttask2&gt sequence of samples in the file. </li>
+
+       <li>  Interrupts can be displayed interrupting tasks and other interrupts. Interrupts may even interrupt itself. This means that only for Isr’s (not Tasks, see above) nested occurrences of STA/STO pairs may occur. </li>
+
+       <li>   Queue sizes are derived by adding 1 (or the optional size value) for each send and subtracting 1 (or the optional size value) for each receive, limiting at 0. Some startup artifacts may occur when sampling starts when queues are already non-empty. Similar artifacts occur for Semaphores and Queues. </li>
+
+       <li> DSC tags are always associated with the immediately preceding STA/STO/OCC tags.  Any VAL tags in between will not interfere with this association</li>
+</ul>
+
+<br><div class="runningfooter">(C) Copyright NXP Semiconductors B.V., 2006. All Rights Reserved.</div>
+</body>
+</html>

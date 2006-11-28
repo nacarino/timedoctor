@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="File Format" link_to="toc.xml#fileformat">
+	<topic label="Overview" href="html/fileformat/overview.html" >
+		<topic label="Constraints" href="html/fileformat/overview.html#constraints" ></topic>
+	</topic>topic>
+	<topic label="Tags" href="html/FileFormat/tags.html">
+		<topic label="CPU" href="html/FileFormat/tags.html" ></topic>
+		<topic label="SPEED" href="html/FileFormat/tags.html#speed" />
+		<topic label="MEMSPEED" href="html/FileFormat/tags.html#memspeed"></topic>
+		<topic label="TIME" href="html/FileFormat/tags.html#time" > </topic>
+		<topic label="CRE" href="html/FileFormat/tags.html#cre" />
+		<topic label="DEL" href="html/FileFormat/tags.html#del" />
+		<topic label="STA" href="html/FileFormat/tags.html#sta" />
+		<topic label="STO" href="html/FileFormat/tags.html#sto" />
+		<topic label="OCC" href="html/FileFormat/tags.html#occ" />
+		<topic label="TIM" href="html/FileFormat/tags.html#tim" />
+		<topic label="VAL" href="html/FileFormat/tags.html#val" />
+		<topic label="DSC" href="html/FileFormat/tags.html#dsc" />
+		<topic label="DNM" href="html/FileFormat/tags.html#dnm" />
+		<topic label="NAM" href="html/FileFormat/tags.html#nam" />
+		<topic label="END" href="html/FileFormat/tags.html#end" />
+	</topic>		
+</toc>
