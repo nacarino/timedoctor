@@ -31,7 +31,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction propertyAction;
     private IWorkbenchAction preferenceAction;
     private IWorkbenchAction aboutAction;
-
+    private IWorkbenchAction helpAction;
+    
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
         super(configurer);
     }
@@ -51,6 +52,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         preferenceAction = ActionFactory.PREFERENCES.create(window);
         register(preferenceAction);
+
+        helpAction = ActionFactory.HELP_CONTENTS.create(window);
+        register(helpAction);
 
         aboutAction = ActionFactory.ABOUT.create(window);
         register(aboutAction);
@@ -79,6 +83,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         windowMenu.add(preferenceAction);
         
         // Help
+        helpMenu.add(helpAction);
+        helpMenu.add(new Separator());
         helpMenu.add(aboutAction);
     }
     
