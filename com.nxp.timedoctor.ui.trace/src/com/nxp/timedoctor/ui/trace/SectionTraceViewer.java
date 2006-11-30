@@ -141,8 +141,18 @@ public class SectionTraceViewer implements IExpandClient {
 		sash.setEnabled(true);
 		sectionTrace.getParent().layout();
 		updateVerticalScrollBar();
+	}
 
-		updateLeftScroll();
+	/**
+	 * Collapses this side of the section so only the header is visible.
+	 */
+	public final void collapse() {
+		final FormData data = (FormData) sectionTrace.getLayoutData();
+		traceHeight = data.height;
+		data.height = 0;
+		sash.setEnabled(false);
+		sectionTrace.getParent().layout();
+		updateVerticalScrollBar();
 	}
 
 	/**
@@ -161,21 +171,7 @@ public class SectionTraceViewer implements IExpandClient {
 			left.getParent().layout(false);
 		}
 	}
-
-	/**
-	 * Collapses this side of the section so only the header is visible.
-	 */
-	public final void collapse() {
-		final FormData data = (FormData) sectionTrace.getLayoutData();
-		traceHeight = data.height;
-		data.height = 0;
-		sash.setEnabled(false);
-		sectionTrace.getParent().layout();
-		updateVerticalScrollBar();
-
-		updateLeftScroll();
-	}
-
+	
 	/**
 	 * Creates the contents of the right side of the section, laying out and
 	 * populating trace lines.
@@ -270,5 +266,26 @@ public class SectionTraceViewer implements IExpandClient {
 				.getParent();
 		int height = rightPane.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 		rightScroll.setMinHeight(height);
+	}
+	
+	/**
+	 * This method will adjust the height of the section which contains the trace lines.
+	 * 
+	 * @param height
+	 * 				The amount by which the height of the Section must be changed.	 
+	 */
+	public void updateHeight(final int height) {
+		traceHeight += height;
+		((FormData) sectionTrace.getLayoutData()).height = traceHeight;
+	}
+
+	/**
+	 * This method will relayout the section and updates the vertical scroll bar.
+	 *
+	 */
+	public void layoutSection() {
+		sectionTrace.layout(false);
+		sectionTrace.getParent().layout();
+		updateVerticalScrollBar();
 	}
 }

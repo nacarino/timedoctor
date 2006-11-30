@@ -210,4 +210,15 @@ public class SectionBar extends Composite {
 			}
 		});
 	}
+	
+	/**
+	 * This method will adjust the height of the section which contains the labels. 
+	 * 
+	 * @param height
+	 *            The amount by which the height of the Section must be changed.	 
+	 */
+	public void updateHeight(final int height) {
+		contentHeight += height;
+		((FormData) content.getLayoutData()).height = contentHeight;
+	}
 }

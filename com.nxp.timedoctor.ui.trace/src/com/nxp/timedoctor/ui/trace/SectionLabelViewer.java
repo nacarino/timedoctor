@@ -86,5 +86,14 @@ public class SectionLabelViewer extends SectionBar implements ISashClient {
 		sectionLabel.setLayout(sectionLabelLayout);
 	
 		setContent(sectionLabel);
+	}	
+
+	/**
+	 * This method will relayout the section which contains the labels.
+	 * 
+	 */
+	public void layoutSection() {
+		this.getParent().layout(true);
+		this.getParent().update();
 	}
 }

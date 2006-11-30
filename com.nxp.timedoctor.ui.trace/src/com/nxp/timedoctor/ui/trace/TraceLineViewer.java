@@ -92,6 +92,10 @@ public class TraceLineViewer {
 	 */
 	private static CLabel selectedLabel = null;
 	
+	private Label separator;
+	
+	private boolean isVisible = true;
+	
 	/**
 	 * Constructs a new TraceLineViewer.
 	 * 
@@ -191,7 +195,7 @@ public class TraceLineViewer {
 	 * @return the created separator
 	 */
 	private Label createSeparator(final Composite sectionLabel) {
-		Label separator = new Label(sectionLabel, SWT.HORIZONTAL);
+		separator = new Label(sectionLabel, SWT.HORIZONTAL);
 		separator.setBackground(sectionLabel.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 		separator.setForeground(sectionLabel.getDisplay().getSystemColor(
@@ -523,5 +527,51 @@ public class TraceLineViewer {
 		label.setBackground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
 		label.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
 		selectedLabel = label;
+	}
+
+	/**
+	 * This method will decide whether to show or hide a line.
+	 * @return heightOffset
+	 * 				The amount by which the section height needs to be changed.
+	 * 				The value will be -ve if we are hiding a previously visible line.
+	 * 				The value will be +ve if we are showing a previously hidden line.
+	 * 				The value will be 0 when a hidden line remains hidden or a visible line remains visible.
+	 */
+	public int updateVisibility() {
+		int heightOffset;
+		boolean lineStatus = line.hasSamples(zoom.getStartTime(), zoom
+				.getEndTime());
+		if (lineStatus == true && isVisible == false) {
+			setVisible(lineStatus);
+			heightOffset = trace.getBounds().height;
+		} else if (lineStatus == false && isVisible == true) {
+			setVisible(lineStatus);
+			heightOffset = (-1) * trace.getBounds().height;
+		} else {
+			heightOffset = 0;
+		}
+		return heightOffset;
+	}
+
+	/**
+	 * This method will show or hide a line  
+	 *
+	 * @param visible
+	 * 			Boolean value which specifies whether the line should be hidden or not
+	 */
+	private void setVisible(final boolean visible) {
+		GridData canvasGridData = (GridData) trace.getLayoutData();
+		canvasGridData.exclude = !visible; //Set exclude property to false, when line is to be made visible
+		trace.setVisible(visible);
+
+		GridData labelGridData = (GridData) label.getLayoutData();
+		labelGridData.exclude = !visible;
+		label.setVisible(visible);
+
+		GridData separatorGridData = (GridData) separator.getLayoutData();
+		separatorGridData.exclude = !visible;
+		separator.setVisible(visible);
+
+		isVisible = visible;
 	}
 }

@@ -10,6 +10,10 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -25,7 +29,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * (tasks, ISRs, Queues, etc.) The section has a header at the top and a
  * splitter at the bottom to resize the height of the section.
  */
-public class SectionViewer {
+public class SectionViewer implements Observer,IExpandClient{
 
 	/**
 	 * Constant for use in form layouts to indicate an element's
@@ -63,7 +67,11 @@ public class SectionViewer {
 	 * Model component containing current zoom/scroll information.
 	 */
 	private ZoomModel zoomData;
-
+	
+	private ArrayList<TraceLineViewer> traceLineViewerArrayList;
+	
+	private boolean isExpanded = true;
+	
 	/**
 	 * Constructs a new SectionViewer, and creates and lays out the trace lines.
 	 * Handles setting the label and canvas parts to synchronize expand/collapse
@@ -97,7 +105,10 @@ public class SectionViewer {
 		this.last = lastSection;
 		this.section = section;
 		this.zoomData = zoomData;
-
+		
+		zoomData.addObserver(this);
+		traceLineViewerArrayList = new ArrayList<TraceLineViewer>();
+		
 		createLabelView(leftPane);
 		createTraceView(rightPane);
 
@@ -105,7 +116,8 @@ public class SectionViewer {
 				model, traceCursorListener);
 
 		sectionTrace.addSashClient(sectionLabel);
-		sectionLabel.addExpandClient(sectionTrace);
+		sectionLabel.addExpandClient(sectionTrace);	
+		sectionLabel.addExpandClient(this);
 	}
 
 	/**
@@ -197,7 +209,54 @@ public class SectionViewer {
 			if (line.getCount() > 1) {
                 traceLine = new TraceLineViewer(traceLine, labels, traces,
                         line, zoomData, model, traceCursorListener);
+                traceLineViewerArrayList.add(traceLine);
             }
 		}
+	}
+	
+	/**
+	 * Updates the section when the zoom or scroll is changed by another part of
+	 * the view.
+	 * 
+	 * @param o
+	 *            the <code>Observable</code> calling the update
+	 * @param data
+	 *            has no effect
+	 */
+	public void update(Observable o, Object data) {
+		updateVisibility();
+	}
+
+	private void updateVisibility() {
+		if (isExpanded) {
+			int sectionHeightOffset = 0;
+			for (TraceLineViewer currentTraceLine : traceLineViewerArrayList) {
+				int traceHeightOffset = currentTraceLine.updateVisibility();
+				sectionHeightOffset += traceHeightOffset;
+			}
+			
+			if (sectionHeightOffset != 0) {
+				sectionTrace.updateHeight(sectionHeightOffset);
+				sectionLabel.updateHeight(sectionHeightOffset);
+				sectionTrace.layoutSection();
+				sectionLabel.layoutSection();
+			}
+		}
+	}
+
+	/**
+	 * updates the value of "isExpanded" variable on collapsing a section.
+	 */
+	public void collapse() {
+		isExpanded = false;
+	}
+
+	/**
+	 * updates the value of "isExpanded" variable on expanding a section.
+	 * Also it will update the section.
+	 */
+	public void expand() {
+		isExpanded = true;
+		updateVisibility();
 	}
 }
