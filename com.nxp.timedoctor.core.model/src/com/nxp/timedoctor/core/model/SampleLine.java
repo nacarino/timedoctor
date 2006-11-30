@@ -665,20 +665,19 @@ public abstract class SampleLine {
 	 * Determines whether or not the line has samples within the given time
 	 * window.
 	 * 
-	 * @param from
-	 *            the start time
-	 * @param to
-	 *            the end time
-	 * @return boolean indicating whether or not there are samples
-	 */
-	// ignoring checkstyle request to make final, abstract, or empty--method
-	// needs to be overridden
-	public boolean hasSamples(final double from, final double to) {
-		int i = binarySearch(from);
-		int j = binarySearch(to);
-		return (i != j);
+	 * @param startTime
+	 * 			The start time of the TraceView
+	 * @param endTime
+	 * 			The end time of the TraceView
+	 * @return boolean
+	 * 			returns a boolean value indicating whether a sample is present or not.
+	 */	
+	public boolean hasSamples(final double startTime, final double endTime) {
+		final int startIndex = binarySearch(startTime);
+	 	final int endIndex = binarySearch(endTime);
+	 	return (startIndex != endIndex);
 	}
-
+	
 	/**
 	 * Empty method to be overridden by subclasses.
 	 * 

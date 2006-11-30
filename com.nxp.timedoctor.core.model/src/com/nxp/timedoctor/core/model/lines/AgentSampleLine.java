@@ -116,31 +116,42 @@ public class AgentSampleLine extends SampleLine {
     }
 
     /**
-     * Overrides superclass method for type-specific behavior.
-     * 
-     * @param from
-     *            the start time for the search
-     * @param to
-     *            the end time for the search
-     * @return boolean indicating whether samples are present in the specified
-     *         window
-     */
-    @Override
-    public final boolean hasSamples(final double from, final double to) {
-        int i = binarySearch(from);
-        int j = binarySearch(to);
-        if (i != j) {
-            return true;
-        } else if (getCount() == 0) {
-            return false;
-        } else if (getSample(i).time > to || getSample(i).time < from) {
-            return false;
-        } else if (getSample(i).type == SampleType.STOP) {
-            // what does Checkstyle mean here?
-            return false;
-        } else {
-            return true;
-        }
-    }
+	 * Determines whether or not the line has samples within the given time
+	 * window.
+	 * 
+	 * @param startTime
+	 *            The start time of the TraceView
+	 * @param endTime
+	 *            The end time of the TraceView
+	 * @return boolean returns a boolean value indicating whether a sample is
+	 *         present or not.
+	 */
+	@Override
+	public final boolean hasSamples(final double startTime, final double endTime) {
+		if (getCount() <= 1) {
+			// no samples are present in the sample line.
+			return false;
+		}
+		final int startIndex = binarySearch(startTime);
+		final int endIndex = binarySearch(endTime);
 
+		if (startIndex != endIndex) {
+			return true;
+		} else {
+			//startIndex is same as endIndex
+			if (getSample(startIndex).type == SampleType.STOP) {
+				// No samples in between and the last sample before startTime is a stop
+				return false;
+			}
+
+			double startIndexTime = getSample(startIndex).time;
+			double nextIndexTime = getSample(startIndex + 1).time;
+
+			if (startTime < nextIndexTime && endTime > startIndexTime) {
+				//The specified times overlap with the sample times
+				return true;
+			}
+		}
+		return false;
+	}
 }

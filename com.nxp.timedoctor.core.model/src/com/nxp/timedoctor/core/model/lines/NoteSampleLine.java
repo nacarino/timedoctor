@@ -50,31 +50,4 @@ public class NoteSampleLine extends SampleLine {
 			addSample(SampleType.END, endTime);
 		}
 	}
-
-	/**
-	 * Overrides superclass method for type-specific behavior.
-	 * 
-	 * @param from
-	 *            the beginning time of the search window
-	 * @param to
-	 *            the end time of the search window
-	 * @return whether or not the line has samples in the given window
-	 */
-	@Override
-	public final boolean hasSamples(final double from, final double to) {
-		int i = binarySearch(from);
-		int j = binarySearch(to);
-		if (i != j) {
-			return true;
-		} else if (getCount() <= 1) {
-			return false;
-		} else if (getSample(i).time > to || getSample(i).time < from) {
-			return false;
-		} else if (getSample(i).type == SampleType.STOP) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
 }

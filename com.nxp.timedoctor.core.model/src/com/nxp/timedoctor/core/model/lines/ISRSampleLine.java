@@ -184,29 +184,42 @@ public class ISRSampleLine extends SampleLine {
 	}
 
 	/**
-	 * Overrides superclass method for type-specific behavior.
+	 * Determines whether or not the line has samples within the given time
+	 * window.
 	 * 
-	 * @param from
-	 *            the beginning time of the search window
-	 * @param to
-	 *            the end time of the search window
-	 * @return whether or not the line has samples in the given window
+	 * @param startTime
+	 *            The start time of the TraceView
+	 * @param endTime
+	 *            The end time of the TraceView
+	 * @return boolean returns a boolean value indicating whether a sample is
+	 *         present or not.
 	 */
 	@Override
-	public final boolean hasSamples(final double from, final double to) {
-		int i = binarySearch(from);
-		int j = binarySearch(to);
-		if (i != j) {
-			return true;
-		} else if (getCount() <= 1) {
+	public final boolean hasSamples(final double startTime, final double endTime) {
+		if (getCount() <= 1) {
+			//no samples are present in the sample line.
 			return false;
-		} else if (getSample(i).time > to || getSample(i).time < from) {
-			return false;
-		} else if (getSample(i).type == SampleType.STOP) {
-			return false;
-		} else {
-			return true;
 		}
-	}
+		final int startIndex = binarySearch(startTime);
+		final int endIndex = binarySearch(endTime);
 
+		if (startIndex != endIndex) {
+			return true;
+		} else {
+			//startIndex is same as endIndex
+			if (getSample(startIndex).type == SampleType.STOP) {
+				//No samples in between and the last sample before startTime is a stop
+				return false;
+			}
+
+			double startIndexTime = getSample(startIndex).time;
+			double nextIndexTime = getSample(startIndex + 1).time;
+
+			if (startTime < nextIndexTime && endTime > startIndexTime) {
+				//The specified times overlap with the sample times
+				return true;
+			}
+		}
+		return false;
+	}
 }
