@@ -122,8 +122,8 @@ public class RulerPaintListener implements PaintListener {
 		double width = INITIAL_INTERVAL * pixelsPerTime;
 		int count = DEFAULT_TICKS_PER_UNIT;
 		
-		// these numbers seem clear enough to leave here
-		int cursorWidth = 60;
+		// Find 10-power that ensures 75 pixel spacing (max number is xxxx.xxus)
+		int cursorWidth = 75;
 		while (width > 10 * cursorWidth) {
 			interval /= 10;
 			width /= 10;
