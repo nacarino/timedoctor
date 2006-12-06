@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.nxp.timedoctor.core.model;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+
 /**
  * Utility class containing methods for formatting time strings.
  */
@@ -72,15 +75,19 @@ public final class Times {
 	 */
 	public static String timeToString(final double time,
 			final double precision) {
+	    
 		String s;
 		if (time < PREC_0) {
 			s = "0s";
 		} else if (precision >= PREC_S) {
-			s = String.format("%.3fs", time);
+			NumberFormat timeFormat = new DecimalFormat("0.###s");
+			s = timeFormat.format(time);
 		} else if (precision >= PREC_MS) {
-			s = String.format("%.3fms", time * MULT_MS);
+			NumberFormat timeFormat = new DecimalFormat("0.###ms");
+			s = timeFormat.format(time * MULT_MS);
 		} else {
-			s = String.format("%.3fus", time * MULT_US);
+			NumberFormat timeFormat = new DecimalFormat("0.###us");
+			s = timeFormat.format(time * MULT_US);
 		}
 		return s;
 	}
