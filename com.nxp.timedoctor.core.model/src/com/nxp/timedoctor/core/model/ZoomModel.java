@@ -229,6 +229,8 @@ public class ZoomModel extends Observable {
 	
 	public void setSelectedLine(SampleLine line) {
 		this.selectedLine = line;
+		setChanged();
+		notifyObservers();
 	}
 	
 	public SampleLine getSelectedLine() {
