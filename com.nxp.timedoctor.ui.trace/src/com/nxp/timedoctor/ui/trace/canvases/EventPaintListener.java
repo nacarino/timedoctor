@@ -25,7 +25,7 @@ import com.nxp.timedoctor.core.model.Sample.SampleType;
 /**
  * Contains the code to paint an event or semaphore.
  */
-public class EventPaintListener implements PaintListener {
+public class EventPaintListener extends TracePaintListener implements PaintListener {
 
 	/**
 	 * The color to use in painting the line.
@@ -62,18 +62,6 @@ public class EventPaintListener implements PaintListener {
      * Height used to draw the trace which connects start and end event.
 	 */	
 	private static final int EVENT_BAR_HEIGHT = 4;
-
-	/**
-	 * The minimum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MIN = -100;
-
-	/**
-	 * The maximum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MAX = 100000;
 
 	private SampleFlag sampleFlag;
 
@@ -120,7 +108,8 @@ public class EventPaintListener implements PaintListener {
 			Composite scroll = rightPane.getParent();
 
 			int fullWidth = scroll.getBounds().width;
-			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
+			int canvasHeight = canvas.getBounds().height;
+			int traceHeight = canvasHeight - VERTICAL_PADDING;
 			double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
 			final double drawStartTime = timeOffset + (e.x / zoom);
 			final double drawEndTime = drawStartTime + (e.width / zoom);
@@ -129,10 +118,6 @@ public class EventPaintListener implements PaintListener {
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
 
-			// Draw the bottom line
-			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
-			
 			e.gc.setForeground(color);
 			for (int xOld = -1; index < line.getCount() - 1; index++) {
 
@@ -151,30 +136,16 @@ public class EventPaintListener implements PaintListener {
 				xOld = xEnd;
 
 				if (line.getSample(index).type == SampleType.START) {
-					sampleFlag.draw(e, color, color, xStart, 0, fullHeight);
+					sampleFlag.draw(e, color, color, xStart, VERTICAL_PADDING, traceHeight);
 					e.gc.setBackground(fillColor);
-					e.gc.fillRectangle(xStart, fullHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
+					e.gc.fillRectangle(xStart, canvasHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
 							EVENT_BAR_HEIGHT);
-					e.gc.drawRectangle(xStart, fullHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
+					e.gc.drawRectangle(xStart, canvasHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
 							EVENT_BAR_HEIGHT);
 				} else if (line.getSample(index).type == SampleType.STOP) {
-					sampleFlag.draw(e, color, fillColor, xStart, 0, fullHeight);
+					sampleFlag.draw(e, color, fillColor, xStart, VERTICAL_PADDING, traceHeight);
 				}
 			}
 		}
-	}
-
-	/**
-	 * Ensures the given value is within the valid x-values and casts it to an
-	 * int. If the value is too low, returns <code>X_MIN</code>. If it's too
-	 * high, returns <code>X_MAX</code>.
-	 * 
-	 * @param val
-	 *            the value to be checked and casted
-	 * @return <code>value</code>, <code>X_MIN</code>, or
-	 *         <code>X_MAX</code>
-	 */
-	private int boundedInt(final double val) {
-		return (int) Math.min(X_MAX, Math.max(X_MIN, val));
 	}
 }

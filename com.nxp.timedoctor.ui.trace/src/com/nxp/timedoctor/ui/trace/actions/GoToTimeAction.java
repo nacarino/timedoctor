@@ -29,11 +29,11 @@ public class GoToTimeAction extends TraceAction {
 	 * @param label
 	 *  		 Name of the action 
 	 */
-	public GoToTimeAction(String label) {
+	public GoToTimeAction(final String label) {
 		super(label);
 		
 		inputValidator = new IInputValidator() {
-			public String isValid(String newText) {				
+			public String isValid(final String newText) {				
 				try {
 					Double d = Double.parseDouble(newText);
 					if (d < 0) {
@@ -48,6 +48,7 @@ public class GoToTimeAction extends TraceAction {
 		};		
 	}
 
+	@Override
 	public void run() {
 		InputDialog inputDialog = new InputDialog(null, "Go To Time",
 				"Enter the time in seconds", "0", inputValidator);

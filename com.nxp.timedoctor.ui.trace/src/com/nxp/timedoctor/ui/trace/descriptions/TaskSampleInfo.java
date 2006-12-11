@@ -15,12 +15,13 @@ import com.nxp.timedoctor.core.model.SampleLine;
 public class TaskSampleInfo extends SampleInfo {
 	private SampleLine line;
 	
-	public TaskSampleInfo(SampleLine line) {
+	public TaskSampleInfo(final SampleLine line) {
 		super(line);
 		this.line = line;	
 	}
 	
-	public String getInfoStr(int index) {
+	@Override
+	public String getInfoStr(final int index) {
 		double startTime = line.getSample(index).time;
 		double endTime = line.getSample(index + 1).time;
 

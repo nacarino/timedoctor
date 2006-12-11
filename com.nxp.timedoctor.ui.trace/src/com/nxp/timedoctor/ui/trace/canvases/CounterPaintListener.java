@@ -24,7 +24,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 /**
  * Contains the code to paint a value,cycle or memory cycle.
  */
-public class CounterPaintListener implements PaintListener {
+public class CounterPaintListener extends TracePaintListener implements PaintListener {
 
 	/**
 	 * The color to use in painting the line.
@@ -47,32 +47,9 @@ public class CounterPaintListener implements PaintListener {
 	private SampleLine line;
 
 	/**
-	 * The minimum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MIN = -100;
-
-	/**
-	 * The maximum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MAX = 100000;
-
-	/**
 	 * Vertical padding value on the bottom of trace lines.
 	 */
 	private static final int VERTICAL_PADDING = 2;
-
-	/**
-	 * The starting time of the part of the line currently displayed, based on
-	 * scroll data.
-	 */
-	private double timeOffset;
-
-	/**
-	 * Sapcing in pixels between grid lines.
-	 */
-	private static final int GRID_SPACING = 10;
 
 	private double frequency;
 	
@@ -90,10 +67,12 @@ public class CounterPaintListener implements PaintListener {
 	 *            contains data on the zoom/scroll state of the system
 	 */
 
-	public CounterPaintListener(final Color col, final Color fillCol,
-			final SampleLine sampleLine, final ZoomModel zoomData) {
-		this.color = col;
-		this.fillColor = fillCol;
+	public CounterPaintListener(final Color color, 
+			final Color fillColor,
+			final SampleLine sampleLine, 
+			final ZoomModel zoomData) {
+		this.color = color;
+		this.fillColor = fillColor;
 		this.line = sampleLine;
 		this.zoom = zoomData;
 		
@@ -125,12 +104,13 @@ public class CounterPaintListener implements PaintListener {
 			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
 			// TODO calculate height for proportional counters
-			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
+			int canvasHeight = canvas.getBounds().height; 
+			int traceHeight = canvasHeight - VERTICAL_PADDING;
 			double startTime = zoom.getStartTime();
 			double endTime = zoom.getEndTime();
 			double pixelsPerSec = fullWidth / (endTime - startTime);
-			double drawStartTime = startTime + (((double)e.x) / pixelsPerSec);
-			double drawEndTime = drawStartTime + (((double)e.width) / pixelsPerSec);
+			double drawStartTime = startTime + ((e.x) / pixelsPerSec);
+			double drawEndTime = drawStartTime + ((e.width) / pixelsPerSec);
 			double maxFilling = line.getMaxSampleValue();
 			
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
@@ -138,9 +118,9 @@ public class CounterPaintListener implements PaintListener {
 			
 			// Draw the bottom line
 			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
+			e.gc.drawLine(e.x, traceHeight, e.x + e.width, traceHeight);
 			
-			drawGridLines(e, fullHeight);
+			drawGridLines(e, canvasHeight, traceHeight);
 
 			e.gc.setForeground(color);
 			e.gc.setBackground(fillColor);
@@ -158,8 +138,8 @@ public class CounterPaintListener implements PaintListener {
 					- line.getSample(index - 1).val;
 				
 				double curFilling;
-				if (line.getType() == SampleLine.LineType.CYCLES
-						|| line.getType() == SampleLine.LineType.MEM_CYCLES) {
+				if ((line.getType() == SampleLine.LineType.CYCLES)
+						|| (line.getType() == SampleLine.LineType.MEM_CYCLES)) {
 					curFilling = valueDifference / (timeDifference * frequency);					
 				} else {
 					curFilling = valueDifference / maxFilling;
@@ -172,7 +152,7 @@ public class CounterPaintListener implements PaintListener {
 				curMaxFilling = Math.max(curMaxFilling, curFilling);
 				curMinFilling = Math.min(curMinFilling, curFilling);
 				
-				if (xNext == xCur && index < line.getCount()) {
+				if ((xNext == xCur) && (index < line.getCount())) {
 					continue;
 				}
 				
@@ -180,18 +160,18 @@ public class CounterPaintListener implements PaintListener {
 				int curFillHeight = 0;
 				if (curFilling > 0) {
 					// Show at least one pixel if there is something in the counter
-					curFillHeight = Math.max(1, (int) (fullHeight * curFilling));
+					curFillHeight = Math.max(1, (int) (traceHeight * curFilling));
 				}
 
 				// Get min filling in pixels
 				int minFillHeight = 0;
 				if (curMinFilling > 0) {
 					// Show at least one pixel if there is something in the counter
-					minFillHeight = Math.max(1, (int) (fullHeight * curMinFilling));
+					minFillHeight = Math.max(1, (int) (traceHeight * curMinFilling));
 				}
 
 				// Get max buffer filling in pixels
-				int maxFillHeight = (int) (fullHeight * curMaxFilling);
+				int maxFillHeight = (int) (traceHeight * curMaxFilling);
 
 				// Note: fillRectangle is drawn (verified for MS Windows) from the left-upper origin
 				// including the origin, up to (excluding) width, height
@@ -204,23 +184,23 @@ public class CounterPaintListener implements PaintListener {
 					
 				// Draw rectangle with actual value
 				// Set height origin to fullHeight + 1 to include drawing at fullHeight
-				e.gc.fillRectangle(xCur, fullHeight + 1, 
+				e.gc.fillRectangle(xCur, canvasHeight + 1, 
 						xNext - xCur, - curFillHeight);
 				// Draw top line on top of rectangle
-				e.gc.drawLine(xCur, fullHeight - curFillHeight, 
-						xNext, fullHeight - curFillHeight);
+				e.gc.drawLine(xCur, canvasHeight - curFillHeight, 
+						xNext, canvasHeight - curFillHeight);
 
 				// Draw min line
 				e.gc.setForeground(fillColor);
-				e.gc.drawLine(xCur, fullHeight, 
-						xCur, fullHeight - minFillHeight);
+				e.gc.drawLine(xCur, canvasHeight, 
+						xCur, canvasHeight - minFillHeight);
 
 				// Draw max line on top of min line
 				// Drawing after the drawing of min line ensures that if max=min=0
 				// only the contour is drawn (one pixel for the max line is visible)
 				e.gc.setForeground(color);
-				e.gc.drawLine(xCur, fullHeight - minFillHeight, 
-						xCur, fullHeight - maxFillHeight);
+				e.gc.drawLine(xCur, canvasHeight - minFillHeight, 
+						xCur, canvasHeight - maxFillHeight);
 
 				if (line.getSample(index).time > drawEndTime) {
 					break;
@@ -232,33 +212,5 @@ public class CounterPaintListener implements PaintListener {
 				curMinFilling = curFilling;
 			}
 		}			
-	}
-
-	private void drawGridLines(final PaintEvent e, int height) {
-		for (int i = 0, y = height; y >= 0; i++, y -= GRID_SPACING) {
-			if (i == 0) {
-				e.gc.setForeground(e.display
-						.getSystemColor(SWT.COLOR_BLACK));
-			} else {
-				e.gc
-						.setForeground(e.display
-								.getSystemColor(SWT.COLOR_GRAY));
-			}
-			e.gc.drawLine(e.x, y, e.x + e.width, y);
-		}
-	}
-	
-	/**
-	 * Ensures the given value is within the valid x-values and casts it to an
-	 * int. If the value is too low, returns <code>X_MIN</code>. If it's too
-	 * high, returns <code>X_MAX</code>.
-	 * 
-	 * @param val
-	 *            the value to be checked and casted
-	 * @return <code>value</code>, <code>X_MIN</code>, or
-	 *         <code>X_MAX</code>
-	 */
-	private int boundedInt(final double val) {
-		return (int) Math.min(X_MAX, Math.max(X_MIN, val));
 	}
 }

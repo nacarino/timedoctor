@@ -22,10 +22,11 @@ public class ZoomOutAction extends TraceAction {
 	 * @param label
 	 * 			   Name of the action
 	 */
-	public ZoomOutAction(String label) {
+	public ZoomOutAction(final String label) {
 		super(label);
 	}
 	
+	@Override
 	public void run() {
 		double startTime = zoomModel.getStartTime();
 		double endTime = zoomModel.getEndTime();

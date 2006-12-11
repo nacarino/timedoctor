@@ -26,24 +26,14 @@ import com.nxp.timedoctor.core.model.Sample.SampleType;
 /**
  * Contains the code to paint a task, ISR, or agent.
  */
-public class TaskPaintListener implements PaintListener {
+public class TaskPaintListener extends TracePaintListener implements PaintListener {
 
 	/**
-	 * The minimum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
+	 * Vertical padding value above a trace line.
+	 * Relatively large value as task trace does not
+	 * need to use the full canvas height.
 	 */
-	private static final int X_MIN = -100;
-
-	/**
-	 * The maximum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MAX = 100000;
-
-	/**
-	 * Vertical padding value on the bottom of trace lines.
-	 */
-	private static final int VERTICAL_PADDING = 2;
+	private static final int VERTICAL_PADDING = 6;
 
 	/**
 	 * Contains the list of colors which are used to paint the event.
@@ -64,12 +54,6 @@ public class TaskPaintListener implements PaintListener {
 	 */
 	private static final int MAX_COLORS = 8;
 	
-	/**
-	 * The model containing all trace data. Used to retrieve the end time of the
-	 * full trace, for use in full trace width calculations.
-	 */
-	private TraceModel model;
-
 	/**
 	 * The line containing data to visualize.
 	 */
@@ -109,10 +93,11 @@ public class TaskPaintListener implements PaintListener {
 	 * @param tdModel
 	 *            contains all trace data
 	 */
-	public TaskPaintListener(final Color col, final SampleLine sampleLine,
-			final ZoomModel zoomData, final TraceModel tdModel) {
-		this.color = col;
-		this.model = tdModel;
+	public TaskPaintListener(final Color color, 
+			final SampleLine sampleLine,
+			final ZoomModel zoomData, 
+			final TraceModel tdModel) {
+		this.color = color;
 		this.line = sampleLine;
 		this.data = zoomData;
 	}
@@ -138,7 +123,8 @@ public class TaskPaintListener implements PaintListener {
 			// guarantees trace drawing is unaffected by appearance of vertical
 			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
-			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
+			int canvasHeight = canvas.getBounds().height;
+			int traceHeight = canvasHeight - VERTICAL_PADDING;
 			double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
 
 			final double drawStartTime = timeOffset + (e.x / zoom);
@@ -148,25 +134,21 @@ public class TaskPaintListener implements PaintListener {
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
 
-			if (line.getSample(index).time < drawStartTime
-					&& line.getSample(index).type != SampleType.STOP) {
+			if ((line.getSample(index).time < drawStartTime)
+					&& (line.getSample(index).type != SampleType.STOP)) {
 				active = true;
 			}
-			
-			// Draw the bottom line
-			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
 			
 			for (int xOld = -1; index < line.getCount(); index++) {
 				if (line.getSample(index).time > drawEndTime) {
 					break;
 				}
-				if (!active && line.getSample(index).type == SampleType.START) {
+				if (!active && (line.getSample(index).type == SampleType.START)) {
 					active = true;
 				}
 				if (active) {
-					if (line.getSample(index).type == SampleType.START
-							|| line.getSample(index).type == SampleType.RESUME) {
+					if ((line.getSample(index).type == SampleType.START)
+							|| (line.getSample(index).type == SampleType.RESUME)) {
                         
 						final int xStart = boundedInt((line.getSample(index).time - timeOffset)
 								* zoom);
@@ -193,13 +175,12 @@ public class TaskPaintListener implements PaintListener {
 						}
 
 						if (xStart == xEnd) {
-							e.gc.drawLine(xStart, 0, xEnd, fullHeight);
+							e.gc.drawLine(xStart, canvasHeight, xEnd, VERTICAL_PADDING);
 						} else {
-							e.gc.drawRectangle(xStart, 0, xEnd - xStart,
-									fullHeight);
-
-							e.gc.fillRectangle(xStart + 1, 1,
-									xEnd - xStart - 1, fullHeight - 1);
+							e.gc.fillRectangle(xStart, VERTICAL_PADDING,
+									xEnd - xStart, traceHeight);
+							e.gc.drawRectangle(xStart, VERTICAL_PADDING, xEnd - xStart,
+									traceHeight);
 						}
 					} else if (line.getSample(index).type == SampleType.SUSPEND) {
 						// Handle preemption by another task or ISR
@@ -216,37 +197,26 @@ public class TaskPaintListener implements PaintListener {
 								* zoom));
                         xOld = xEnd;
 						index = j - 1;
+						
 						e.gc.setBackground(e.display
 								.getSystemColor(SWT.COLOR_GRAY));
-						e.gc.fillRectangle(xStart, 0, xEnd - xStart, fullHeight);
+
 						if (xStart == xEnd) {
-							e.gc.drawLine(xStart, 0, xEnd, fullHeight);
+							e.gc.drawLine(xStart, canvasHeight, xEnd, VERTICAL_PADDING);
 						} else {
 							e.gc.setForeground(color);
-							e.gc.drawRectangle(xStart, 0, xEnd - xStart,
-									fullHeight);
+							
+							e.gc.fillRectangle(xStart, VERTICAL_PADDING, xEnd - xStart, traceHeight);
+							e.gc.drawRectangle(xStart, VERTICAL_PADDING, xEnd - xStart,
+									traceHeight);
 						}
 
-					} else if (line.getSample(index).type == SampleType.STOP
-							|| line.getSample(index).type == SampleType.END) {
+					} else if ((line.getSample(index).type == SampleType.STOP)
+							|| (line.getSample(index).type == SampleType.END)) {
 						active = false;
 					}
 				}
 			}
 		}
-	}
-
-	/**
-	 * Ensures the given value is within the valid x-values and casts it to an
-	 * int. If the value is too low, returns <code>X_MIN</code>. If it's too
-	 * high, returns <code>X_MAX</code>.
-	 * 
-	 * @param val
-	 *            the value to be checked and casted
-	 * @return <code>value</code>, <code>X_MIN</code>, or
-	 *         <code>X_MAX</code>
-	 */
-	private int boundedInt(final double val) {
-		return (int) Math.min(X_MAX, Math.max(X_MIN, val));
 	}
 }

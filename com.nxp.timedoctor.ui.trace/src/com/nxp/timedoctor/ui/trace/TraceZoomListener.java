@@ -66,7 +66,7 @@ public class TraceZoomListener implements MouseListener {
 	 * 
 	 * @see org.eclipse.swt.events.MouseTrackListener#mouseHover(org.eclipse.swt.events.MouseEvent)
 	 */
-	public void mouseUp(MouseEvent e) {
+	public void mouseUp(final MouseEvent e) {
 		if (!mouseDownCalled) {
 			// A boolean-guard against mouseUp events that are not associated
 			// with selection-zoom
@@ -81,8 +81,8 @@ public class TraceZoomListener implements MouseListener {
 			drawEndTime = temp;
 		}
 
-		if (drawStartTime > zoom.getStartTime()
-				&& drawEndTime > zoom.getStartTime()
+		if ((drawStartTime > zoom.getStartTime())
+				&& (drawEndTime > zoom.getStartTime())
 				&& (drawStartTime != drawEndTime)) {
 			zoom.pushZoom(drawStartTime, drawEndTime);
 			zoom.setTimes(drawStartTime, drawEndTime);
@@ -91,7 +91,7 @@ public class TraceZoomListener implements MouseListener {
 		mouseDownCalled = false; // Reset flag
 	}
 
-	private int getWidth(MouseEvent e) {
+	private int getWidth(final MouseEvent e) {
 		final Canvas currentCanvas = (TraceCanvas) e.widget;
 		final Composite parent1 = currentCanvas.getParent();
 		final Composite parent2 = parent1.getParent();

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.ZoomModel;
@@ -31,19 +30,19 @@ public class TraceCursorFactory {
         MARKER
 	};
 	
-	public TraceCursorFactory(ZoomModel zoom) {
+	public TraceCursorFactory(final ZoomModel zoom) {
 		this.zoom = zoom;
 	}
 	
-	public void setRulerPane(Composite rulerPane) {
+	public void setRulerPane(final Composite rulerPane) {
 		this.rulerPane = rulerPane;
 	}
 	
-	public void setTracePane(Composite tracePane) {
+	public void setTracePane(final Composite tracePane) {
 		this.tracePane = tracePane;
 	}
 	
-	public TimeLine createTraceCursor(CursorType type) {
+	public TimeLine createTraceCursor(final CursorType type) {
 		TimeLine timeLine = null;
 		switch (type) {
 		case CURSOR:

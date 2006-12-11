@@ -25,10 +25,11 @@ public class PreviousAction extends TraceAction {
 	 * @param label
 	 *            Name of the action
 	 */
-	public PreviousAction(String label) {
+	public PreviousAction(final String label) {
 		super(label);
 	}
 
+	@Override
 	public void run() {
 		final double baselineTime = zoomModel.getSelectTime();
 		final SampleLine selectedLine = zoomModel.getSelectedLine();
@@ -40,8 +41,8 @@ public class PreviousAction extends TraceAction {
 					&& (index > 0)) {
 				index--;
 			} else {
-				while (index > 0
-						&& selectedLine.getSample(index).time > baselineTime) {
+				while ((index > 0)
+						&& (selectedLine.getSample(index).time > baselineTime)) {
 					index--;
 				}
 			}

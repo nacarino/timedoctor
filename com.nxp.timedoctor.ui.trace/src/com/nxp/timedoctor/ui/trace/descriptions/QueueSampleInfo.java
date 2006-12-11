@@ -17,12 +17,13 @@ import com.nxp.timedoctor.core.model.Sample.SampleType;
 public class QueueSampleInfo extends SampleInfo {
 	private SampleLine line;
 	
-	public QueueSampleInfo(SampleLine line) {
+	public QueueSampleInfo(final SampleLine line) {
 		super(line);
 		this.line = line;	
 	}
 	
-	public String getInfoStr(int index) {
+	@Override
+	public String getInfoStr(final int index) {
 		final int LOW_MASK = 0x00000000ffffffff;
 		SampleType type = line.getSample(index).type;
 		long value = (long) line.getSample(index).val;

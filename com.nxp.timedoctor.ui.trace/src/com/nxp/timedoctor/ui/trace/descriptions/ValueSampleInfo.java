@@ -17,13 +17,14 @@ public class ValueSampleInfo extends SampleInfo {
 	private SampleLine line;
 	private ZoomModel zoom;
 	
-	public ValueSampleInfo(SampleLine line, ZoomModel zoom) {
+	public ValueSampleInfo(final SampleLine line, final ZoomModel zoom) {
 		super(line);
 		this.zoom = zoom;
 		this.line = line;	
 	}
 	
-	public String getInfoStr(int index) {
+	@Override
+	public String getInfoStr(final int index) {
 		double startTime = line.getSample(index).time;
 		double endTime = line.getSample(index + 1).time;
 		double valueDifference = line.getSample(index + 1).val

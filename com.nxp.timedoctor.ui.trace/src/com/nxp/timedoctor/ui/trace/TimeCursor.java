@@ -30,6 +30,7 @@ public class TimeCursor extends TimeLine {
 		super(rulerPane, tracePane, zoom, SWT.COLOR_RED, OFFSET);
 	}
 	
+	@Override
 	protected void setTimeLabel(final double time) {
 		double accuracy = zoom.getTimeDisplayAccuracy();
 		String timeString = Times.timeToString(time, accuracy);
@@ -38,7 +39,7 @@ public class TimeCursor extends TimeLine {
 		// show current time plus difference from baseline
 		double selectTime = zoom.getSelectTime();
 		double delta = time - selectTime;
-		if (selectTime >= 0 && delta != 0) {
+		if ((selectTime >= 0) && (delta != 0)) {
 			timeString += " (" + ((delta > 0) ? "+" : "-") + Times.timeToString(Math.abs(delta),Math.abs(delta)) + ")";
 		}
 		cursorLabel.setText(timeString);

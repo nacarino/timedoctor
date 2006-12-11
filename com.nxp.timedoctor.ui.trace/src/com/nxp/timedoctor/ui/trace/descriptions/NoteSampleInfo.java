@@ -16,12 +16,13 @@ import com.nxp.timedoctor.core.model.Times;
 public class NoteSampleInfo extends SampleInfo {
 	private SampleLine line;
 	
-	public NoteSampleInfo(SampleLine line) {
+	public NoteSampleInfo(final SampleLine line) {
 		super(line);
 		this.line = line;	
 	}
 	
-	public String getInfoStr(int index) {
+	@Override
+	public String getInfoStr(final int index) {
 		double startTime = line.getSample(index).time;
 		
 		String text = "Note @ ";

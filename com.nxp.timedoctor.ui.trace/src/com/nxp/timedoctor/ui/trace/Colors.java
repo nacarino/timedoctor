@@ -16,7 +16,11 @@ import org.eclipse.swt.graphics.RGB;
  * Contains RGB color definitions to be used in sections and trace lines. 
  */
 public class Colors {
-
+	/**
+	 * RGB object to create light yellow for grid lines
+	 */
+	public static final RGB LIGHT_YELLOW = new RGB(0xFF, 0xFF, 0x99);
+	
 	/**
 	 * RGB object to create dark blue for tasks.
 	 */
@@ -25,7 +29,7 @@ public class Colors {
     /** 
      * RGB object to create light blue for tasks.
      */
-	public static final RGB  LIGHT_BLUE = new RGB(0xE7, 0xC6, 0xF2);
+	public static final RGB LIGHT_BLUE = new RGB(0xE7, 0xC6, 0xF2);
 	
 	/**
 	 * RGB object to create dark green for isrs.

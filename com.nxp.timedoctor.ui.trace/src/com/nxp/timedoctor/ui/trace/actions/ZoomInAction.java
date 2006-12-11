@@ -21,11 +21,12 @@ public class ZoomInAction extends TraceAction {
 	 * @param label
 	 * 			   Name of the action
 	 */
-	public ZoomInAction(String label) {
+	public ZoomInAction(final String label) {
 		super(label);
 	}
 		
- 	public void run() {
+ 	@Override
+	public void run() {
 		double startTime = zoomModel.getStartTime();
 		double endTime = zoomModel.getEndTime();
 		double interval = endTime - startTime;

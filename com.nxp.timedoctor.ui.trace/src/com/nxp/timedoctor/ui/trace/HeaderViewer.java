@@ -14,13 +14,17 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Sash;
+import org.eclipse.swt.widgets.Text;
 
+import com.nxp.timedoctor.core.model.SampleCPU;
+import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
 
 /**
@@ -30,6 +34,8 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  */
 public class HeaderViewer extends Composite implements ISashClient, Observer {
 
+	private static final int LOGO_FONT_SIZE = 8;
+	
 	/**
 	 * Constant for use in form layouts, to indicate that a given attachment is
 	 * to be at 100% of the parent's client area.
@@ -40,7 +46,7 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 * The logo composite, for spacing in the header (and eventual presence of a
 	 * logo).
 	 */
-	private Composite logo;
+	private Text logo;
 
 	/**
 	 * The header sash, for synchronization with lower pane's sash.
@@ -57,6 +63,8 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 */
 	private Canvas ruler;
 
+	private ZoomModel zoom;
+	
 	/**
 	 * Constructs a header view in the given parent, and creates the contents of
 	 * the header.
@@ -68,13 +76,14 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 */
 	public HeaderViewer(final Composite parent, 
 			final TraceCursorFactory traceCursorFactory,
-			final ZoomModel data) {
+			final ZoomModel zoom) {
 		super(parent, SWT.NONE);
+		this.zoom = zoom;
 
 		setLayout(new FormLayout());
-		createContents(parent, traceCursorFactory, data);
+		createContents(parent, traceCursorFactory);
 
-		data.addObserver(this);
+		zoom.addObserver(this);
 	}
 
 	/**
@@ -87,51 +96,55 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 *            data
 	 */
 	private void createContents(final Composite parent,
-			final TraceCursorFactory traceCursorFactory,
-			final ZoomModel zoomData) {
-		logo = new Canvas(this, SWT.NONE);
-		FormData data = new FormData();
-		data.left = new FormAttachment(0);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		logo.setLayoutData(data);
-
+			final TraceCursorFactory traceCursorFactory) {
+		logo = new Text(this, SWT.LEFT | SWT.MULTI | SWT.READ_ONLY);
+			
+		logo.setForeground(logo.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+		logo.setFont(new Font(getDisplay(), "Tahoma",
+				LOGO_FONT_SIZE, SWT.NORMAL));
+		
 		headerSash = new Sash(this, SWT.VERTICAL);
-		data = new FormData();
-		data.left = new FormAttachment(logo);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		headerSash.setLayoutData(data);
-
+		FormData sashFormData = new FormData();
+		sashFormData.top = new FormAttachment(0);
+		sashFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
+		headerSash.setLayoutData(sashFormData);
+		
 		sashListener = new SashSyncListener(this, null, SWT.VERTICAL, false);
 		headerSash.addSelectionListener(sashListener);
 		headerSash.addMouseListener(sashListener);
 
+		FormData logoFormData = new FormData();
+		logoFormData.left = new FormAttachment(0);
+		logoFormData.top = new FormAttachment(0);
+		logoFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
+		logoFormData.right = new FormAttachment(headerSash);
+		logo.setLayoutData(logoFormData);
+		
 		// Ruler pane
 		Composite rulerPane = new Composite(this, SWT.NONE);
 		rulerPane.setLayout(new FormLayout());
 
-		data = new FormData();
-		data.left = new FormAttachment(headerSash);
-		data.right = new FormAttachment(FORMLAYOUT_FULL);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		rulerPane.setLayoutData(data);
+		FormData rulerPaneFormData = new FormData();
+		rulerPaneFormData.left = new FormAttachment(headerSash);
+		rulerPaneFormData.right = new FormAttachment(FORMLAYOUT_FULL);
+		rulerPaneFormData.top = new FormAttachment(0);
+		rulerPaneFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
+		rulerPane.setLayoutData(rulerPaneFormData);
 		
 		traceCursorFactory.setRulerPane(rulerPane);
 
 		// ruler
 		ruler = new Canvas(rulerPane, SWT.DOUBLE_BUFFERED);
-		data = new FormData();
-		data.left = new FormAttachment(0);
-		data.right = new FormAttachment(FORMLAYOUT_FULL);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		ruler.setLayoutData(data);
+		FormData rulerFormData = new FormData();
+		rulerFormData.left = new FormAttachment(0);
+		rulerFormData.right = new FormAttachment(FORMLAYOUT_FULL);
+		rulerFormData.top = new FormAttachment(0);
+		rulerFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
+		ruler.setLayoutData(rulerFormData);
 
 		// Paint ruler
 		RulerPaintListener rulerPaintListener =
-			new RulerPaintListener(zoomData);
+			new RulerPaintListener(zoom);
 		ruler.addPaintListener(rulerPaintListener);
 	}
 
@@ -154,7 +167,7 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 * @return the minimum sash offset
 	 */
 	public final int getMinSashOffset() {
-		return logo.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
+		return 0;
 	}
 
 	/**
@@ -164,8 +177,9 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 *            sets the sash offset from the left of the client area.
 	 */
 	public final void setSashOffset(final int offset) {
-		((FormData) logo.getLayoutData()).width = offset;
+		((FormData) headerSash.getLayoutData()).left = new FormAttachment(0, offset);
 		layout(true);
+		update();
 	}
 
 	/**
@@ -177,7 +191,20 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 *            has no effect
 	 */
 	public final void update(final Observable o, final Object data) {
+		updateLogo();
+	
 		ruler.redraw();
 		ruler.update();
+	}
+
+	private void updateLogo() {
+		SampleLine selectedLine = zoom.getSelectedLine();
+		if (selectedLine != null) {
+			SampleCPU cpu = selectedLine.getCPU();
+			
+			String cpuFreqStr = String.format("CPU freq: %.0fHz", cpu.getClocksPerSec());
+			String memFreqStr = String.format("\nMemory freq: %.0fHz", cpu.getMemClocksPerSec());
+			logo.setText(cpuFreqStr + memFreqStr);
+		}
 	}
 }

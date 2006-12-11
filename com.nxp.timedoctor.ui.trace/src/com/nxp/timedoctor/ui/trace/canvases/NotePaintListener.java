@@ -24,18 +24,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 /**
  * Contains the code to paint a note.
  */
-public class NotePaintListener implements PaintListener {
-    /**
-     * The minimum allowed x-value, for use in the <code>boundedInt</code>
-     * function.
-     */
-    private static final int X_MIN = -100;
-
-    /**
-     * The maximum allowed x-value, for use in the <code>boundedInt</code>
-     * function.
-     */
-    private static final int X_MAX = 100000;
+public class NotePaintListener extends TracePaintListener implements PaintListener {
 
 	/**
 	 * Vertical padding value on the bottom of trace lines.
@@ -104,7 +93,7 @@ public class NotePaintListener implements PaintListener {
             Composite scroll = rightPane.getParent();
 
             int fullWidth = scroll.getBounds().width;
-			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
+			int traceHeight = canvas.getBounds().height - VERTICAL_PADDING;
 
             double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
             final double drawStartTime = timeOffset + (e.x / zoom);
@@ -113,10 +102,6 @@ public class NotePaintListener implements PaintListener {
 
             e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
             e.gc.fillRectangle(e.x, e.y, e.width, e.height);
-
-			// Draw the bottom line
-			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-			e.gc.drawLine(e.x, fullHeight, e.x + e.width, fullHeight);
 
             for (int xOld = -1; index < line.getCount(); index++) {
 
@@ -131,23 +116,8 @@ public class NotePaintListener implements PaintListener {
                 }
                 xOld = xStart;
 
-                sampleFlag.draw(e, color, color, xStart, 0, fullHeight);
+                sampleFlag.draw(e, color, color, xStart, VERTICAL_PADDING, traceHeight);
             }
         }
-    }
-
-    /**
-     * Ensures the given value is within the valid x-values and casts it to an
-     * int. If the value is too low, returns <code>X_MIN</code>. If it's too
-     * high, returns <code>X_MAX</code>.
-     * 
-     * @param val
-     *            the value to be checked and casted
-     * @return <code>value</code>, <code>X_MIN</code>, or
-     *         <code>X_MAX</code>
-     */
-
-    private int boundedInt(final double val) {
-        return (int) Math.min(X_MAX, Math.max(X_MIN, val));
     }
 }

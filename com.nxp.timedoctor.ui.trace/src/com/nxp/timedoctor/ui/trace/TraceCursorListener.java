@@ -29,10 +29,10 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	/**
 	 * Constructor.
 	 */
-	public TraceCursorListener(TraceCursorFactory traceCursorFactory,
-			TimeLine traceCursor,
-			TimeLine baseLine,
-			ZoomModel zoom) {
+	public TraceCursorListener(final TraceCursorFactory traceCursorFactory,
+			final TimeLine traceCursor,
+			final TimeLine baseLine,
+			final ZoomModel zoom) {
 		this.traceCursorFactory = traceCursorFactory;
 		this.traceCursor = traceCursor;
 		this.baseLine = baseLine;
@@ -50,24 +50,24 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 		traceCursor.setCursor(e.x);		
 	}
 
-	public void mouseEnter(MouseEvent e) {
+	public void mouseEnter(final MouseEvent e) {
 		traceCursor.setVisible(true);
 	}
 
-	public void mouseExit(MouseEvent e) {
+	public void mouseExit(final MouseEvent e) {
 		traceCursor.setVisible(false);		
 	}
 
-	public void mouseHover(MouseEvent e) {
+	public void mouseHover(final MouseEvent e) {
 	}
 
-	public void mouseDoubleClick(MouseEvent e) {
+	public void mouseDoubleClick(final MouseEvent e) {
 		TimeLine marker = traceCursorFactory.createTraceCursor(CursorType.MARKER);
 		marker.setCursor(e.x);
 		marker.setVisible(true);
 	}
 
-	public void mouseDown(MouseEvent e) {
+	public void mouseDown(final MouseEvent e) {
 		baseLine.setCursor(e.x);
 		baseLine.setVisible(true);
 		
@@ -75,6 +75,6 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 		zoom.setSelectTime(baseLine.getTime());
 	}
 
-	public void mouseUp(MouseEvent e) {
+	public void mouseUp(final MouseEvent e) {
 	}
 }

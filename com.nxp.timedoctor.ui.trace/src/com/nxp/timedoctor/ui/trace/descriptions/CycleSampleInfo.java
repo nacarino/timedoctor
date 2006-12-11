@@ -12,20 +12,19 @@ package com.nxp.timedoctor.ui.trace.descriptions;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
-import com.nxp.timedoctor.core.model.lines.CyclesSampleLine;
-import com.nxp.timedoctor.core.model.lines.MemCyclesSampleLine;
 
 public class CycleSampleInfo extends SampleInfo {
 	private SampleLine line;
 	private ZoomModel zoom;
 	
-	public CycleSampleInfo(SampleLine line, ZoomModel zoom) {
+	public CycleSampleInfo(final SampleLine line, final ZoomModel zoom) {
 		super(line);
 		this.zoom = zoom;
 		this.line = line;	
 	}
 	
-	public String getInfoStr(int index) {
+	@Override
+	public String getInfoStr(final int index) {
 		double startTime = line.getSample(index).time;
 		double endTime = line.getSample(index + 1).time;
 		double timeInterval = endTime - startTime; // based on sample times

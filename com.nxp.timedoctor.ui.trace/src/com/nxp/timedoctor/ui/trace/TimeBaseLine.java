@@ -47,12 +47,14 @@ public class TimeBaseLine extends TimeLine {
 	 * @param data
 	 *            has no effect
 	 */
+	@Override
 	public void update(final Observable o, final Object data) {
 		updatePositionAndLabel(zoom.getSelectTime());
 	}
 
 	private void addSelectionListener() {
 		SelectionListener selectionListener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setCursor(e.x);
 			}

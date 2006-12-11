@@ -17,12 +17,13 @@ import com.nxp.timedoctor.core.model.Sample.SampleType;
 public class SemaphoreSampleInfo extends SampleInfo {
 	private SampleLine line;
 	
-	public SemaphoreSampleInfo(SampleLine line) {
+	public SemaphoreSampleInfo(final SampleLine line) {
 		super(line);
 		this.line = line;	
 	}
 	
-	public String getInfoStr(int index) {
+	@Override
+	public String getInfoStr(final int index) {
 		double startTime = line.getSample(index).time;
 		double value = line.getSample(index).val;
 		

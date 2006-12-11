@@ -12,30 +12,44 @@ package com.nxp.timedoctor.ui.trace;
 
 import java.util.ArrayList;
 
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.widgets.Button;
 
 /**
  * Assumes the contents are expanded upon creation. 
  */
-public class ExpandSyncListener implements SelectionListener {
-
-	/**
-	 * Holds the ExpandClients associated with this listener.
-	 */
-	// Checkstyle not compatible with J2SE5 type parameterization
+public class ExpandSyncListener implements MouseListener, SelectionListener {
+	
+	private boolean isExpanded = true;
+	
 	private ArrayList < IExpandClient > clients;
 
 	/**
 	 * Constructs an ExpandSyncListener, initializing the empty list of clients.
 	 */
-	// Checkstyle not compatible with J2SE5 type parameterization
 	public ExpandSyncListener() {
 		clients = new ArrayList < IExpandClient > ();
 	}
 
+	public void widgetDefaultSelected(final SelectionEvent e) {
+	}
+
+	public void widgetSelected(final SelectionEvent e) {
+		expand();
+	}	
+	
+	public void mouseDoubleClick(final MouseEvent e) {
+		expand();
+	}
+
+	public void mouseDown(final MouseEvent e) {
+	}
+
+	public void mouseUp(final MouseEvent e) {
+	}
+	
 	/**
 	 * Adds a client to the ExpandSyncListener.
 	 * 
@@ -45,52 +59,21 @@ public class ExpandSyncListener implements SelectionListener {
 	public final void addClient(final IExpandClient client) {
 		clients.add(client);
 	}
-
+	
 	/**
-	 * Empty method -- listener does nothing on this type of event.
-	 * 
-	 * @param e
-	 *            SelectionEvent
-	 */
-	public final void widgetDefaultSelected(final SelectionEvent e) {
-	}
-
-	/**
-	 * Method to handle selection of this listener's clients. Syncronizes
-	 * expand/collapse events across all clients.
-	 * 
-	 * @param e
-	 *            SelectionEvent from one of this listener's clients
-	 */
-	public final void widgetSelected(final SelectionEvent e) {
-		Button expandButton = (Button) e.widget;
-
-		if (expandButton.getAlignment() == SWT.UP) {
-			collapse();
-			expandButton.setAlignment(SWT.DOWN);
-		} else {
-			expand();
-			expandButton.setAlignment(SWT.UP);
-		}
-	}
-
-	/**
-	 * Handles expanding all clients.
+	 * Handles expand/collapse of all clients.
 	 * 
 	 */
 	private void expand() {
-		for (int i = 0; i < clients.size(); i++) {
-			clients.get(i).expand();
+		if (isExpanded) {
+			for (int i = 0; i < clients.size(); i++) {
+				clients.get(i).collapse();
+			}
+		} else {
+			for (int i = 0; i < clients.size(); i++) {
+				clients.get(i).expand();
+			}
 		}
-	}
-
-	/**
-	 * Handles collapsing all clients.
-	 * 
-	 */
-	private void collapse() {
-		for (int i = 0; i < clients.size(); i++) {
-			clients.get(i).collapse();
-		}
+		isExpanded = !isExpanded;
 	}
 }

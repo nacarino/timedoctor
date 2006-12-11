@@ -112,7 +112,7 @@ public abstract class TraceCanvas extends Canvas implements Observer {
 		update();
 	}
 
-	public void showSampleInfo(int sampleIndex) {
+	public void showSampleInfo(final int sampleIndex) {
 		if (sampleIndex >= 0) {
 			setToolTipText(sampleInfo.getInfoStr(sampleIndex));
 		} else {

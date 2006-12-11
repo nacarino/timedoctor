@@ -22,10 +22,11 @@ public class ZoomFitAction extends TraceAction {
 	 * @param label
 	 * 			   Name of the action
 	 */
-	public ZoomFitAction(String label) {
+	public ZoomFitAction(final String label) {
 		super(label);
 	}
 		
+	@Override
 	public void run() {
 		double oldStart = zoomModel.getStartTime();
 		double oldEnd = zoomModel.getEndTime();

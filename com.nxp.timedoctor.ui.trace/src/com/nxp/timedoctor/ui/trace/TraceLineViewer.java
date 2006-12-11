@@ -21,6 +21,10 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -28,6 +32,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Sash;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -71,6 +76,8 @@ public class TraceLineViewer {
 	 */
 	private TraceCanvas trace;
 
+	private Sash traceSash;
+	
 	/**
 	 * Model, to be passed on to canvases for use in computing the full trace
 	 * width.
@@ -96,6 +103,8 @@ public class TraceLineViewer {
 	
 	private boolean isVisible = true;
 	
+	private MainViewer mainViewer;
+	
 	/**
 	 * Constructs a new TraceLineViewer.
 	 * 
@@ -113,11 +122,13 @@ public class TraceLineViewer {
 	 * @param model
 	 *            model containing data on the whole trace
 	 */
-	public TraceLineViewer(final TraceLineViewer topLine,
+	public TraceLineViewer(final MainViewer mainViewer,
+			final TraceLineViewer topLine,
 			final Composite sectionLabel, final Composite sectionTrace,
 			final SampleLine sampleLine, final ZoomModel zoomData,
-			final TraceModel model, TraceCursorListener traceCursorListener) {
+			final TraceModel model, final TraceCursorListener traceCursorListener) {
 
+		this.mainViewer = mainViewer;
 		this.line = sampleLine;
 		this.zoom = zoomData;
 		this.model = model;
@@ -136,7 +147,6 @@ public class TraceLineViewer {
 			// something that traces can be moved below during drag & drop.
 			topSeparator.setData("trace", topPadding);
 		} else {
-
 			createLabel(sectionLabel);
 			label.setData("top", topLine.bottomSeparator);
 			topLine.bottomSeparator.setData("bottom", label);
@@ -147,6 +157,9 @@ public class TraceLineViewer {
 		label.setData("bottom", bottomSeparator);
 
 		createTrace(sectionTrace, traceCursorListener);
+		
+		// Set default height to minimum needed for label text
+		setHeight(0); 
 	}
 
 	/**
@@ -169,7 +182,7 @@ public class TraceLineViewer {
 		}
 
 		label = new CLabel(sectionLabel, SWT.NONE);
-		label.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
 		label.setBackground(sectionLabel.getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
 
@@ -177,7 +190,7 @@ public class TraceLineViewer {
 		label.setText(line.getName());
 
 		// Small text font to allow minimal trace line height
-		label.setFont(new Font(sectionLabel.getDisplay(), "Arial",
+		label.setFont(new Font(sectionLabel.getDisplay(), "Tahoma",
 				LABEL_FONT_SIZE, SWT.NORMAL));
 
 		label.addMouseListener(new TraceLineSelectListener(this, line, zoom));
@@ -234,7 +247,7 @@ public class TraceLineViewer {
 	 *            the traces composite
 	 */
 	private void createTrace(final Composite sectionTrace, 
-			TraceCursorListener traceCursorListener) {
+			final TraceCursorListener traceCursorListener) {
 		// Add padding on top to ensure alignment of traces and labels
 		if (sectionTrace.getChildren().length == 0) {
 			Label topPadding = new Label(sectionTrace, SWT.NONE);
@@ -247,18 +260,12 @@ public class TraceLineViewer {
 		}
 
 		trace = TraceCanvas.createCanvas(sectionTrace, line, zoom, model);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		final GridData traceGridData = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
 		// Since the labels define the height of the trace section,
 		// we must ensure that the initial trace height is equal
 		// to or less than the height of the labels for proper layout.
-		data.heightHint = SEPARATOR_HEIGHT;
-		trace.setLayoutData(data);
-
-		// Exclude a label from layout, and reduce height of parent
-		// if (i == 3) {
-		// ((GridData) trace.getLayoutData()).exclude = true;
-		// // label.getParent().getParent().layout();
-		// }
+		//traceGridData.heightHint = 16; // TODO
+		trace.setLayoutData(traceGridData);
 
 		trace.addMouseListener(new TraceLineSelectListener(this, line, zoom));
 		trace.addMouseMoveListener(traceCursorListener);
@@ -267,17 +274,46 @@ public class TraceLineViewer {
 		trace.addMouseListener(new TraceZoomListener(zoom));
 		trace.addMouseMoveListener(new TraceToolTipListener(line, zoom));
 		
+		// sash below each trace
+		traceSash = new Sash(sectionTrace, SWT.HORIZONTAL);
+		GridData sashGridData = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		sashGridData.heightHint = SEPARATOR_HEIGHT;
+		traceSash.setLayoutData(sashGridData);
+		
+		traceSash.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				int height = e.y - trace.getLocation().y;
+				if (height >= label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y) {
+					setHeight(height); 				
+				}
+				else {
+					e.doit = false;
+				}
+			}
+		});
+		
+		traceSash.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseDoubleClick(final MouseEvent e) {
+				setHeight(0);				 
+			}
+		});
+		
 		// Used for drag & drop
 		label.setData("trace", trace);
-		bottomSeparator.setData("trace", trace);
+		label.setData("sash", traceSash);
+		bottomSeparator.setData("sash", traceSash);
 	}
 
+	
 	/**
 	 * Setup drag and drop for the trace label to allow reordering of trace
 	 * lines.
 	 */
 	private void setupLabelDND() {
 		DragSourceAdapter dragListener = new DragSourceAdapter() {
+			@Override
 			public final void dragSetData(final DragSourceEvent event) {
 				// Provide the transfer data of the requested type
 				if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
@@ -288,15 +324,17 @@ public class TraceLineViewer {
 				}
 			}
 
+			@Override
 			public final void dragStart(final DragSourceEvent event) {
 				// Store the source label for reference during
 				// the drop operation
-				dragSourceLabel = ((Control) ((DragSource) event.widget)
+				dragSourceLabel = (((DragSource) event.widget)
 						.getControl());
 			}
 		};
 
 		DropTargetAdapter dropListener = new DropTargetAdapter() {
+			@Override
 			public final void dragEnter(final DropTargetEvent event) {
 				// Set visual indication that only moves are allowed
 				if (event.detail == DND.DROP_DEFAULT) {
@@ -312,23 +350,26 @@ public class TraceLineViewer {
 				}
 			}
 
+			@Override
 			public final void dragLeave(final DropTargetEvent event) {
 				deselectDropTarget(getTargetSeparator(event));
 			}
 
+			@Override
 			public final void dragOver(final DropTargetEvent event) {
 				if (dropValid(event)) {
 					selectDropTarget(getTargetSeparator(event));
 				}
 			}
 
+			@Override
 			public final void drop(final DropTargetEvent event) {
 				moveBelow(getTargetSeparator(event));
 			}
 
 			private Control getTargetLabel(final DropTargetEvent event) {
 				DropTarget target = (DropTarget) event.widget;
-				return (Control) target.getControl();
+				return target.getControl();
 			}
 
 			private Control getTargetSeparator(final DropTargetEvent event) {
@@ -379,6 +420,7 @@ public class TraceLineViewer {
 	 */
 	private void setupSeparatorDND(final Control separator) {
 		DropTargetAdapter dropListener = new DropTargetAdapter() {
+			@Override
 			public final void dragEnter(final DropTargetEvent event) {
 				// Set visual indication that only moves are allowed
 				if (event.detail == DND.DROP_DEFAULT) {
@@ -395,17 +437,20 @@ public class TraceLineViewer {
 
 			}
 
+			@Override
 			public final void dragLeave(final DropTargetEvent event) {
 				deselectDropTarget(getTargetSeparator(event));
 
 			}
 
+			@Override
 			public final void dragOver(final DropTargetEvent event) {
 				if (dropValid(event)) {
 					selectDropTarget(getTargetSeparator(event));
 				}
 			}
 
+			@Override
 			public final void drop(final DropTargetEvent event) {
 
 				moveBelow(getTargetSeparator(event));
@@ -423,7 +468,7 @@ public class TraceLineViewer {
 
 			private Control getTargetSeparator(final DropTargetEvent event) {
 				DropTarget target = (DropTarget) event.widget;
-				return (Control) target.getControl();
+				return target.getControl();
 
 			}
 		};
@@ -501,10 +546,12 @@ public class TraceLineViewer {
 		sourceBottom.setData("bottom", targetBelow);
 
 		// Reorder traces
-		Control targetTrace = (Control) targetSeparator.getData("trace");
+		Control targetSash = (Control) targetSeparator.getData("sash");
+		Control sourceSash = (Control) dragSourceLabel.getData("sash");
 		Control sourceTrace = (Control) dragSourceLabel.getData("trace");
-		sourceTrace.moveBelow(targetTrace);
-		targetTrace.getParent().layout();
+		sourceTrace.moveBelow(targetSash);
+		sourceSash.moveBelow(sourceTrace);
+		targetSash.getParent().layout();
 	}
 	
 	/**
@@ -520,7 +567,7 @@ public class TraceLineViewer {
 	public void selectLine(final Display display) {
 		// Check if the selected label still exists, it may belong to a
 		// label of another editor that has been closed in the meantime
-		if (selectedLabel != null && !selectedLabel.isDisposed()) {
+		if ((selectedLabel != null) && !selectedLabel.isDisposed()) {
 			selectedLabel.setBackground(selectedLabel.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
 			selectedLabel.setForeground(selectedLabel.getParent().getForeground());			
 		}
@@ -529,28 +576,32 @@ public class TraceLineViewer {
 		selectedLabel = label;
 	}
 
+	public void setHeight(final int height) {
+		int minHeight = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		int lineHeight = Math.max(height, minHeight);
+		GridData labelGridData = (GridData) label.getLayoutData();
+		labelGridData.heightHint = lineHeight;
+			
+		GridData traceGridData = (GridData) trace.getLayoutData();
+		traceGridData.heightHint = lineHeight;
+			
+		// relayout and update vertical scrollbar, and left scroll setting
+		// TODO do not depend on SectionViewer class, better MVC
+		mainViewer.layout();
+	}
+	
 	/**
 	 * This method will decide whether to show or hide a line.
-	 * @return heightOffset
-	 * 				The amount by which the section height needs to be changed.
-	 * 				The value will be -ve if we are hiding a previously visible line.
-	 * 				The value will be +ve if we are showing a previously hidden line.
-	 * 				The value will be 0 when a hidden line remains hidden or a visible line remains visible.
 	 */
-	public int updateVisibility() {
-		int heightOffset;
-		boolean lineStatus = line.hasSamples(zoom.getStartTime(), zoom
+	public void updateVisibility() {
+		boolean hasSamples = line.hasSamples(zoom.getStartTime(), zoom
 				.getEndTime());
-		if (lineStatus == true && isVisible == false) {
-			setVisible(lineStatus);
-			heightOffset = trace.getBounds().height;
-		} else if (lineStatus == false && isVisible == true) {
-			setVisible(lineStatus);
-			heightOffset = (-1) * trace.getBounds().height;
-		} else {
-			heightOffset = 0;
+
+		if ((hasSamples == true) && (isVisible == false)) {
+			showLine(hasSamples);
+		} else if ((hasSamples == false) && (isVisible == true)) {
+			showLine(hasSamples);
 		}
-		return heightOffset;
 	}
 
 	/**
@@ -559,11 +610,15 @@ public class TraceLineViewer {
 	 * @param visible
 	 * 			Boolean value which specifies whether the line should be hidden or not
 	 */
-	private void setVisible(final boolean visible) {
-		GridData canvasGridData = (GridData) trace.getLayoutData();
-		canvasGridData.exclude = !visible; //Set exclude property to false, when line is to be made visible
+	public void showLine(final boolean visible) {
+		GridData traceGridData = (GridData) trace.getLayoutData();
+		traceGridData.exclude = !visible;
 		trace.setVisible(visible);
 
+		GridData sashGridData = (GridData) traceSash.getLayoutData();
+		sashGridData.exclude = !visible;
+		traceSash.setVisible(visible);
+		
 		GridData labelGridData = (GridData) label.getLayoutData();
 		labelGridData.exclude = !visible;
 		label.setVisible(visible);

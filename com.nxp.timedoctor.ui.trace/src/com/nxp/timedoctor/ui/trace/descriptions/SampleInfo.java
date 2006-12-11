@@ -19,7 +19,7 @@ public class SampleInfo {
 	
 	private double clockFrequency;
 	
-	protected SampleInfo(SampleLine line) {
+	protected SampleInfo(final SampleLine line) {
 		if (line.getType() == LineType.MEM_CYCLES) {
 			this.clockFrequency = line.getCPU().getMemClocksPerSec();
 		}
@@ -28,33 +28,33 @@ public class SampleInfo {
 		}
 	}
 	
-	public String getInfoStr(int index) {
+	public String getInfoStr(final int index) {
 		return null;
 	}
 	
-	protected String timeBoundsToStr(double startTime, double endTime) {
+	protected String timeBoundsToStr(final double startTime, final double endTime) {
 		String text = Times.timeToString(startTime, ACCURACY);
 		text += " - ";
 		text += Times.timeToString(endTime, ACCURACY);
 		return text;
 	}
 	
-	protected String timeIntervalToStr(double startTime, double endTime) {
+	protected String timeIntervalToStr(final double startTime, final double endTime) {
 		double timeInterval = endTime - startTime;
 		return Times.timeToString(timeInterval, ACCURACY);		
 	}
 	
-	protected String timeIntervalToCyclesStr(double startTime, double endTime) {
+	protected String timeIntervalToCyclesStr(final double startTime, final double endTime) {
 		double cycles = (endTime - startTime) * clockFrequency;
 		return doubleToIntStr(cycles) + " cycles";
 	}	
 	
-	protected String cyclesToFrequencyStr(double cycles, double timeInterval) {
+	protected String cyclesToFrequencyStr(final double cycles, final double timeInterval) {
 		double frequency = cycles /(1000000 * timeInterval);
 		return doubleToIntStr(frequency) + " MCy/s";
 	}
 	
-	protected String cyclesToPercentageStr(double cycles, double totalCycles) {
+	protected String cyclesToPercentageStr(final double cycles, final double totalCycles) {
 		double percentage = 100 * cycles / (totalCycles * clockFrequency);
 		return String.format("%.3f", percentage) + "%";
 	}

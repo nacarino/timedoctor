@@ -21,10 +21,11 @@ public class ZoomBackAction extends TraceAction {
 	 * @param label
 	 * 			   Name of the action
 	 */
-	public ZoomBackAction(String label) {
+	public ZoomBackAction(final String label) {
 		super(label);
 	}
 	
+	@Override
 	public void run() {
 		double[] zoom = zoomModel.popZoom();
 		

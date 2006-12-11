@@ -50,29 +50,29 @@ public class TraceToolTipListener implements MouseMoveListener {
 	 * 
 	 * @param e an event containing information about the mouse position.
 	 */
-	public void mouseMove(MouseEvent e) {
+	public void mouseMove(final MouseEvent e) {
 		TraceCanvas canvas = (TraceCanvas) e.widget;
 		canvas.showSampleInfo(getSampleIndex(e));
 	}
 
-	private int getSampleIndex(MouseEvent e) {
+	private int getSampleIndex(final MouseEvent e) {
 		int width = getWidth(e);
 		double zoomFactor = zoom.getPixelsPerTime(width);
 		double time = zoom.getTimeAtPosition(e.x, width);
 
 		int index = line.binarySearch(time);
-		while (index > 0 && line.getSample(index).time > time) {
+		while ((index > 0) && (line.getSample(index).time > time)) {
 			index--;
 		}
-		while (index < line.getCount() - 1
-				&& line.getSample(index + 1).time < time) {
+		while ((index < line.getCount() - 1)
+				&& (line.getSample(index + 1).time < time)) {
 			index++;
 		}
 
-		if (line.getType() == LineType.EVENTS
-				|| line.getType() == LineType.SEMAPHORES
-				|| line.getType() == LineType.QUEUES
-				|| line.getType() == LineType.NOTES) {
+		if ((line.getType() == LineType.EVENTS)
+				|| (line.getType() == LineType.SEMAPHORES)
+				|| (line.getType() == LineType.QUEUES)
+				|| (line.getType() == LineType.NOTES)) {
 			double timeDifference = Math
 					.abs(line.getSample(index).time - time);
 			int dx = (int) (timeDifference * zoomFactor);
@@ -88,22 +88,22 @@ public class TraceToolTipListener implements MouseMoveListener {
 			}
 			return -1;
 		} else {
-			if (line.getSample(index).time > time
-					|| line.getSample(index + 1).time < time) {
+			if ((line.getSample(index).time > time)
+					|| (line.getSample(index + 1).time < time)) {
 				return -1;
 			}
-			if (line.getType() == LineType.VALUES
-					|| line.getType() == LineType.CYCLES
-					|| line.getType() == LineType.MEM_CYCLES) {
+			if ((line.getType() == LineType.VALUES)
+					|| (line.getType() == LineType.CYCLES)
+					|| (line.getType() == LineType.MEM_CYCLES)) {
 				if (index < line.getCount() - 2) {
 					return index;
 				} else {
 					return -1;
 				}
 			} else {
-				if ((line.getSample(index).type == SampleType.START
-						|| line.getSample(index).type == SampleType.SUSPEND || line
-						.getSample(index).type == SampleType.RESUME)) {
+				if (((line.getSample(index).type == SampleType.START)
+						|| (line.getSample(index).type == SampleType.SUSPEND) || (line
+						.getSample(index).type == SampleType.RESUME))) {
 					return index;
 				} else {
 					return -1;
@@ -112,11 +112,10 @@ public class TraceToolTipListener implements MouseMoveListener {
 		}
 	}
 
-	private int getWidth(MouseEvent e) {
+	private int getWidth(final MouseEvent e) {
 		final Canvas currentCanvas = (Canvas) e.widget;
 		final Composite parent1 = currentCanvas.getParent();
-		final Composite parent2 = parent1.getParent();
-		final Composite parent3 = parent2.getParent(); // ScrolledComposite
-		return parent3.getBounds().width;
+		final Composite parent2 = parent1.getParent(); // ScrolledComposite
+		return parent2.getBounds().width;
 	}
 }

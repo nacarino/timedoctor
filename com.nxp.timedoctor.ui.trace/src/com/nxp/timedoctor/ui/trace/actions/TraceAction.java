@@ -19,7 +19,7 @@ public abstract class TraceAction extends Action {
 	protected ZoomModel zoomModel;
 	protected TraceModel traceModel;
 
-	protected TraceAction(String label) {
+	protected TraceAction(final String label) {
 		setText(label);
 	}
 	
@@ -35,7 +35,7 @@ public abstract class TraceAction extends Action {
 		
 		double timeDifference = endTime - startTime;
 		
-		if (time > timeDifference + startTime || time < startTime) {
+		if ((time > timeDifference + startTime) || (time < startTime)) {
 			// Set scrollbar such that selected time is in the middle of the page
 			startTime = Math.max(0, time - (timeDifference/2));
 			endTime = startTime + timeDifference;

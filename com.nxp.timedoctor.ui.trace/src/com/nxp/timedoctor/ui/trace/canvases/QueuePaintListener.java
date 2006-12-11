@@ -24,35 +24,12 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 /**
  * Contains the code to paint a queue.
  */
-public class QueuePaintListener implements PaintListener {
-
-	/**
-	 * The minimum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MIN = -100;
-
-	/**
-	 * The maximum allowed x-value, for use in the <code>boundedInt</code>
-	 * function.
-	 */
-	private static final int X_MAX = 100000;
+public class QueuePaintListener extends TracePaintListener implements PaintListener {
 
 	/**
 	 * Vertical padding value on the bottom of trace lines.
 	 */
 	private static final int VERTICAL_PADDING = 2;
-
-	/**
-	 * Sapcing in pixels between grid lines.
-	 */
-	private static final int GRID_SPACING = 10;
-
-	/**
-	 * The model containing all trace zoom. Used to retrieve the end time of the
-	 * full trace, for use in full trace width calculations.
-	 */
-	private TraceModel model;
 
 	/**
 	 * The line containing zoom to visualize.
@@ -94,7 +71,6 @@ public class QueuePaintListener implements PaintListener {
 			final TraceModel tdModel) {
 		this.color = color;
 		this.fillColor = fillColor;
-		this.model = tdModel;
 		this.line = sampleLine;
 		this.zoom = zoom;
 	}
@@ -119,18 +95,19 @@ public class QueuePaintListener implements PaintListener {
 			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
 			// TODO calculate height for proportional queues
-			int fullHeight = canvas.getBounds().height - VERTICAL_PADDING;
+			int canvasHeight = canvas.getBounds().height;
+			int traceHeight = canvasHeight - VERTICAL_PADDING;
 			double startTime = zoom.getStartTime();
 			double endTime = zoom.getEndTime();
 			double pixelsPerSec = fullWidth / (endTime - startTime);
-			double drawStartTime = startTime + (((double)e.x) / pixelsPerSec);
-			double drawEndTime = drawStartTime + (((double)e.width) / pixelsPerSec);
+			double drawStartTime = startTime + ((e.x) / pixelsPerSec);
+			double drawEndTime = drawStartTime + ((e.width) / pixelsPerSec);
 			double maxFilling = line.getMaxSampleValue();
 
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
 
-			drawGridLines(e, fullHeight);
+			drawGridLines(e, canvasHeight, traceHeight);
 
 			int index = Math.max(1, line.binarySearch(drawStartTime));
 			double curMaxFilling = 0;
@@ -140,7 +117,7 @@ public class QueuePaintListener implements PaintListener {
 				int xNext = boundedInt((line.getSample(index).time - startTime) * pixelsPerSec);
 
 				// TODO hide >> 32 in model interface
-				double curFilling = (double) (((long) line.getSample(index - 1).val) >> 32);
+				double curFilling = (((long) line.getSample(index - 1).val) >> 32);
 				
 				// Compute maximum and minimum over the last queue events that fall within the same pixel
 				// Always at least include the previous queue event to ensure the contour line is
@@ -149,7 +126,7 @@ public class QueuePaintListener implements PaintListener {
 				curMaxFilling = Math.max(curMaxFilling, curFilling);
 				curMinFilling = Math.min(curMinFilling, curFilling);
 				
-				if (xNext == xCur && index < line.getCount()) {
+				if ((xNext == xCur) && (index < line.getCount())) {
 					continue;
 				}
 				
@@ -157,18 +134,18 @@ public class QueuePaintListener implements PaintListener {
 				int curFillHeight = 0;
 				if (curFilling > 0) {
 					// Show at least one pixel if there is something in the queue
-					curFillHeight = Math.max(1, (int) (fullHeight * curFilling / maxFilling));
+					curFillHeight = Math.max(1, (int) (traceHeight * curFilling / maxFilling));
 				}
 
 				// Get min buffer filling in pixels
 				int minFillHeight = 0;
 				if (curMinFilling > 0) {
 					// Show at least one pixel if there is something in the queue
-					minFillHeight = Math.max(1, (int) (fullHeight * curMinFilling / maxFilling));
+					minFillHeight = Math.max(1, (int) (traceHeight * curMinFilling / maxFilling));
 				}
 
 				// Get max buffer filling in pixels
-				int maxFillHeight = (int) (fullHeight * curMaxFilling / maxFilling);
+				int maxFillHeight = (int) (traceHeight * curMaxFilling / maxFilling);
 
 				// Note: fillRectangle is drawn (verified for MS Windows) from the left-upper origin
 				// including the origin, up to (excluding) width, height
@@ -181,23 +158,23 @@ public class QueuePaintListener implements PaintListener {
 					
 				// Draw rectangle with actual value
 				// Set height origin to fullHeight + 1 to include drawing at fullHeight
-				e.gc.fillRectangle(xCur, fullHeight + 1, 
+				e.gc.fillRectangle(xCur, canvasHeight + 1, 
 						xNext - xCur, - curFillHeight);
 				// Draw top line on top of rectangle
-				e.gc.drawLine(xCur, fullHeight - curFillHeight, 
-						xNext, fullHeight - curFillHeight);
+				e.gc.drawLine(xCur, canvasHeight - curFillHeight, 
+						xNext, canvasHeight - curFillHeight);
 
 				// Draw min line
 				e.gc.setForeground(fillColor);
-				e.gc.drawLine(xCur, fullHeight, 
-						xCur, fullHeight - minFillHeight);
+				e.gc.drawLine(xCur, canvasHeight, 
+						xCur, canvasHeight - minFillHeight);
 
 				// Draw max line on top of min line
 				// Drawing after the drawing of min line ensures that if max=min=0
 				// only the contour is drawn (one pixel for the max line is visible)
 				e.gc.setForeground(color);
-				e.gc.drawLine(xCur, fullHeight - minFillHeight, 
-						xCur, fullHeight - maxFillHeight);
+				e.gc.drawLine(xCur, canvasHeight - minFillHeight, 
+						xCur, canvasHeight - maxFillHeight);
 
 				if (line.getSample(index).time > drawEndTime) {
 					break;
@@ -209,33 +186,5 @@ public class QueuePaintListener implements PaintListener {
 				curMinFilling = curFilling;
 			}
 		}
-	}
-
-	private void drawGridLines(final PaintEvent e, int height) {
-		for (int i = 0, y = height; y >= 0; i++, y -= GRID_SPACING) {
-			if (i == 0) {
-				e.gc.setForeground(e.display
-						.getSystemColor(SWT.COLOR_BLACK));
-			} else {
-				e.gc
-						.setForeground(e.display
-								.getSystemColor(SWT.COLOR_GRAY));
-			}
-			e.gc.drawLine(e.x, y, e.x + e.width, y);
-		}
-	}
-
-	/**
-	 * Ensures the given value is within the valid x-values and casts it to an
-	 * int. If the value is too low, returns <code>X_MIN</code>. If it's too
-	 * high, returns <code>X_MAX</code>.
-	 * 
-	 * @param val
-	 *            the value to be checked and casted
-	 * @return <code>value</code>, <code>X_MIN</code>, or
-	 *         <code>X_MAX</code>
-	 */
-	private int boundedInt(final double val) {
-		return (int) Math.min(X_MAX, Math.max(X_MIN, val));
 	}
 }

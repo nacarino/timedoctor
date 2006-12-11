@@ -41,6 +41,7 @@ public class TimeMarker extends TimeLine {
 	/**
 	 * Dispose method, needed to get rid of markers upon double click
 	 */
+	@Override
 	public void dispose() {
 		super.dispose();
 		
@@ -51,6 +52,7 @@ public class TimeMarker extends TimeLine {
 
 	private void addSelectionListener() {
 		SelectionListener selectionListener = new SelectionAdapter() {
+			@Override
 			public void widgetSelected(SelectionEvent e) {
 				setCursor(e.x);
 			}
@@ -60,6 +62,7 @@ public class TimeMarker extends TimeLine {
 	
 	private void addMouseListener() {
 		MouseListener mouseListener = new MouseAdapter() {
+			@Override
 			public void mouseDoubleClick(MouseEvent e) {
 				dispose();
 			}

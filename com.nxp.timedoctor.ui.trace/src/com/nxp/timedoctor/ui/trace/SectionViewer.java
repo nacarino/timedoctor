@@ -11,14 +11,10 @@
 package com.nxp.timedoctor.ui.trace;
 
 import java.util.ArrayList;
-import java.util.Observable;
-import java.util.Observer;
-
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.Section;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -29,14 +25,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * (tasks, ISRs, Queues, etc.) The section has a header at the top and a
  * splitter at the bottom to resize the height of the section.
  */
-public class SectionViewer implements Observer,IExpandClient{
-
-	/**
-	 * Constant for use in form layouts to indicate an element's
-	 * <code>FormData</code> goes all the way to the bottom or right of the
-	 * client area.
-	 */
-	private static final int FORMLAYOUT_FULL = 100;
+public class SectionViewer implements IExpandClient{
 
 	/**
 	 * The section in the model with which this view is associated.
@@ -44,24 +33,9 @@ public class SectionViewer implements Observer,IExpandClient{
 	private Section section;
 
 	/**
-	 * The section above this one.
-	 */
-	private SectionViewer top;
-
-	/**
-	 * True iff this is the last section.
-	 */
-	private boolean last;
-
-	/**
 	 * Holds the labels for the trace lines.
 	 */
-	private SectionLabelViewer sectionLabel;
-
-	/**
-	 * Holds the lines themselves.
-	 */
-	private SectionTraceViewer sectionTrace;
+	private SectionHeader sectionHeader;
 
 	/**
 	 * Model component containing current zoom/scroll information.
@@ -71,6 +45,10 @@ public class SectionViewer implements Observer,IExpandClient{
 	private ArrayList<TraceLineViewer> traceLineViewerArrayList;
 	
 	private boolean isExpanded = true;
+	
+	private Composite traceHeader;
+	
+	private MainViewer mainViewer;
 	
 	/**
 	 * Constructs a new SectionViewer, and creates and lays out the trace lines.
@@ -82,10 +60,6 @@ public class SectionViewer implements Observer,IExpandClient{
 	 * @param rightPane
 	 *            the right pane of the view, where the trace canvases will be
 	 *            placed
-	 * @param topSection
-	 *            the section above this one
-	 * @param lastSection
-	 *            whether this is the last section
 	 * @param section
 	 *            the section from which to get data
 	 * @param zoomData
@@ -93,31 +67,26 @@ public class SectionViewer implements Observer,IExpandClient{
 	 * @param model
 	 *            the model containing data for the whole trace
 	 */
-	public SectionViewer(final Composite leftPane, 
+	public SectionViewer(final MainViewer mainViewer,
+			final Composite leftPane, 
 			final Composite rightPane,
-			final SectionViewer topSection, 
-			final boolean lastSection,
 			final Section section, 
 			final ZoomModel zoomData, 
 			final TraceModel model, 
-			TraceCursorListener traceCursorListener) {
-		this.top = topSection;
-		this.last = lastSection;
+			final TraceCursorListener traceCursorListener) {
+		this.mainViewer = mainViewer;
 		this.section = section;
 		this.zoomData = zoomData;
 		
-		zoomData.addObserver(this);
 		traceLineViewerArrayList = new ArrayList<TraceLineViewer>();
 		
 		createLabelView(leftPane);
 		createTraceView(rightPane);
 
-		createTraceLines(sectionLabel.getContent(), sectionTrace.getContent(),
+		createTraceLines(leftPane, rightPane,
 				model, traceCursorListener);
 
-		sectionTrace.addSashClient(sectionLabel);
-		sectionLabel.addExpandClient(sectionTrace);	
-		sectionLabel.addExpandClient(this);
+		sectionHeader.addExpandClient(this);
 	}
 
 	/**
@@ -127,8 +96,8 @@ public class SectionViewer implements Observer,IExpandClient{
 	 *            the header color
 	 */
 	public final void setHeaderColor(final Color color) {
-		sectionLabel.setHeaderColor(color);
-		sectionTrace.setHeaderColor(color);
+		sectionHeader.setBackground(color);
+		traceHeader.setBackground(color);
 	}
 
 	/**
@@ -138,17 +107,7 @@ public class SectionViewer implements Observer,IExpandClient{
 	 *            the section title to be displayed in the header
 	 */
 	public final void setHeaderText(final String text) {
-		sectionLabel.setHeaderText(text);
-	}
-
-	/**
-	 * Sets whether or not this is the last section.
-	 * 
-	 * @param lastSection
-	 *            section true if this is the last section, false otherwise
-	 */
-	public final void setLast(final boolean lastSection) {
-		last = lastSection;
+		sectionHeader.setText(text);
 	}
 
 	/**
@@ -159,18 +118,10 @@ public class SectionViewer implements Observer,IExpandClient{
 	 *            the left pane of the window
 	 */
 	private void createLabelView(final Composite parent) {
-
-		sectionLabel = new SectionLabelViewer(parent);
-
-		FormData data = new FormData();
-		data.left = new FormAttachment(0);
-		data.right = new FormAttachment(FORMLAYOUT_FULL);
-		if (null == top) {
-			data.top = new FormAttachment(0);
-		} else {
-			data.top = new FormAttachment(top.sectionLabel);
-		}
-		sectionLabel.setLayoutData(data);
+		sectionHeader = new SectionHeader(parent);
+		
+		GridData headerGridData = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		sectionHeader.setLayoutData(headerGridData);
 	}
 
 	/**
@@ -181,12 +132,10 @@ public class SectionViewer implements Observer,IExpandClient{
 	 *            the right pane of the window
 	 */
 	private void createTraceView(final Composite parent) {
-		SectionTraceViewer topTraces = null;
-		if (top != null) {
-			topTraces = top.sectionTrace;
-		}
-		sectionTrace = new SectionTraceViewer(parent, topTraces, last,
-				sectionLabel.getHeaderHeight());
+		traceHeader = new Composite(parent, SWT.NONE);
+		GridData headerGridData = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
+		headerGridData.heightHint = sectionHeader.getHeaderHeight();
+		traceHeader.setLayoutData(headerGridData);
 	}
 
 	/**
@@ -203,11 +152,11 @@ public class SectionViewer implements Observer,IExpandClient{
 	private void createTraceLines(final Composite labels,
 			final Composite traces, 
 			final TraceModel model, 
-			TraceCursorListener traceCursorListener) {
+			final TraceCursorListener traceCursorListener) {
 		TraceLineViewer traceLine = null;
 		for (SampleLine line : section.getLines()) {				
 			if (line.getCount() > 1) {
-                traceLine = new TraceLineViewer(traceLine, labels, traces,
+                traceLine = new TraceLineViewer(mainViewer, traceLine, labels, traces,
                         line, zoomData, model, traceCursorListener);
                 traceLineViewerArrayList.add(traceLine);
             }
@@ -215,48 +164,31 @@ public class SectionViewer implements Observer,IExpandClient{
 	}
 	
 	/**
-	 * Updates the section when the zoom or scroll is changed by another part of
-	 * the view.
-	 * 
-	 * @param o
-	 *            the <code>Observable</code> calling the update
-	 * @param data
-	 *            has no effect
-	 */
-	public void update(Observable o, Object data) {
-		updateVisibility();
-	}
-
-	private void updateVisibility() {
-		if (isExpanded) {
-			int sectionHeightOffset = 0;
-			for (TraceLineViewer currentTraceLine : traceLineViewerArrayList) {
-				int traceHeightOffset = currentTraceLine.updateVisibility();
-				sectionHeightOffset += traceHeightOffset;
-			}
-			
-			if (sectionHeightOffset != 0) {
-				sectionTrace.updateHeight(sectionHeightOffset);
-				sectionLabel.updateHeight(sectionHeightOffset);
-				sectionTrace.layoutSection();
-				sectionLabel.layoutSection();
-			}
-		}
-	}
-
-	/**
-	 * updates the value of "isExpanded" variable on collapsing a section.
+	 * Collapse the section by hiding all trace lines 
 	 */
 	public void collapse() {
 		isExpanded = false;
+		
+		for (TraceLineViewer currentTraceLine : traceLineViewerArrayList) {
+			currentTraceLine.showLine(false);
+		}
+		mainViewer.layout();
 	}
 
 	/**
-	 * updates the value of "isExpanded" variable on expanding a section.
-	 * Also it will update the section.
+	 * Expand the section by showing all trace lines of interest
 	 */
 	public void expand() {
 		isExpanded = true;
-		updateVisibility();
+		updateAutoHide();
+		mainViewer.layout();
+	}
+	
+	public void updateAutoHide() {
+		if (isExpanded) {
+			for (TraceLineViewer currentTraceLine : traceLineViewerArrayList) {
+				currentTraceLine.updateVisibility();
+			}
+		}
 	}
 }

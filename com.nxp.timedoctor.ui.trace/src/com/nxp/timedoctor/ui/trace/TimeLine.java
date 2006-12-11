@@ -18,6 +18,7 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Sash;
@@ -90,10 +91,10 @@ public class TimeLine implements Observer {
 		// Handle window resize and maximize events
 		// (Only one needed, either in ruler or trace area)
 		parent.addControlListener(new ControlListener(){
-			public void controlMoved(ControlEvent e) {
+			public void controlMoved(final ControlEvent e) {
 			}
 
-			public void controlResized(ControlEvent e) {
+			public void controlResized(final ControlEvent e) {
 				updatePositionAndLabel(cursorTime);
 			}
 		});
@@ -104,13 +105,14 @@ public class TimeLine implements Observer {
 		// Cursor line
 		cursorLine = new Composite(parent, SWT.NONE);
  		cursorLine.setBackground(cursorLabel.getDisplay().getSystemColor(color));
- 		
-		final FormData cursorLineData = new FormData();
-		cursorLineData.top = new FormAttachment(0);
-		cursorLineData.width = CURSOR_LINE_WIDTH;
-		cursorLineData.bottom = new FormAttachment(FORM_LAYOUT_FULL);
+ 		final GridData cursorLineData = new GridData();
+ 		// Layout explicitly via setLocation and setSize
+ 		cursorLineData.exclude = true;
 		cursorLine.setLayoutData(cursorLineData);
-		
+
+		// A bite nasty: set height to max integer to ensure cursor 
+		// always fills the screen. Height is bound by parent composite anyhow
+		cursorLine.setSize(CURSOR_LINE_WIDTH, Integer.MAX_VALUE);
 		cursorLine.setVisible(false);
 		// Make sure the mouse cursor does not see this as a widget
 		// and responds to MouseExit, etc. triggers when moving over this widget.
@@ -146,7 +148,7 @@ public class TimeLine implements Observer {
 	
 	private void setPosition(final int x, final int width) {
 		((FormData)cursorSash.getLayoutData()).left = new FormAttachment(0, x);
-		((FormData)cursorLine.getLayoutData()).left = new FormAttachment(0, x);
+		cursorLine.setLocation(x, 0);
 		
 		// New text may change label width, recompute label size
 		int labelWidth = cursorLabel.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
@@ -161,9 +163,11 @@ public class TimeLine implements Observer {
 		// layout(true) for the label to ensure the label of other markers
 		// is redrawn when the mouse cursor moves ahead
 		cursorLabel.getParent().layout(true);
-		cursorLine.getParent().update();
-		cursorLine.getParent().layout(false);
 		cursorLabel.getParent().update();
+		
+		// Only update, not layout of trace window, 
+		// as here layout is done manually
+		cursorLine.getParent().update();
 	}
 	
 	protected void setTimeLabel(final double time) {
@@ -189,7 +193,7 @@ public class TimeLine implements Observer {
 		updatePositionAndLabel(cursorTime);
 	}
 
-	protected void updatePositionAndLabel(double time) {
+	protected void updatePositionAndLabel(final double time) {
 		if (time >= 0d) {
 			double startTime = zoom.getStartTime();
 			int width = cursorLabel.getParent().getBounds().width;

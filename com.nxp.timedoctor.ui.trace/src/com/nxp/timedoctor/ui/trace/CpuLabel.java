@@ -51,7 +51,7 @@ public class CpuLabel {
 
 	private String cpuName;
 
-	private Color[] color = new Color[2];
+	private final Color[] color = new Color[2];
 
 	private Image cpuLabelImage = null;
 
@@ -108,7 +108,7 @@ public class CpuLabel {
 	 * @return the created the icon.
 	 */
 	private void drawCpuLabelImage(final int width, final int height) {
-		final Font font = new Font(parent.getDisplay(), "Arial",
+		final Font font = new Font(parent.getDisplay(), "Tahoma",
 				ICON_FONT_SIZE, SWT.ITALIC);
 		
 		Image image = new Image(parent.getDisplay(), width, height);
