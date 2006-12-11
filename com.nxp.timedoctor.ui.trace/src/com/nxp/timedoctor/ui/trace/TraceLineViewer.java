@@ -283,12 +283,15 @@ public class TraceLineViewer {
 		traceSash.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
-				int height = e.y - trace.getLocation().y;
-				if (height >= label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y) {
-					setHeight(height); 				
-				}
-				else {
-					e.doit = false;
+				// Ensure that select action does not execute upon double-click in linux
+				if (e.detail == SWT.DRAG) {
+					int height = e.y - trace.getLocation().y;
+					if (height >= label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y) {
+						setHeight(height); 				
+					}
+					else {
+						e.doit = false;
+					}
 				}
 			}
 		});

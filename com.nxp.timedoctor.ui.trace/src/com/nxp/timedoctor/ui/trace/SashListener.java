@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
@@ -50,7 +51,10 @@ public class SashListener implements SelectionListener, MouseListener {
 	 *            SelectionEvent containing details on the sash's location
 	 */
 	public final void widgetSelected(final SelectionEvent e) {
-		client.setSashOffset(e.x);
+		// Ensure that select action does not execute upon double-click in linux
+		if (e.detail == SWT.DRAG) {
+			client.setSashOffset(e.x);
+		}
 	}
 
 	/**
