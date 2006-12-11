@@ -145,7 +145,7 @@ public class TraceLineViewer {
 
 			// Add this padding as "trace" to the top separator to have
 			// something that traces can be moved below during drag & drop.
-			topSeparator.setData("trace", topPadding);
+			topSeparator.setData("sash", topPadding);
 		} else {
 			createLabel(sectionLabel);
 			label.setData("top", topLine.bottomSeparator);
