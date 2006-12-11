@@ -28,45 +28,38 @@ public class TraceViewer {
 
 	private static final int SASH_WIDTH = 2;
 
-	/**
-	 * The model containing this view's data.
-	 */
-	private TraceModel model;
+	private TraceModel traceModel;
 
-	/**
-	 * Model component containing zoom and scroll data.
-	 */
-	private ZoomModel zoomData;
-
-	private MainSashListener sashListener;
+	private ZoomModel zoomModel;
 
 	private Composite leftPane;
 
 	private Composite rightPane;
-	
+
 	/**
 	 * Creates the <code>TraceViewer</code> contents in the parent composite,
-	 * using the model for data. So far, just uses dummy data, and model isn't
+	 * using the traceModel for data. So far, just uses dummy data, and traceModel isn't
 	 * passed beyond this step.
 	 * 
 	 * @param parent
 	 *            the parent composite in which to construct the view
-	 * @param model
-	 *            the model containing data to display
-	 * @param zoomData
+	 * @param traceModel
+	 *            the traceModel containing data to display
+	 * @param zoomModel
 	 *            <code>ZoomModel</code> object from which to retrieve zoom and
 	 *            scroll data
 	 */
 	public TraceViewer(final Composite parent, final TraceModel model,
 			final ZoomModel zoomData) {
-		this.model = model;
-		this.zoomData = zoomData;
+		this.traceModel = model;
+		this.zoomModel = zoomData;
+		
 		createContents(parent);
 	}
 
 	/**
 	 * Creates the contents of the view within the parent composite. Handles all
-	 * sub-initializations and will eventually pass the model along.
+	 * sub-initializations and will eventually pass the traceModel along.
 	 * 
 	 * @param parent
 	 *            the parent composite
@@ -79,8 +72,6 @@ public class TraceViewer {
 		parentLayout.horizontalSpacing = 0;
 		parent.setLayout(parentLayout);
 
-		TraceCursorFactory traceCursorFactory = new TraceCursorFactory(zoomData);
-		
 		leftPane = new Composite(parent, SWT.NONE);
 		GridLayout leftLayout = new GridLayout(1, false);
 		leftLayout.marginHeight = 0;
@@ -104,10 +95,12 @@ public class TraceViewer {
 
 		rightPane.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		HeaderViewer header = new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomData);
-		MainViewer mainViewer = new MainViewer(leftPane, rightPane, traceCursorFactory, model, zoomData);
+		TraceCursorFactory traceCursorFactory = new TraceCursorFactory(zoomModel);
+
+		new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomModel);
+		new MainViewer(leftPane, rightPane, traceCursorFactory, traceModel, zoomModel);
 		
-		sashListener = new MainSashListener(leftPane);
+		MainSashListener sashListener = new MainSashListener(leftPane);
 		mainSash.addSelectionListener(sashListener);
 		mainSash.addMouseListener(sashListener);
 	}

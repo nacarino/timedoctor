@@ -16,11 +16,8 @@ import java.util.Observer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
@@ -73,7 +70,7 @@ public class MainViewer implements Observer {
 	 * Scrolled composite to handle the scrolling of trace lines. Automatically
 	 * synchronizes the left pane.
 	 */
-	private ScrolledComposite vertScroll;
+	private ScrolledComposite verticalScroll;
 
 	/**
 	 * A slider to serve as the horizontal scrollbar, allowing horizontal
@@ -83,15 +80,15 @@ public class MainViewer implements Observer {
 	private Slider horizontalScroll;
 
 	/**
-	 * The model from which to retrieve data.
+	 * The traceModel from which to retrieve data.
 	 */
-	private TraceModel model;
+	private TraceModel traceModel;
 
 	/**
-	 * Model component containing data on the zoom factor and horizontal offset
+	 * Model component containing data on the zoomModel factor and horizontal offset
 	 * due to scrolling of trace lines.
 	 */
-	private ZoomModel zoom;
+	private ZoomModel zoomModel;
 		
 	/** 
 	 * Zoom factor multiplied by MAX_HOR_SCROLL.
@@ -108,23 +105,23 @@ public class MainViewer implements Observer {
 	 * 
 	 * @param parent
 	 *            the parent composite
-	 * @param model
-	 *            the model containing trace data to display
-	 * @param zoom
-	 *            the model component containing zoom data for this trace
+	 * @param traceModel
+	 *            the traceModel containing trace data to display
+	 * @param zoomModel
+	 *            the traceModel component containing zoomModel data for this trace
 	 */
 	public MainViewer(final Composite leftPane,
 			final Composite rightPane, 
 			final TraceCursorFactory traceCursorFactory,
-			final TraceModel model,
-			final ZoomModel zoom) {
-		this.model = model;
-		this.zoom = zoom;
+			final TraceModel traceModel,
+			final ZoomModel zoomModel) {
+		this.traceModel = traceModel;
+		this.zoomModel = zoomModel;
 		
 		sectionViewerArrayList = new ArrayList<SectionViewer>();
 		
-		zoom.setTimes(0, model.getEndTime() / 2);
-		zoom.addObserver(this);
+		zoomModel.setTimes(0, traceModel.getEndTime() / 2);
+		zoomModel.addObserver(this);
 
 		createContents(leftPane, rightPane, traceCursorFactory);
 	}
@@ -147,31 +144,29 @@ public class MainViewer implements Observer {
 				
 		leftContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
-		vertScroll = new ScrolledComposite(rightPane, SWT.V_SCROLL);
-		vertScroll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+		verticalScroll = new ScrolledComposite(rightPane, SWT.V_SCROLL);
+		verticalScroll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		horizontalScroll = new Slider(rightPane, SWT.HORIZONTAL);
-		horizontalScroll.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
-		
-		rightContent = new Composite(vertScroll, SWT.NONE);
+		rightContent = new Composite(verticalScroll, SWT.NONE);
 		GridLayout rightContentLayout = new GridLayout(1, false);
 		rightContentLayout.marginHeight = 0;
 		rightContentLayout.marginWidth = 0;
 		rightContentLayout.verticalSpacing = 0;
 		rightContent.setLayout(rightContentLayout);
 
+		horizontalScroll = new Slider(rightPane, SWT.HORIZONTAL);
+		horizontalScroll.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
+
 		// Create cursor and baseline
 		traceCursorFactory.setTracePane(rightContent);
 		TimeLine traceCursor = traceCursorFactory.createTraceCursor(CursorType.CURSOR);
 		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
-		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoom);
+		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoomModel);
 		
 		createTraceLines(leftContent, rightContent, traceCursorListener);
 				
 		initializeScrollbars();		
 	}
-
-	// Handle sash between left and right panes
 
 	/**
 	 * Creates the trace lines (label and canvas) in the main view.
@@ -187,14 +182,14 @@ public class MainViewer implements Observer {
 			final Composite right,
 			final TraceCursorListener traceCursorListener) {
 		final LineType[] values = LineType.values();
-		final SectionList sectionList = model.getSections();
+		final SectionList sectionList = traceModel.getSections();
 
 		// Create sections in the order of LineType
 		for (LineType type : values) {
 			if (type != LineType.PORTS) {
 				Section s = sectionList.getSection(type);				
 				if (s != null) {
-					SectionViewer section = new SectionViewer(this, left, right, s, zoom, model, traceCursorListener);
+					SectionViewer section = new SectionViewer(this, left, right, s, zoomModel, traceModel, traceCursorListener);
 					sectionViewerArrayList.add(section);
 					section.setHeaderText(type.toString());
 					section.setHeaderColor(new Color(right.getDisplay(), COLORS[type.ordinal()]));
@@ -207,12 +202,12 @@ public class MainViewer implements Observer {
 	 * Initializes vertical and horizontal scrolling.
 	 */
 	private void initializeScrollbars() {
-		vertScroll.setMinWidth(0);
-		vertScroll.setExpandHorizontal(true);
-		vertScroll.setMinHeight(rightContent.computeSize(SWT.DEFAULT,
+		verticalScroll.setMinWidth(0);
+		verticalScroll.setExpandHorizontal(true);
+		verticalScroll.setMinHeight(rightContent.computeSize(SWT.DEFAULT,
 				SWT.DEFAULT).y);
-		vertScroll.setExpandVertical(true);
-		vertScroll.setContent(rightContent);
+		verticalScroll.setExpandVertical(true);
+		verticalScroll.setContent(rightContent);
 
 		intializeVerticalScroll();
 		initializeHorizontalScroll();
@@ -222,33 +217,9 @@ public class MainViewer implements Observer {
 	 * Initializes automatic vertical scrolling in the scrolled composite.
 	 */
 	private void intializeVerticalScroll() {
-		vertScroll.setData(leftContent);
-
-		final ScrollBar rightScrollBar = vertScroll.getVerticalBar();
-
-		rightScrollBar.addSelectionListener(new SelectionListener() {
-			public void widgetDefaultSelected(final SelectionEvent e) {
-			}
-
-			public void widgetSelected(final SelectionEvent e) {
-				int selection = rightScrollBar.getSelection();
-				setVerticalScroll(selection);
-			}
-		});
-
-		vertScroll.addControlListener(new ControlListener() {
-			public void controlResized(final ControlEvent e) {
-				ScrollBar bar = ((ScrolledComposite) e.widget).getVerticalBar();
-				int selection = 0;
-				if (bar.getVisible()) {
-					selection = rightScrollBar.getSelection();
-				}
-				setVerticalScroll(selection);
-			}
-
-			public void controlMoved(final ControlEvent e) {
-			}
-		});
+		VerticalScrollListener verticalScrollListener = new VerticalScrollListener(leftContent);
+		verticalScroll.getVerticalBar().addSelectionListener(verticalScrollListener);
+		verticalScroll.addControlListener(verticalScrollListener);
 	}
 
 	/**
@@ -268,20 +239,20 @@ public class MainViewer implements Observer {
 
 				int selection = slider.getSelection();
 
-				// Update zoom with selection
-				double oldStartTime = zoom.getStartTime();
-				double oldEndTime = zoom.getEndTime();
+				// Update zoomModel with selection
+				double oldStartTime = zoomModel.getStartTime();
+				double oldEndTime = zoomModel.getEndTime();
 				double interval = oldEndTime - oldStartTime;
 				
-				double startTime = selection * model.getEndTime() / (HOR_SCROLL_MAX);
+				double startTime = selection * traceModel.getEndTime() / (HOR_SCROLL_MAX);
 				double endTime = startTime + interval;
-				zoom.setTimes(startTime, endTime);
+				zoomModel.setTimes(startTime, endTime);
 			}
 		});
 	}
 
 	/**
-	 * Updates scrolling when the zoom or scroll is changed by another part of
+	 * Updates scrolling when the zoomModel or scroll is changed by another part of
 	 * the view.
 	 * 
 	 * @param o
@@ -302,23 +273,24 @@ public class MainViewer implements Observer {
 	}
 	                               
 	private void setHorizontalScroll() {
-		// MR would be more accurate and faster to store the zoom factor in the zoomModel
-		double modelEndTime = model.getEndTime();
-		double zoomEndTime = zoom.getEndTime();
-		double zoomStartTime = zoom.getStartTime();
+		// MR would be more accurate and faster to store the zoomModel factor in the zoomModel
+		double modelEndTime = traceModel.getEndTime();
+		double zoomEndTime = zoomModel.getEndTime();
+		double zoomStartTime = zoomModel.getStartTime();
 		double zoomInterval = zoomEndTime - zoomStartTime;		
 		double zoomFactor = zoomInterval / modelEndTime;
 		int newZoomPercentage = (int) (zoomFactor * (HOR_SCROLL_MAX));
 		int selection = (int) (zoomStartTime * (HOR_SCROLL_MAX) / modelEndTime);
 		
-		// Should only be executed on zoom, not on scroll to 
+		// Should only be executed on zoomModel, not on scroll to 
 		// avoid ping-pong between update and the scrollbar selection listener
 		if (newZoomPercentage != zoomPercentage) {
 			zoomPercentage = newZoomPercentage;
-			if (zoomPercentage >= HOR_SCROLL_MAX) {
-				horizontalScroll.setVisible(false);
-			} else {
-				horizontalScroll.setVisible(true);
+			GridData horScrollGridData = ((GridData)horizontalScroll.getLayoutData());
+			boolean newExclude = (zoomPercentage >= HOR_SCROLL_MAX);
+			if (horScrollGridData.exclude != newExclude) {
+				horScrollGridData.exclude = newExclude; 
+				rightContent.getParent().getParent().layout(false);
 			}
 		}
 		
@@ -341,15 +313,10 @@ public class MainViewer implements Observer {
 	 */
 	private void updateVerticalScrollBar() {
 		int height = rightContent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-		vertScroll.setMinHeight(height);
+		verticalScroll.setMinHeight(height);
 		
-		ScrollBar bar = vertScroll.getVerticalBar();
+		ScrollBar bar = verticalScroll.getVerticalBar();
 		int selection = bar.getSelection();
 		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
-	}
-
-	private void setVerticalScroll(final int selection) {
-		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
-		leftContent.getParent().layout(false);
 	}
 }
