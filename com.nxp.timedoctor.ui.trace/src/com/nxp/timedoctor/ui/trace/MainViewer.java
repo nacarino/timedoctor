@@ -37,7 +37,7 @@ import com.nxp.timedoctor.ui.trace.TraceCursorFactory.CursorType;
  * The main view, containing sashes, sections, labels, and traces. Vertical
  * scrolling is automatic when the content is larger than the client area.
  */
-public class MainViewer implements Observer {
+public class MainViewer implements IScrollClient, Observer {
 	
 	/**
 	 * Horizontal scrollbar settings.
@@ -217,7 +217,7 @@ public class MainViewer implements Observer {
 	 * Initializes automatic vertical scrolling in the scrolled composite.
 	 */
 	private void intializeVerticalScroll() {
-		VerticalScrollListener verticalScrollListener = new VerticalScrollListener(leftContent);
+		ScrollListener verticalScrollListener = new ScrollListener(this);
 		verticalScroll.getVerticalBar().addSelectionListener(verticalScrollListener);
 		verticalScroll.addControlListener(verticalScrollListener);
 	}
@@ -300,10 +300,10 @@ public class MainViewer implements Observer {
 	}
 	
 	public void layout() {
-		updateVerticalScrollBar();
-		
 		rightContent.layout();
 		leftContent.layout();
+		
+		updateVerticalScrollBar();
 		leftContent.update();
 	}
 	
@@ -317,6 +317,11 @@ public class MainViewer implements Observer {
 		
 		ScrollBar bar = verticalScroll.getVerticalBar();
 		int selection = bar.getSelection();
-		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
+		setScroll(selection);
 	}
+	
+	public void setScroll(final int selection) {
+		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
+		leftContent.getParent().layout(false);
+	}	
 }

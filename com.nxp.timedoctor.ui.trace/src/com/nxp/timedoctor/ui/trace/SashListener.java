@@ -10,33 +10,27 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
 
 /**
  * handle splitter between left and right trace view panes
  */
-public class MainSashListener implements SelectionListener, MouseListener {
+public class SashListener implements SelectionListener, MouseListener {
 
-	private Composite leftPane;
+	private ISashClient client;
 	
 	/**
-	 * Constructs a MainSashListener with the given properties.
+	 * Constructs a SashListener with the given properties.
 	 * 
-	 * @param refControl
-	 *            the reference control
-	 * @param sashStyle
-	 *            the orientation of the sash
-	 * @param hasMinOffset
-	 *            whether or not it has a minumum offset
+	 * @param client
+	 *            the <code>ISashClient</code> that implements the 
+	 *            updates upon sash actions
 	 */
-	public MainSashListener(final Composite leftPane) {
-		this.leftPane = leftPane;
+	public SashListener(final ISashClient client) {
+		this.client = client;
 	}
 
 	/**
@@ -56,7 +50,7 @@ public class MainSashListener implements SelectionListener, MouseListener {
 	 *            SelectionEvent containing details on the sash's location
 	 */
 	public final void widgetSelected(final SelectionEvent e) {
-		setSashOffset(e.x);
+		client.setSashOffset(e.x);
 	}
 
 	/**
@@ -67,7 +61,7 @@ public class MainSashListener implements SelectionListener, MouseListener {
 	 *            <code>MouseEvent</code> containing details on the event
 	 */
 	public final void mouseDoubleClick(final MouseEvent e) {
-		setSashOffset(getMinSashOffset());
+		client.setSashOffset(client.getMinSashOffset());
 	}
 
 	/**
@@ -86,27 +80,5 @@ public class MainSashListener implements SelectionListener, MouseListener {
 	 *            <code>MouseEvent</code>
 	 */
 	public final void mouseUp(final MouseEvent e) {
-	}
-
-	/**
-	 * Returns the minimum sash offset from the left of the parent's client
-	 * area.
-	 * 
-	 * @return the minimum sash offset in pixels
-	 */
-	public final int getMinSashOffset() {
-		return leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
-	}
-
-	/**
-	 * Sets the sash offset to the given value.
-	 * 
-	 * @param offset
-	 *            the offset in pixels from the left of the parent's client area
-	 */
-	public final void setSashOffset(final int offset) {
-		((GridData) leftPane.getLayoutData()).widthHint = offset;
-		leftPane.getParent().layout(true);
-		leftPane.getParent().update();
 	}
 }

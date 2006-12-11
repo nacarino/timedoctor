@@ -24,7 +24,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * header containing a logo and ruler, and a main, scrollable body within which
  * to view the data.
  */
-public class TraceViewer {
+public class TraceViewer implements ISashClient {
 
 	private static final int SASH_WIDTH = 2;
 
@@ -100,8 +100,30 @@ public class TraceViewer {
 		new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomModel);
 		new MainViewer(leftPane, rightPane, traceCursorFactory, traceModel, zoomModel);
 		
-		MainSashListener sashListener = new MainSashListener(leftPane);
+		SashListener sashListener = new SashListener(this);
 		mainSash.addSelectionListener(sashListener);
 		mainSash.addMouseListener(sashListener);
 	}
+	
+	/**
+	 * Returns the minimum sash offset from the left of the parent's client
+	 * area.
+	 * 
+	 * @return the minimum sash offset in pixels
+	 */
+	public final int getMinSashOffset() {
+		return leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
+	}
+
+	/**
+	 * Sets the sash offset to the given value.
+	 * 
+	 * @param offset
+	 *            the offset in pixels from the left of the parent's client area
+	 */
+	public final void setSashOffset(final int offset) {
+		((GridData) leftPane.getLayoutData()).widthHint = offset;
+		leftPane.getParent().layout(true);
+		leftPane.getParent().update();
+	}	
 }

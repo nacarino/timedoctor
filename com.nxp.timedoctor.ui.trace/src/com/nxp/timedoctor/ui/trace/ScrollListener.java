@@ -15,25 +15,23 @@ import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 
 /**
- * Trace window vertical scrollbar listener
+ * Scrollbar listener, calls client with the IScrollClient interface
  */
-public class VerticalScrollListener implements SelectionListener, ControlListener {
+public class ScrollListener implements SelectionListener, ControlListener {
 
-	private Composite leftPane;
+	private IScrollClient client;
 	
 	/**
-	 * Constructs a MainSashListener with the given properties.
+	 * Constructs a SashListener with the given properties.
 	 * 
 	 * @param leftPane
 	 *            the compositeon the left that must be synchronized
 	 */
-	public VerticalScrollListener(final Composite leftPane) {
-		this.leftPane = leftPane;
+	public ScrollListener(final IScrollClient client) {
+		this.client = client;
 	}
 
 	public void widgetDefaultSelected(final SelectionEvent e) {
@@ -41,7 +39,8 @@ public class VerticalScrollListener implements SelectionListener, ControlListene
 
 	public void widgetSelected(final SelectionEvent e) {
 		ScrollBar bar = ((ScrollBar) e.widget);
-		setVerticalScroll(bar.getSelection());		
+		client.setScroll(bar.getSelection());
+		
 	}
 
 	public void controlMoved(final ControlEvent e) {
@@ -53,11 +52,8 @@ public class VerticalScrollListener implements SelectionListener, ControlListene
 		if (bar.getVisible()) {
 			selection = bar.getSelection();
 		}
-		setVerticalScroll(selection);		
+		client.setScroll(selection);		
 	}
 
-	private void setVerticalScroll(final int selection) {
-		((GridData) leftPane.getLayoutData()).verticalIndent = - selection;
-		leftPane.getParent().layout(false);
-	}
+
 }
