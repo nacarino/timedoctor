@@ -18,9 +18,9 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Text;
 
 import com.nxp.timedoctor.core.model.SampleCPU;
@@ -32,7 +32,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * spacing) and a ruler, with a disabled sash between them to synchronize
  * position with the sash in the lower pane.
  */
-public class HeaderViewer extends Composite implements ISashClient, Observer {
+public class HeaderViewer implements Observer {
 
 	private static final int LOGO_FONT_SIZE = 8;
 	
@@ -43,20 +43,15 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	private static final int FORMLAYOUT_FULL = 100;
 
 	/**
+	 * The height of the header in pixels.
+	 */
+	private static final int HEADER_HEIGHT = 50;
+	
+	/**
 	 * The logo composite, for spacing in the header (and eventual presence of a
 	 * logo).
 	 */
 	private Text logo;
-
-	/**
-	 * The header sash, for synchronization with lower pane's sash.
-	 */
-	private Sash headerSash;
-
-	/**
-	 * The sash listener to synchronize the two sashes.
-	 */
-	private SashSyncListener sashListener;
 
 	/**
 	 * The ruler canvas.
@@ -74,14 +69,13 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 * @param data
 	 *            <code>Observable</code> containing zoom and scroll data
 	 */
-	public HeaderViewer(final Composite parent, 
+	public HeaderViewer(final Composite leftPane,
+			final Composite rightPane,
 			final TraceCursorFactory traceCursorFactory,
 			final ZoomModel zoom) {
-		super(parent, SWT.NONE);
 		this.zoom = zoom;
 
-		setLayout(new FormLayout());
-		createContents(parent, traceCursorFactory);
+		createContents(leftPane, rightPane, traceCursorFactory);
 
 		zoom.addObserver(this);
 	}
@@ -95,41 +89,25 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 	 *            <code>Observable</code> containing current zoom and scroll
 	 *            data
 	 */
-	private void createContents(final Composite parent,
+	private void createContents(final Composite leftPane,
+			final Composite rightPane,
 			final TraceCursorFactory traceCursorFactory) {
-		logo = new Text(this, SWT.LEFT | SWT.MULTI | SWT.READ_ONLY);
-			
-		logo.setForeground(logo.getDisplay().getSystemColor(SWT.COLOR_BLUE));
-		logo.setFont(new Font(getDisplay(), "Tahoma",
-				LOGO_FONT_SIZE, SWT.NORMAL));
-		
-		headerSash = new Sash(this, SWT.VERTICAL);
-		FormData sashFormData = new FormData();
-		sashFormData.top = new FormAttachment(0);
-		sashFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		headerSash.setLayoutData(sashFormData);
-		
-		sashListener = new SashSyncListener(this, null, SWT.VERTICAL, false);
-		headerSash.addSelectionListener(sashListener);
-		headerSash.addMouseListener(sashListener);
+		logo = new Text(leftPane, SWT.LEFT | SWT.MULTI | SWT.READ_ONLY);
+		GridData logoGridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		logoGridData.heightHint = HEADER_HEIGHT;
+		logo.setLayoutData(logoGridData);
 
-		FormData logoFormData = new FormData();
-		logoFormData.left = new FormAttachment(0);
-		logoFormData.top = new FormAttachment(0);
-		logoFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		logoFormData.right = new FormAttachment(headerSash);
-		logo.setLayoutData(logoFormData);
-		
+		logo.setForeground(logo.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+		logo.setFont(new Font(logo.getDisplay(), "Tahoma",
+				LOGO_FONT_SIZE, SWT.NORMAL));
+				
 		// Ruler pane
-		Composite rulerPane = new Composite(this, SWT.NONE);
+		Composite rulerPane = new Composite(rightPane, SWT.NONE);
 		rulerPane.setLayout(new FormLayout());
 
-		FormData rulerPaneFormData = new FormData();
-		rulerPaneFormData.left = new FormAttachment(headerSash);
-		rulerPaneFormData.right = new FormAttachment(FORMLAYOUT_FULL);
-		rulerPaneFormData.top = new FormAttachment(0);
-		rulerPaneFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		rulerPane.setLayoutData(rulerPaneFormData);
+		GridData rulerPaneGridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
+		rulerPaneGridData.heightHint = HEADER_HEIGHT;
+		rulerPane.setLayoutData(rulerPaneGridData);
 		
 		traceCursorFactory.setRulerPane(rulerPane);
 
@@ -146,40 +124,6 @@ public class HeaderViewer extends Composite implements ISashClient, Observer {
 		RulerPaintListener rulerPaintListener =
 			new RulerPaintListener(zoom);
 		ruler.addPaintListener(rulerPaintListener);
-	}
-
-	// Handle sash between left and right panes
-
-	/**
-	 * Adds the given SashClient to its sash listener for synchronization.
-	 * 
-	 * @param client
-	 *            the client to be added
-	 */
-	public final void addSashClient(final ISashClient client) {
-		sashListener.addClient(client);
-	}
-
-	/**
-	 * Returns the current size of the logo composite, which determines the
-	 * sash's minimum x-position.
-	 * 
-	 * @return the minimum sash offset
-	 */
-	public final int getMinSashOffset() {
-		return 0;
-	}
-
-	/**
-	 * Sets the sash offset.
-	 * 
-	 * @param offset
-	 *            sets the sash offset from the left of the client area.
-	 */
-	public final void setSashOffset(final int offset) {
-		((FormData) headerSash.getLayoutData()).left = new FormAttachment(0, offset);
-		layout(true);
-		update();
 	}
 
 	/**

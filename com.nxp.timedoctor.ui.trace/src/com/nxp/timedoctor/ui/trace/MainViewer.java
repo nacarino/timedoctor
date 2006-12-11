@@ -23,12 +23,9 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Slider;
 
@@ -43,13 +40,7 @@ import com.nxp.timedoctor.ui.trace.TraceCursorFactory.CursorType;
  * The main view, containing sashes, sections, labels, and traces. Vertical
  * scrolling is automatic when the content is larger than the client area.
  */
-public class MainViewer extends Composite implements ISashClient, Observer {
-
-	/**
-	 * Constant for use in FormAttachments to indicate the percentage should be
-	 * full right or bottom.
-	 */
-	private static final int FORMLAYOUT_FULL = 100;
+public class MainViewer implements Observer {
 	
 	/**
 	 * Horizontal scrollbar settings.
@@ -71,7 +62,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	/**
 	 * The left pane, containing labels and collapsible header bars.
 	 */
-	private Composite leftPane;
+	private Composite leftContent;
 
 	/**
 	 * The right pane, containing traces and sashes.
@@ -82,7 +73,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * Scrolled composite to handle the scrolling of trace lines. Automatically
 	 * synchronizes the left pane.
 	 */
-	private ScrolledComposite rightScroll;
+	private ScrolledComposite vertScroll;
 
 	/**
 	 * A slider to serve as the horizontal scrollbar, allowing horizontal
@@ -90,11 +81,6 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * automatically.
 	 */
 	private Slider horizontalScroll;
-
-	/**
-	 * The listener to synchronize the main sash with the header sash.
-	 */
-	private SashSyncListener sashListener;
 
 	/**
 	 * The model from which to retrieve data.
@@ -127,12 +113,11 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * @param zoom
 	 *            the model component containing zoom data for this trace
 	 */
-	public MainViewer(final Composite parent, 
+	public MainViewer(final Composite leftPane,
+			final Composite rightPane, 
 			final TraceCursorFactory traceCursorFactory,
 			final TraceModel model,
 			final ZoomModel zoom) {
-		super(parent, SWT.NONE);
-
 		this.model = model;
 		this.zoom = zoom;
 		
@@ -141,7 +126,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		zoom.setTimes(0, model.getEndTime() / 2);
 		zoom.addObserver(this);
 
-		createContents(parent, traceCursorFactory);
+		createContents(leftPane, rightPane, traceCursorFactory);
 	}
 
 	/**
@@ -150,61 +135,25 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * @param parent
 	 *            the parent composite
 	 */
-	private void createContents(final Composite parent,
+	private void createContents(final Composite leftPane,
+			final Composite rightPane,
 			final TraceCursorFactory traceCursorFactory) {
-		setLayout(new FormLayout());
+		leftContent = new Composite(leftPane, SWT.NONE);
+		GridLayout leftContentLayout = new GridLayout(1, false);
+		leftContentLayout.marginHeight = 0;
+		leftContentLayout.marginWidth = 0;
+		leftContentLayout.verticalSpacing = 0;
+		leftContent.setLayout(leftContentLayout);
+				
+		leftContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		
-		leftPane = new Composite(this, SWT.NONE);
-		GridLayout leftPaneLayout = new GridLayout(1, false);
-		leftPaneLayout.marginHeight = 0;
-		leftPaneLayout.marginWidth = 0;
-		leftPaneLayout.verticalSpacing = 0;
-		leftPane.setLayout(leftPaneLayout);
+		vertScroll = new ScrolledComposite(rightPane, SWT.V_SCROLL);
+		vertScroll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 
-		FormData data = new FormData();
-		data.left = new FormAttachment(0);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		leftPane.setLayoutData(data);
-
-		Sash mainSash = new Sash(this, SWT.VERTICAL);
-		data = new FormData();
-		data.left = new FormAttachment(leftPane);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		mainSash.setLayoutData(data);
-
-		sashListener = new SashSyncListener(this, null, SWT.VERTICAL, false);
-		mainSash.addSelectionListener(sashListener);
-		mainSash.addMouseListener(sashListener);
-
-		Composite rightPane = new Composite(this, SWT.NONE);
-		data = new FormData();
-		data.left = new FormAttachment(mainSash);
-		data.right = new FormAttachment(FORMLAYOUT_FULL);
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		rightPane.setLayoutData(data);
-
-		rightPane.setLayout(new FormLayout());
-
-		rightScroll = new ScrolledComposite(rightPane, SWT.V_SCROLL);
 		horizontalScroll = new Slider(rightPane, SWT.HORIZONTAL);
-
-		data = new FormData();
-		data.top = new FormAttachment(0);
-		data.bottom = new FormAttachment(horizontalScroll);
-		data.left = new FormAttachment(0);
-		data.right = new FormAttachment(FORMLAYOUT_FULL);
-		rightScroll.setLayoutData(data);
-
-		data = new FormData();
-		data.left = new FormAttachment(0);
-		data.right = new FormAttachment(FORMLAYOUT_FULL);
-		data.bottom = new FormAttachment(FORMLAYOUT_FULL);
-		horizontalScroll.setLayoutData(data);
-
-		rightContent = new Composite(rightScroll, SWT.NONE);
+		horizontalScroll.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
+		
+		rightContent = new Composite(vertScroll, SWT.NONE);
 		GridLayout rightContentLayout = new GridLayout(1, false);
 		rightContentLayout.marginHeight = 0;
 		rightContentLayout.marginWidth = 0;
@@ -217,7 +166,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
 		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoom);
 		
-		createTraceLines(leftPane, rightContent, traceCursorListener);
+		createTraceLines(leftContent, rightContent, traceCursorListener);
 				
 		initializeScrollbars();		
 	}
@@ -248,7 +197,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 					SectionViewer section = new SectionViewer(this, left, right, s, zoom, model, traceCursorListener);
 					sectionViewerArrayList.add(section);
 					section.setHeaderText(type.toString());
-					section.setHeaderColor(new Color(getDisplay(), COLORS[type.ordinal()]));
+					section.setHeaderColor(new Color(right.getDisplay(), COLORS[type.ordinal()]));
 				}
 			}
 		}
@@ -258,12 +207,12 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * Initializes vertical and horizontal scrolling.
 	 */
 	private void initializeScrollbars() {
-		rightScroll.setMinWidth(0);
-		rightScroll.setExpandHorizontal(true);
-		rightScroll.setMinHeight(rightContent.computeSize(SWT.DEFAULT,
+		vertScroll.setMinWidth(0);
+		vertScroll.setExpandHorizontal(true);
+		vertScroll.setMinHeight(rightContent.computeSize(SWT.DEFAULT,
 				SWT.DEFAULT).y);
-		rightScroll.setExpandVertical(true);
-		rightScroll.setContent(rightContent);
+		vertScroll.setExpandVertical(true);
+		vertScroll.setContent(rightContent);
 
 		intializeVerticalScroll();
 		initializeHorizontalScroll();
@@ -273,9 +222,9 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 * Initializes automatic vertical scrolling in the scrolled composite.
 	 */
 	private void intializeVerticalScroll() {
-		rightScroll.setData(leftPane);
+		vertScroll.setData(leftContent);
 
-		final ScrollBar rightScrollBar = rightScroll.getVerticalBar();
+		final ScrollBar rightScrollBar = vertScroll.getVerticalBar();
 
 		rightScrollBar.addSelectionListener(new SelectionListener() {
 			public void widgetDefaultSelected(final SelectionEvent e) {
@@ -287,7 +236,7 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 			}
 		});
 
-		rightScroll.addControlListener(new ControlListener() {
+		vertScroll.addControlListener(new ControlListener() {
 			public void controlResized(final ControlEvent e) {
 				ScrollBar bar = ((ScrolledComposite) e.widget).getVerticalBar();
 				int selection = 0;
@@ -302,12 +251,6 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		});
 	}
 
-	private void setVerticalScroll(final int selection) {
-		((FormData) leftPane.getLayoutData()).top = new FormAttachment(0,
-				0 - selection);
-		leftPane.getParent().layout(false);
-	}
-	
 	/**
 	 * Initializes horizontal scrolling using a manual slider and updating the
 	 * start and end times of the visible portion of the trace lines.
@@ -335,37 +278,6 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 				zoom.setTimes(startTime, endTime);
 			}
 		});
-	}
-
-	/**
-	 * Adds a SashClient to its sash listener for sash synchronization.
-	 * 
-	 * @param client
-	 *            the client to be added
-	 */
-	public final void addSashClient(final ISashClient client) {
-		sashListener.addClient(client);
-	}
-
-	/**
-	 * Returns the minimum sash offset from the left of the parent's client
-	 * area.
-	 * 
-	 * @return the minimum sash offset in pixels
-	 */
-	public final int getMinSashOffset() {
-		return leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
-	}
-
-	/**
-	 * Sets the sash offset to the given value.
-	 * 
-	 * @param offset
-	 *            the offset in pixels from the left of the parent's client area
-	 */
-	public final void setSashOffset(final int offset) {
-		((FormData) leftPane.getLayoutData()).width = offset;
-		layout(true);
 	}
 
 	/**
@@ -415,13 +327,12 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 		horizontalScroll.setSelection(selection);		
 	}
 	
-	@Override
 	public void layout() {
 		updateVerticalScrollBar();
 		
 		rightContent.layout();
-		leftPane.layout();
-		leftPane.update();
+		leftContent.layout();
+		leftContent.update();
 	}
 	
 	/**
@@ -430,19 +341,15 @@ public class MainViewer extends Composite implements ISashClient, Observer {
 	 */
 	private void updateVerticalScrollBar() {
 		int height = rightContent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-		rightScroll.setMinHeight(height);
+		vertScroll.setMinHeight(height);
 		
-		updateLabelVerticalScroll();
+		ScrollBar bar = vertScroll.getVerticalBar();
+		int selection = bar.getSelection();
+		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
 	}
 
-	/**
-	 * Updates the manual scrolling of the left pane in the event of a sash move
-	 * or section collapse.
-	 */
-	private void updateLabelVerticalScroll() {
-		ScrollBar bar = rightScroll.getVerticalBar();
-		int selection = bar.getSelection();
-		((FormData) leftPane.getLayoutData()).top = new FormAttachment(0,
-				0 - selection);
+	private void setVerticalScroll(final int selection) {
+		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
+		leftContent.getParent().layout(false);
 	}
 }
