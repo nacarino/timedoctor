@@ -103,6 +103,9 @@ public class TraceViewer implements ISashClient {
 		SashListener sashListener = new SashListener(this);
 		mainSash.addSelectionListener(sashListener);
 		mainSash.addMouseListener(sashListener);
+		
+		// Set initial width of the leftPane
+		setSashOffset(getMinSashOffset());
 	}
 	
 	/**
@@ -112,7 +115,7 @@ public class TraceViewer implements ISashClient {
 	 * @return the minimum sash offset in pixels
 	 */
 	public final int getMinSashOffset() {
-		return leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
+		return leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
 	}
 
 	/**
