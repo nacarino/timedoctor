@@ -155,11 +155,9 @@ public class SectionViewer implements IExpandClient{
 			final TraceCursorListener traceCursorListener) {
 		TraceLineViewer traceLine = null;
 		for (SampleLine line : section.getLines()) {				
-			if (line.getCount() > 1) {
-                traceLine = new TraceLineViewer(mainViewer, traceLine, labels, traces,
-                        line, zoomData, model, traceCursorListener);
-                traceLineViewerArrayList.add(traceLine);
-            }
+			traceLine = new TraceLineViewer(mainViewer, traceLine, labels, traces,
+            line, zoomData, model, traceCursorListener);
+            traceLineViewerArrayList.add(traceLine);
 		}
 	}
 	
