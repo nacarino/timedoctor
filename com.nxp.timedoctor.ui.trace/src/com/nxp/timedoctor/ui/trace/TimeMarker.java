@@ -54,7 +54,9 @@ public class TimeMarker extends TimeLine {
 		SelectionListener selectionListener = new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				setCursor(e.x);
+				if (e.detail == SWT.DRAG) {
+					setCursor(e.x);
+				}
 			}
 		};
 		cursorSash.addSelectionListener(selectionListener);
