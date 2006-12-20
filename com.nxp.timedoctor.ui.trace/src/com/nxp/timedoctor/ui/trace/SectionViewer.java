@@ -149,15 +149,15 @@ public class SectionViewer implements IExpandClient{
 	 * @param model
 	 *            the model containing data on the whole trace
 	 */
-	private void createTraceLines(final Composite labels,
-			final Composite traces, 
+	private void createTraceLines(final Composite labelPane,
+			final Composite tracePane, 
 			final TraceModel model, 
 			final TraceCursorListener traceCursorListener) {
 		TraceLineViewer traceLine = null;
 		for (SampleLine line : section.getLines()) {				
-			traceLine = new TraceLineViewer(mainViewer, traceLine, labels, traces,
+			traceLine = new TraceLineViewer(this, traceLine, labelPane, tracePane,
             line, zoomData, model, traceCursorListener);
-            traceLineViewerArrayList.add(traceLine);
+			addTraceLineViewer(traceLine);
 		}
 	}
 	
@@ -188,5 +188,13 @@ public class SectionViewer implements IExpandClient{
 				currentTraceLine.updateVisibility();
 			}
 		}
+	}
+	
+	public void addTraceLineViewer(final TraceLineViewer traceLineViewer) {
+		traceLineViewerArrayList.add(traceLineViewer);
+	}
+	
+	public void layout() {
+		mainViewer.layout();
 	}
 }

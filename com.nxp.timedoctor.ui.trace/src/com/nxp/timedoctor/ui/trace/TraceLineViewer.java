@@ -14,11 +14,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
-import org.eclipse.swt.dnd.DragSourceAdapter;
-import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DropTarget;
-import org.eclipse.swt.dnd.DropTargetAdapter;
-import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
@@ -54,12 +50,6 @@ public class TraceLineViewer {
 	 * The height in pixels of the separator between labels.
 	 */
 	private static final int SEPARATOR_HEIGHT = 2;
-
-	/**
-	 * The trace line that is selected during a drag operation for reordering
-	 * the trace lines.
-	 */
-	private static Control dragSourceLabel;
 
 	/**
 	 * The label containing the name of the line.
@@ -103,7 +93,7 @@ public class TraceLineViewer {
 	
 	private boolean isVisible = true;
 	
-	private MainViewer mainViewer;
+	private SectionViewer sectionViewer;
 	
 	/**
 	 * Constructs a new TraceLineViewer.
@@ -122,21 +112,25 @@ public class TraceLineViewer {
 	 * @param model
 	 *            model containing data on the whole trace
 	 */
-	public TraceLineViewer(final MainViewer mainViewer,
+	public TraceLineViewer(final SectionViewer sectionViewer,
 			final TraceLineViewer topLine,
-			final Composite sectionLabel, final Composite sectionTrace,
-			final SampleLine sampleLine, final ZoomModel zoomData,
-			final TraceModel model, final TraceCursorListener traceCursorListener) {
+			final Composite sectionLabel,
+			final Composite sectionTrace,
+			final SampleLine sampleLine, 
+			final ZoomModel zoomData,
+			final TraceModel model, 
+			final TraceCursorListener traceCursorListener) {
 
-		this.mainViewer = mainViewer;
+		this.sectionViewer = sectionViewer;
 		this.line = sampleLine;
 		this.zoom = zoomData;
 		this.model = model;
 
+		createLabel(sectionLabel);
+		
 		if (null == topLine) {
 			// separator above first label
 			Label topSeparator = createSeparator(sectionLabel);
-			createLabel(sectionLabel);
 			label.setData("top", topSeparator);
 			topSeparator.setData("bottom", label);
 
@@ -147,7 +141,6 @@ public class TraceLineViewer {
 			// something that traces can be moved below during drag & drop.
 			topSeparator.setData("sash", topPadding);
 		} else {
-			createLabel(sectionLabel);
 			label.setData("top", topLine.bottomSeparator);
 			topLine.bottomSeparator.setData("bottom", label);
 		}
@@ -195,7 +188,7 @@ public class TraceLineViewer {
 
 		label.addMouseListener(new TraceLineSelectListener(this, line, zoom));
 
-		setupLabelDND();
+		setupDND(label, true);
 	}
 
 	/**
@@ -217,7 +210,7 @@ public class TraceLineViewer {
 		data.heightHint = SEPARATOR_HEIGHT;
 		separator.setLayoutData(data);
 
-		setupSeparatorDND(separator);
+		setupDND(separator, false);
 
 		return separator;
 	}
@@ -311,206 +304,51 @@ public class TraceLineViewer {
 
 	
 	/**
-	 * Setup drag and drop for the trace label to allow reordering of trace
+	 * Setup drag and drop for the trace labels to allow reordering of trace
 	 * lines.
-	 */
-	private void setupLabelDND() {
-		DragSourceAdapter dragListener = new DragSourceAdapter() {
-			@Override
-			public final void dragSetData(final DragSourceEvent event) {
-				// Provide the transfer data of the requested type
-				if (TextTransfer.getInstance().isSupportedType(event.dataType)) {
-					CLabel sourceLabel = ((CLabel) ((DragSource) event.widget)
-							.getControl());
-					event.data = sourceLabel.getText(); // Transfer the label's
-					// text for now
-				}
-			}
-
-			@Override
-			public final void dragStart(final DragSourceEvent event) {
-				// Store the source label for reference during
-				// the drop operation
-				dragSourceLabel = (((DragSource) event.widget)
-						.getControl());
-			}
-		};
-
-		DropTargetAdapter dropListener = new DropTargetAdapter() {
-			@Override
-			public final void dragEnter(final DropTargetEvent event) {
-				// Set visual indication that only moves are allowed
-				if (event.detail == DND.DROP_DEFAULT) {
-					if ((event.operations & DND.DROP_MOVE) != 0) {
-						event.detail = DND.DROP_MOVE;
-					} else {
-						event.detail = DND.DROP_NONE;
-					}
-				}
-
-				if (!dropValid(event)) {
-					event.detail = DND.DROP_NONE;
-				}
-			}
-
-			@Override
-			public final void dragLeave(final DropTargetEvent event) {
-				deselectDropTarget(getTargetSeparator(event));
-			}
-
-			@Override
-			public final void dragOver(final DropTargetEvent event) {
-				if (dropValid(event)) {
-					selectDropTarget(getTargetSeparator(event));
-				}
-			}
-
-			@Override
-			public final void drop(final DropTargetEvent event) {
-				moveBelow(getTargetSeparator(event));
-			}
-
-			private Control getTargetLabel(final DropTargetEvent event) {
-				DropTarget target = (DropTarget) event.widget;
-				return target.getControl();
-			}
-
-			private Control getTargetSeparator(final DropTargetEvent event) {
-				Control targetLabel = getTargetLabel(event);
-				Control targetSeparator;
-				if (targetLabel.getLocation().y < dragSourceLabel.getLocation().y) {
-					targetSeparator = (Control) targetLabel.getData("top");
-				} else {
-					targetSeparator = (Control) targetLabel.getData("bottom");
-
-				}
-				return targetSeparator;
-			}
-
-			private boolean dropValid(final DropTargetEvent event) {
-				Control targetLabel = getTargetLabel(event);
-				return ((dragSourceLabel.getParent() == targetLabel.getParent()) && (dragSourceLabel != targetLabel));
-			}
-		};
-
-		// Set label as drag source
-		// Allow data to be moved from the drag source
-		int operations = DND.DROP_MOVE;
-
-		// Provide data in Text format
-		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
-
-		DragSource source = new DragSource(label, operations);
-
-		source.setTransfer(types);
-		source.addDragListener(dragListener);
-
-		// drop support in label section
-		// Allow data to be moved to the drop target
-		DropTarget target = new DropTarget(label, operations);
-
-		// Receive data in Text format
-		target.setTransfer(types);
-		target.addDropListener(dropListener);
-	}
-
-	/**
-	 * Setup drag and drop for the separator between trace labels to allow
-	 * reordering of trace lines.
 	 * 
-	 * @param separator
-	 *            the separator that requires drag & drop
+	 * @param control	The control (label or separator) to support drag & drag
+	 * @param isDragSource True if the control can be dragged (labels only)
 	 */
-	private void setupSeparatorDND(final Control separator) {
-		DropTargetAdapter dropListener = new DropTargetAdapter() {
-			@Override
-			public final void dragEnter(final DropTargetEvent event) {
-				// Set visual indication that only moves are allowed
-				if (event.detail == DND.DROP_DEFAULT) {
-					if ((event.operations & DND.DROP_MOVE) != 0) {
-						event.detail = DND.DROP_MOVE;
-					} else {
-						event.detail = DND.DROP_NONE;
-					}
-				}
-
-				if (!dropValid(event)) {
-					event.detail = DND.DROP_NONE;
-				}
-
-			}
-
-			@Override
-			public final void dragLeave(final DropTargetEvent event) {
-				deselectDropTarget(getTargetSeparator(event));
-
-			}
-
-			@Override
-			public final void dragOver(final DropTargetEvent event) {
-				if (dropValid(event)) {
-					selectDropTarget(getTargetSeparator(event));
-				}
-			}
-
-			@Override
-			public final void drop(final DropTargetEvent event) {
-
-				moveBelow(getTargetSeparator(event));
-
-			}
-
-			private boolean dropValid(final DropTargetEvent event) {
-				Control targetSeparator = getTargetSeparator(event);
-				Control top = (Control) dragSourceLabel.getData("top");
-				Control bottom = (Control) dragSourceLabel.getData("bottom");
-				return ((dragSourceLabel.getParent() == targetSeparator
-						.getParent())
-						&& (top != targetSeparator) && (bottom != targetSeparator));
-			}
-
-			private Control getTargetSeparator(final DropTargetEvent event) {
-				DropTarget target = (DropTarget) event.widget;
-				return target.getControl();
-
-			}
-		};
-
-		// Set label as drag source
+	private void setupDND(final Control control, final boolean isDragSource) {
 		// Allow data to be moved from the drag source
 		int operations = DND.DROP_MOVE;
 
 		// Provide data in Text format
 		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		LabelReorderListener labelReorderListener = new LabelReorderListener(this);
 
-		// drop support in label section
-		// Allow data to be moved to the drop target
-		DropTarget target = new DropTarget(separator, operations);
+		if (isDragSource) {
+			DragSource source = new DragSource(control, operations);
+			source.setTransfer(types);
+			source.addDragListener(labelReorderListener);
+		}
 
-		// Receive data in Text format
+		// Accept data in text format
+		DropTarget target = new DropTarget(control, operations);
 		target.setTransfer(types);
-		target.addDropListener(dropListener);
+		target.addDropListener(labelReorderListener);
 	}
 
 	/**
 	 * Visually highlight the selected separator.
 	 * 
-	 * @param targetSeparator
+	 * @param dropTargetControl
 	 *            the selected separator
 	 */
-	private void selectDropTarget(final Control targetSeparator) {
-		targetSeparator.setBackground(targetSeparator.getDisplay()
+	public void selectDropTarget(final Control dropTargetControl) {
+		dropTargetControl.setBackground(dropTargetControl.getDisplay()
 				.getSystemColor(SWT.COLOR_BLUE));
 	}
 
 	/**
 	 * Remove highlight from the selected separator.
 	 * 
-	 * @param targetSeparator
+	 * @param dropTargetControl
 	 *            the selected separator
 	 */
-	private void deselectDropTarget(final Control targetSeparator) {
-		targetSeparator.setBackground(targetSeparator.getDisplay()
+	public void deselectDropTarget(final Control dropTargetControl) {
+		dropTargetControl.setBackground(dropTargetControl.getDisplay()
 				.getSystemColor(SWT.COLOR_WHITE));
 	}
 
@@ -523,7 +361,8 @@ public class TraceLineViewer {
 	 * @param targetSeparator
 	 *            the separator selected by drag & drop
 	 */
-	private void moveBelow(final Control targetSeparator) {
+	public void moveBelow(final Control dragSourceLabel,
+			final Control targetSeparator) {
 		Control sourceBottom = (Control) dragSourceLabel.getData("bottom");
 		Control sourceAbove = (Control) dragSourceLabel.getData("top");
 		Control sourceBelow = (Control) sourceBottom.getData("bottom");
@@ -589,8 +428,7 @@ public class TraceLineViewer {
 		traceGridData.heightHint = lineHeight;
 			
 		// relayout and update vertical scrollbar, and left scroll setting
-		// TODO do not depend on SectionViewer class, better MVC
-		mainViewer.layout();
+		sectionViewer.layout();
 	}
 	
 	/**
