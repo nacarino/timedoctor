@@ -22,6 +22,7 @@ import org.eclipse.swt.events.SelectionListener;
 public class SashListener implements SelectionListener, MouseListener {
 
 	private ISashClient client;
+	private int style;
 	
 	/**
 	 * Constructs a SashListener with the given properties.
@@ -29,9 +30,12 @@ public class SashListener implements SelectionListener, MouseListener {
 	 * @param client
 	 *            the <code>ISashClient</code> that implements the 
 	 *            updates upon sash actions
+	 * @param style SWT.HORIZONTAL or SWT.VERTICAL
+	 * 			
 	 */
-	public SashListener(final ISashClient client) {
+	public SashListener(final ISashClient client, final int style) {
 		this.client = client;
+		this.style = style;
 	}
 
 	/**
@@ -53,7 +57,10 @@ public class SashListener implements SelectionListener, MouseListener {
 	public final void widgetSelected(final SelectionEvent e) {
 		// Ensure that select action does not execute upon double-click in linux
 		if (e.detail == SWT.DRAG) {
-			client.setSashOffset(e.x);
+			int offset = (style == SWT.VERTICAL) ? e.x : e.y;
+			if (!client.setSashOffset(offset)) {
+				e.doit = false;
+			}
 		}
 	}
 
@@ -65,7 +72,7 @@ public class SashListener implements SelectionListener, MouseListener {
 	 *            <code>MouseEvent</code> containing details on the event
 	 */
 	public final void mouseDoubleClick(final MouseEvent e) {
-		client.setSashOffset(client.getMinSashOffset());
+		client.setDefaultSashOffset();
 	}
 
 	/**

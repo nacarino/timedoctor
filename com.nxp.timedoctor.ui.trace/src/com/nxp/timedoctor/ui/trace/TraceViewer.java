@@ -100,22 +100,17 @@ public class TraceViewer implements ISashClient {
 		new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomModel);
 		new MainViewer(leftPane, rightPane, traceCursorFactory, traceModel, zoomModel);
 		
-		SashListener sashListener = new SashListener(this);
+		SashListener sashListener = new SashListener(this, SWT.VERTICAL);
 		mainSash.addSelectionListener(sashListener);
 		mainSash.addMouseListener(sashListener);
 		
 		// Set initial width of the leftPane
-		setSashOffset(getMinSashOffset());
+		setDefaultSashOffset();
 	}
 	
-	/**
-	 * Returns the minimum sash offset from the left of the parent's client
-	 * area.
-	 * 
-	 * @return the minimum sash offset in pixels
-	 */
-	public final int getMinSashOffset() {
-		return leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+	public final void setDefaultSashOffset() {
+		int labelOffset = leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, true).x;
+		setSashOffset(labelOffset);
 	}
 
 	/**
@@ -124,9 +119,16 @@ public class TraceViewer implements ISashClient {
 	 * @param offset
 	 *            the offset in pixels from the left of the parent's client area
 	 */
-	public final void setSashOffset(final int offset) {
-		((GridData) leftPane.getLayoutData()).widthHint = offset;
-		leftPane.getParent().layout(true);
-		leftPane.getParent().update();
+	public final boolean setSashOffset(final int offset) {
+		int labelOffset = leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
+		if (offset <= labelOffset) {
+			((GridData) leftPane.getLayoutData()).widthHint = offset;
+			leftPane.getParent().layout(true);
+			leftPane.getParent().update();
+			return true;
+		}
+		else {
+			return false;
+		}
 	}	
 }

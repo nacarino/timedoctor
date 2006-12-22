@@ -42,7 +42,7 @@ public class SectionViewer implements IExpandClient{
 	 */
 	private ZoomModel zoomData;
 	
-	private ArrayList<TraceLineViewer> traceLineViewerArrayList;
+	private ArrayList<TraceLineViewer> traceLineViewerList;
 	
 	private boolean isExpanded = true;
 	
@@ -78,7 +78,7 @@ public class SectionViewer implements IExpandClient{
 		this.section = section;
 		this.zoomData = zoomData;
 		
-		traceLineViewerArrayList = new ArrayList<TraceLineViewer>();
+		traceLineViewerList = new ArrayList<TraceLineViewer>();
 		
 		createLabelView(leftPane);
 		createTraceView(rightPane);
@@ -153,11 +153,23 @@ public class SectionViewer implements IExpandClient{
 			final Composite tracePane, 
 			final TraceModel model, 
 			final TraceCursorListener traceCursorListener) {
-		TraceLineViewer traceLine = null;
-		for (SampleLine line : section.getLines()) {				
-			traceLine = new TraceLineViewer(this, traceLine, labelPane, tracePane,
-            line, zoomData, model, traceCursorListener);
-			addTraceLineViewer(traceLine);
+				
+		// Top separator in the section
+		TraceLineSeparator separator = new TraceLineSeparator(labelPane, tracePane);
+		separator.setBackground(tracePane.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+		LabelReorderListener labelReorderListener = new LabelReorderListener();
+		separator.setReorderListener(labelReorderListener);
+		
+		for (SampleLine line : section.getLines()) {			
+			TraceLineViewer traceLine = new TraceLineViewer(this, 
+					labelPane, 
+					tracePane,
+					line,
+					zoomData, 
+					model, 
+					traceCursorListener);			
+			traceLineViewerList.add(traceLine);
 		}
 	}
 	
@@ -167,10 +179,10 @@ public class SectionViewer implements IExpandClient{
 	public void collapse() {
 		isExpanded = false;
 		
-		for (TraceLineViewer currentTraceLine : traceLineViewerArrayList) {
-			currentTraceLine.showLine(false);
+		for (TraceLineViewer traceLineViewer : traceLineViewerList) {
+			traceLineViewer.setVisible(isExpanded);
 		}
-		mainViewer.layout();
+		layout();
 	}
 
 	/**
@@ -179,19 +191,15 @@ public class SectionViewer implements IExpandClient{
 	public void expand() {
 		isExpanded = true;
 		updateAutoHide();
-		mainViewer.layout();
+		layout();
 	}
 	
 	public void updateAutoHide() {
 		if (isExpanded) {
-			for (TraceLineViewer currentTraceLine : traceLineViewerArrayList) {
-				currentTraceLine.updateVisibility();
+			for (TraceLineViewer traceLineViewer : traceLineViewerList) {
+				traceLineViewer.updateAutoHide();
 			}
 		}
-	}
-	
-	public void addTraceLineViewer(final TraceLineViewer traceLineViewer) {
-		traceLineViewerArrayList.add(traceLineViewer);
 	}
 	
 	public void layout() {

@@ -16,18 +16,16 @@ package com.nxp.timedoctor.ui.trace;
 public interface ISashClient {
 	
 	/**
-	 * Returns the minimum sash offset from the left of the parent's client
-	 * area.
-	 * 
-	 * @return the minimum sash offset in pixels
+	 * Set the sash to its default offset
 	 */
-	int getMinSashOffset();
+	void setDefaultSashOffset();
 
 	/**
 	 * Sets the sash offset to the given value.
 	 * 
 	 * @param offset
 	 *            the offset in pixels from the left of the parent's client area
+	 * @return true if the setting was accepted, false otherwise            
 	 */
-	void setSashOffset(final int offset);
+	boolean setSashOffset(final int offset);
 }

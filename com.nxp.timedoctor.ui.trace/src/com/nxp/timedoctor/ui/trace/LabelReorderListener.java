@@ -22,12 +22,65 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.widgets.Control;
 
 public class LabelReorderListener implements DragSourceListener, DropTargetListener {
-	private TraceLineViewer traceLineViewer;
-	private static Control dragSourceControl;
+	private class LabelDragSource {
+		public Control control;
+		public int drawIndex;
+		public TraceLineViewer traceLineViewer;
 
-	public LabelReorderListener(final TraceLineViewer traceLineViewer) {
-		this.traceLineViewer = traceLineViewer;
+		public LabelDragSource(final Control controls[], final DragSourceEvent event) {
+			// Store the drag source for reference during
+			// the drop operation
+			control = ((DragSource) event.widget).getControl();
+			drawIndex = getControlIndex(controls, control);
+			if (!(control.getData() instanceof TraceLineViewer)) {
+				traceLineViewer = null;
+			}
+			traceLineViewer = (TraceLineViewer) control.getData();
+		}
+		
+		public void moveBelow(final SeparatorDropTarget separatorDropTarget) {
+			traceLineViewer.moveBelow(separatorDropTarget.traceLineSeparator);
+		}
 	}
+	
+	private class SeparatorDropTarget {
+		public Control control;
+		public TraceLineSeparator traceLineSeparator;
+		
+		public SeparatorDropTarget(final Control controls[], 
+				final LabelDragSource labelDragSource,
+				final DropTargetEvent event) {
+			Control selectedControl = ((DropTarget) event.widget).getControl();
+			int selectedIndex = getControlIndex(controls, selectedControl);
+			
+			// If the selected control is a Label, select the closest visible
+			// separator above or below the label
+			if (selectedControl.getData() instanceof TraceLineViewer) {
+				int dropTargetIndex;
+				if (selectedControl.getLocation().y < labelDragSource.control.getLocation().y) {
+					dropTargetIndex = getTopControlIndex(controls, selectedIndex);
+				} else {
+					dropTargetIndex = getBottomControlIndex(controls, selectedIndex);
+				}
+				control = controls[dropTargetIndex];
+			}		
+			else {
+				control = selectedControl;
+			}
+			if (!(control.getData() instanceof TraceLineSeparator)) {
+				traceLineSeparator = null;
+			}		
+			traceLineSeparator = (TraceLineSeparator) control.getData();
+		}
+		
+		public void highlight(final boolean isHighlighted) {
+			traceLineSeparator.highlightDropTarget(isHighlighted);
+		}
+	}
+
+	private static Control controls[];
+	private static LabelDragSource labelDragSource;
+	private SeparatorDropTarget separatorDropTarget;
 	
 	public void dragFinished(final DragSourceEvent event) {
 	}
@@ -38,14 +91,13 @@ public class LabelReorderListener implements DragSourceListener, DropTargetListe
 			CLabel sourceLabel = ((CLabel) ((DragSource) event.widget)
 					.getControl());
 			// Transfer the label's text
-			event.data = sourceLabel.getText(); 
+			event.data = sourceLabel.getText();
 		}
 	}
 
 	public void dragStart(final DragSourceEvent event) {
-		// Store the drag source for reference during
-		// the drop operation
-		dragSourceControl = ((DragSource) event.widget).getControl();
+		controls = ((DragSource) event.widget).getControl().getParent().getChildren();
+		labelDragSource = new LabelDragSource(controls, event);
 	}
 
 	public void dragEnter(final DropTargetEvent event) {
@@ -58,56 +110,82 @@ public class LabelReorderListener implements DragSourceListener, DropTargetListe
 			}
 		}
 
-		if (!dropValid(event)) {
+		separatorDropTarget = new SeparatorDropTarget(controls, labelDragSource, event);
+		if (!dropValid(controls, labelDragSource, separatorDropTarget)) {
 			event.detail = DND.DROP_NONE;
 		}
 	}
 
-	public void dragLeave(final DropTargetEvent event) {
-		traceLineViewer.deselectDropTarget(getDropTargetControl(event));
+	public void dragLeave(final DropTargetEvent event) {		
+		separatorDropTarget.highlight(false);
 	}
 
 	public void dragOperationChanged(final DropTargetEvent event) {
 	}
 
 	public void dragOver(final DropTargetEvent event) {
-		if (dropValid(event)) {
-			traceLineViewer.selectDropTarget(getDropTargetControl(event));
+		if (dropValid(controls, labelDragSource, separatorDropTarget)) {
+			separatorDropTarget.highlight(true);
 		}
 	}
 
-	public void drop(final DropTargetEvent event) {
-		traceLineViewer.moveBelow(dragSourceControl, getDropTargetControl(event));
+	public void drop(final DropTargetEvent event) {		
+		labelDragSource.moveBelow(separatorDropTarget);
 	}
 
 	public void dropAccept(final DropTargetEvent event) {
 	}
 
-	private boolean dropValid(final DropTargetEvent event) {
-		Control dropTargetControl = getDropTargetControl(event);
-		Control dragSourceTop = (Control) dragSourceControl.getData("top");
-		Control dragSourceBottom = (Control) dragSourceControl.getData("bottom");
-
-		return ((dragSourceControl.getParent() == dropTargetControl.getParent()) 
-				&& (dragSourceControl != dropTargetControl)
-				&& (dragSourceTop != dropTargetControl) 
-				&& (dragSourceBottom != dropTargetControl));
+	// Find index i of selected control in the drawing order
+	private int getControlIndex(final Control controls[], final Control selectedControl) {
+		int index = 0;
+		for (; (index < controls.length) && (controls[index] != selectedControl); index++) {
+			;
+		}
+		return index;
 	}
 	
-	private Control getDropTargetControl(final DropTargetEvent event) {
-		Control selectedControl = ((DropTarget) event.widget).getControl();
-		Control dropTargetControl = selectedControl;
-		
-		// Drop on separator above or below the selected label		
-		if (selectedControl.getClass() == dragSourceControl.getClass()) {			
-			if (selectedControl.getLocation().y < dragSourceControl.getLocation().y) {
-				dropTargetControl = (Control) selectedControl.getData("top");
-			} else {
-				dropTargetControl = (Control) selectedControl.getData("bottom");
+	// Find index i of the nearest visible separator above the selected control 
+	// in the drawing order
+	private int getTopControlIndex(final Control controls[], final int index) {
+		int topIndex = index - 1;
+		for (; topIndex >= 0; topIndex--) {
+			// Only look for separators
+			if (controls[topIndex].getData() instanceof TraceLineSeparator) {
+				// Only look for visible separators
+				if (controls[topIndex].isVisible()) {
+					break;
+				}
 			}
 		}
-		return dropTargetControl;
+		return topIndex;		
 	}
-	
 
+	// Find index i of the nearest visible separator below the selected control 
+	// in the drawing order	
+	private int getBottomControlIndex(final Control controls[], final int index) {
+		int bottomIndex = index + 1;
+		for (; bottomIndex < controls.length; bottomIndex++) {
+			// Only look for separators
+			if (controls[bottomIndex].getData() instanceof TraceLineSeparator) {
+				// Only look for visible separators
+				if (controls[bottomIndex].isVisible()) {
+					break;
+				}
+			}
+		}
+		return bottomIndex;		
+	}
+
+	private boolean dropValid(final Control controls[],
+			final LabelDragSource dragSource,
+			final SeparatorDropTarget dropTarget) {
+		Control dragSourceTop = controls[getTopControlIndex(controls, dragSource.drawIndex)];
+		Control dragSourceBottom = controls[getBottomControlIndex(controls, dragSource.drawIndex)];
+		
+		return ((dragSource.control.getParent() == dropTarget.control.getParent()) 
+				&& (dragSource.control != dropTarget.control)
+				&& (dragSourceTop != dropTarget.control)
+				&& (dragSourceBottom != dropTarget.control));
+	}
 }
