@@ -70,23 +70,9 @@ public class TraceLineSeparator {
 		// selection listener is registered
 		// This ensures the header separator of a section does not 
 		// have sash functionality
-		traceSeparator.setEnabled(false);		
-	}
-	
-	public void setReorderListener(final LabelReorderListener listener) {
-		// Link back to this class as the drop target in the reorder listener
-		labelSeparator.setData(this);
-
-		// Allow data to be moved from the drag source
-		int operations = DND.DROP_MOVE;
-
-		// Provide data in Text format
-		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
-
-		// Accept data in text format
-		DropTarget target = new DropTarget(labelSeparator, operations);
-		target.setTransfer(types);
-		target.addDropListener(listener);
+		traceSeparator.setEnabled(false);
+		
+		setupReordering();
 	}
 	
 	/**
@@ -152,5 +138,23 @@ public class TraceLineSeparator {
 	
 	private void setEnabled(final boolean enabled) {
 		traceSeparator.setEnabled(enabled);		
+	}
+	
+	private void setupReordering() {
+		// Link back to this class as the drop target in the reorder listener
+		labelSeparator.setData(this);
+
+		// Allow data to be moved from the drag source
+		int operations = DND.DROP_MOVE;
+
+		// Provide data in Text format
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+
+		// Accept data in text format
+		DropTarget target = new DropTarget(labelSeparator, operations);
+		target.setTransfer(types);
+		
+		LabelReorderListener reorderListener = new LabelReorderListener();
+		target.addDropListener(reorderListener);
 	}
 }

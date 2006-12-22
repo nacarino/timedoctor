@@ -158,9 +158,6 @@ public class SectionViewer implements IExpandClient{
 		TraceLineSeparator separator = new TraceLineSeparator(labelPane, tracePane);
 		separator.setBackground(tracePane.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-		LabelReorderListener labelReorderListener = new LabelReorderListener();
-		separator.setReorderListener(labelReorderListener);
-		
 		for (SampleLine line : section.getLines()) {			
 			TraceLineViewer traceLine = new TraceLineViewer(this, 
 					labelPane, 

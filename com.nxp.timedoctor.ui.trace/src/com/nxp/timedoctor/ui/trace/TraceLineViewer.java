@@ -114,10 +114,8 @@ public class TraceLineViewer implements ISashClient {
 		traceLineSeparator.addSelectionListener(sashListener);
 		traceLineSeparator.addMouseListener(sashListener);
 		
-		LabelReorderListener reorderListener = new LabelReorderListener();
-		setReorderListener(reorderListener);
-		traceLineSeparator.setReorderListener(reorderListener);
-		
+		setupReordering();
+				
 		// Set default height to minimum needed for label text
 		setHeight(0); 
 	}
@@ -179,26 +177,6 @@ public class TraceLineViewer implements ISashClient {
 		trace.addMouseListener(traceCursorListener);
 		trace.addMouseListener(new TraceZoomListener(zoom));
 		trace.addMouseMoveListener(new TraceToolTipListener(line, zoom));
-	}
-
-	public void setReorderListener(final LabelReorderListener listener) {
-		// Link back to this class as the drag source in the reorder listener
-		label.setData(this);
-
-		// Allow data to be moved from the drag source
-		int operations = DND.DROP_MOVE;
-
-		// Provide data in Text format
-		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
-
-		DragSource source = new DragSource(label, operations);
-		source.setTransfer(types);
-		source.addDragListener(listener);
-		
-		// Accept data in text format
-		DropTarget target = new DropTarget(label, operations);
-		target.setTransfer(types);
-		target.addDropListener(listener);
 	}
 
 	public void moveBelow(final TraceLineSeparator separator) {
@@ -288,9 +266,31 @@ public class TraceLineViewer implements ISashClient {
 			isVisible = visible;
 		}
 	}
+
+	private void setupReordering() {
+		// Link back to this class as the drag source in the reorder listener
+		label.setData(this);
+
+		// Allow data to be moved from the drag source
+		int operations = DND.DROP_MOVE;
+
+		// Provide data in Text format
+		Transfer[] types = new Transfer[] { TextTransfer.getInstance() };
+		
+		LabelReorderListener reorderListener = new LabelReorderListener();
+		
+		DragSource source = new DragSource(label, operations);
+		source.setTransfer(types);
+		source.addDragListener(reorderListener);
+		
+		// Accept data in text format
+		DropTarget target = new DropTarget(label, operations);
+		target.setTransfer(types);
+		target.addDropListener(reorderListener);
+	}
 	
-	public void layout() {
+	private void layout() {
 		label.getParent().layout();
 		trace.getParent().layout();
-	}
+	}		
 }
