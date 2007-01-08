@@ -22,12 +22,13 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * widgets. 
  */
 public class TimeCursor extends TimeLine {
+	private static final int CURSOR_WIDTH = 1;
 	private static final int OFFSET = 0;
 	
 	public TimeCursor(final Composite rulerPane, 
 			final Composite tracePane, 
 			final ZoomModel zoom) {
-		super(rulerPane, tracePane, zoom, SWT.COLOR_RED, OFFSET);
+		super(rulerPane, tracePane, zoom, CURSOR_WIDTH, SWT.COLOR_RED, OFFSET);
 	}
 	
 	@Override

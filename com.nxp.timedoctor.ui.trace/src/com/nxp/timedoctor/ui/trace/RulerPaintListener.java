@@ -140,6 +140,8 @@ public class RulerPaintListener implements PaintListener {
 		double accuracy = interval;
 		interval /= count;
 
+		// MR Ugly: the model should not be updated by a viewer like this
+		// Problems can occur if other viewers depend on this update
 		zoomModel.setTimeDisplayAccuracy(accuracy);
 
 		double time = accuracy * Math.floor(drawStartTime / accuracy);

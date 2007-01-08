@@ -16,6 +16,8 @@ import java.util.Observer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
@@ -34,6 +36,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 public class TimeLine implements Observer {
 	private static final int FORM_LAYOUT_FULL = 100;
 	private static final int CURSOR_LINE_WIDTH = 1;
+	private static final int RULER_VERTICAL_PADDING = 3;
 
 	protected ZoomModel zoom;
 	
@@ -45,7 +48,8 @@ public class TimeLine implements Observer {
 	
 	public TimeLine(final Composite rulerPane, 
 			final Composite tracePane, 
-			final ZoomModel zoom, 
+			final ZoomModel zoom,
+			final int width,
 			final int color, 
 			final int offset) {
 		this.zoom = zoom;
@@ -53,7 +57,7 @@ public class TimeLine implements Observer {
 		// Ensure updates when zoom or horizontal scroll changes
 		zoom.addObserver(this);
 		
-		createRulerContents(rulerPane, color, offset);
+		createRulerContents(rulerPane, width, color, offset);
 		createTraceContents(tracePane, color);
 	}
 
@@ -62,7 +66,8 @@ public class TimeLine implements Observer {
 		zoom.deleteObserver(this);		
 	}
 	
-	private void createRulerContents(final Composite parent, 
+	private void createRulerContents(final Composite parent,
+			final int flagWidth,
 			final int color, 
 			final int offset) {
 		// Time label
@@ -78,16 +83,43 @@ public class TimeLine implements Observer {
 		
 		// Sash
 		cursorSash = new Sash(parent, SWT.VERTICAL);
- 		cursorSash.setBackground(cursorLabel.getDisplay().getSystemColor(color));
- 		
 		final FormData cursorSashData = new FormData();
 		cursorSashData.top = new FormAttachment(cursorLabel);
 		cursorSashData.bottom = new FormAttachment(FORM_LAYOUT_FULL);
-		cursorSashData.width = CURSOR_LINE_WIDTH;
+		cursorSashData.width = flagWidth;
 		cursorSash.setLayoutData(cursorSashData);
 		
-		cursorSash.setVisible(false);
+		if (flagWidth > CURSOR_LINE_WIDTH) {
+			cursorSash.setBackground(cursorLabel.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			
+			// Make the widget for markers larger than a single pixel 
+			// to ensure the user can easily select the widget for dragging/delete
+			// Also draw a nice flag in the extra space.
+			cursorSash.addPaintListener(new PaintListener() {
+				public void paintControl(PaintEvent e) {
+					// Draw a flag on top of marker lines
+					int pointArray[] = {0, 0, 0, flagWidth, flagWidth, 0};
+					e.gc.setBackground(e.display.getSystemColor(color));				
+					e.gc.fillPolygon(pointArray);
+				
+					e.gc.setForeground(e.display.getSystemColor(color));
+					e.gc.drawLine(0, flagWidth, 0, e.height);
+				
+					// Cannot layout the sash widget transparant on top of the ruler
+					// unfortunately.
+					// Hack: redraw the ruler line to make it look a bit nicer...
+					e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
+					int rulerLineHeight = e.height - RULER_VERTICAL_PADDING;
+					e.gc.drawLine(CURSOR_LINE_WIDTH, rulerLineHeight, flagWidth, rulerLineHeight);
+				}			
+			});
+		}
+		else {
+			cursorSash.setBackground(cursorLabel.getDisplay().getSystemColor(color));
+		}
 		
+		cursorSash.setVisible(false);
+
 		// Handle window resize and maximize events
 		// (Only one needed, either in ruler or trace area)
 		parent.addControlListener(new ControlListener(){

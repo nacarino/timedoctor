@@ -27,12 +27,13 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * widgets. 
  */
 public class TimeMarker extends TimeLine {
+	private static final int FLAG_WIDTH = 8;
 	private static final int OFFSET = 12;
-
+	
 	public TimeMarker(final Composite rulerPane, 
 			final Composite tracePane, 
 			final ZoomModel zoom) {
-		super(rulerPane, tracePane, zoom, SWT.COLOR_GRAY, OFFSET);
+		super(rulerPane, tracePane, zoom, FLAG_WIDTH, SWT.COLOR_GRAY, OFFSET);
 		
 		addSelectionListener();
 		addMouseListener();
