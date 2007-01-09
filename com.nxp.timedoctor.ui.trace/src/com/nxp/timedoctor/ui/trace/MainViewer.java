@@ -185,7 +185,7 @@ public class MainViewer implements IScrollClient, Observer {
 				SectionList sectionList = traceModel.getSections();
 				Section s = sectionList.getSection(type);				
 				if (s != null) {
-					SectionViewer sectionViewer = createSectionViewer(type.toString());
+					SectionViewer sectionViewer = createSectionViewer(type.toString(), type.ordinal());
 					sectionViewer.createTraceLines(leftContent, rightContent,
 							s, traceCursorListener);
 				}
@@ -201,11 +201,12 @@ public class MainViewer implements IScrollClient, Observer {
 		traceBottom.setBackground(rightContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 	}
 
-	private SectionViewer createSectionViewer(final String headerText) {
+	private SectionViewer createSectionViewer(final String headerText,
+			final int colorIndex) {
 		SectionViewer sectionViewer = new SectionViewer(this, leftContent, rightContent, zoomModel, traceModel);
 		sectionViewerArrayList.add(sectionViewer);
 		sectionViewer.setHeaderText(headerText);		
-		sectionViewer.setHeaderColor(createSectionColor(sectionViewerArrayList.size()));
+		sectionViewer.setHeaderColor(createSectionColor(colorIndex));
 		return sectionViewer;
 	}
 
@@ -304,6 +305,7 @@ public class MainViewer implements IScrollClient, Observer {
 			zoomPercentage = newZoomPercentage;
 			GridData horScrollGridData = ((GridData)horizontalScroll.getLayoutData());
 			boolean newExclude = (zoomPercentage >= HOR_SCROLL_MAX);
+			
 			if (horScrollGridData.exclude != newExclude) {
 				horScrollGridData.exclude = newExclude; 
 				rightContent.getParent().getParent().layout(false);
