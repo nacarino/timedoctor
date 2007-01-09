@@ -143,6 +143,8 @@ public class MainViewer implements IScrollClient, Observer {
 		leftContent.setLayout(leftContentLayout);
 				
 		leftContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+	
+		leftContent.setBackground(leftContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 		
 		verticalScroll = new ScrolledComposite(rightPane, SWT.V_SCROLL);
 		verticalScroll.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
@@ -154,6 +156,8 @@ public class MainViewer implements IScrollClient, Observer {
 		rightContentLayout.verticalSpacing = 0;
 		rightContent.setLayout(rightContentLayout);
 
+		rightContent.setBackground(rightContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		
 		horizontalScroll = new Slider(rightPane, SWT.HORIZONTAL);
 		horizontalScroll.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
 
