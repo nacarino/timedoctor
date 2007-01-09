@@ -157,7 +157,7 @@ public class MainViewer implements IScrollClient, Observer {
 		rightContent.setLayout(rightContentLayout);
 
 		rightContent.setBackground(rightContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-		
+
 		horizontalScroll = new Slider(rightPane, SWT.HORIZONTAL);
 		horizontalScroll.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false, 1, 1));
 
@@ -168,6 +168,7 @@ public class MainViewer implements IScrollClient, Observer {
 		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoomModel);
 
 		createTraceLines(traceCursorListener);
+		
 		initializeScrollbars();		
 	}
 
@@ -190,6 +191,14 @@ public class MainViewer implements IScrollClient, Observer {
 				}
 			}
 		}
+
+		// Create extra composite at the bottom of the trace pane,
+		// to allow the sash below the last trace line to be dragged down
+		Composite traceBottom = new Composite(rightContent, SWT.NONE);
+		GridData traceBottomGridData = new GridData(SWT.FILL, SWT.BOTTOM, true, true, 1, 1);
+		traceBottomGridData.heightHint = 1;		
+		traceBottom.setLayoutData(traceBottomGridData);
+		traceBottom.setBackground(rightContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 	}
 
 	private SectionViewer createSectionViewer(final String headerText) {
