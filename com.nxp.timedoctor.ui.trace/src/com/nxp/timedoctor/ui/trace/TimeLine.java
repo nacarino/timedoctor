@@ -36,7 +36,6 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 public class TimeLine implements Observer {
 	private static final int FORM_LAYOUT_FULL = 100;
 	private static final int CURSOR_LINE_WIDTH = 1;
-	private static final int RULER_VERTICAL_PADDING = 3;
 
 	protected ZoomModel zoom;
 	
@@ -109,8 +108,7 @@ public class TimeLine implements Observer {
 					// unfortunately.
 					// Hack: redraw the ruler line to make it look a bit nicer...
 					e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-					int rulerLineHeight = e.height - RULER_VERTICAL_PADDING;
-					e.gc.drawLine(CURSOR_LINE_WIDTH, rulerLineHeight, flagWidth, rulerLineHeight);
+					e.gc.drawLine(CURSOR_LINE_WIDTH, e.height - 1, flagWidth, e.height - 1);
 				}			
 			});
 		}

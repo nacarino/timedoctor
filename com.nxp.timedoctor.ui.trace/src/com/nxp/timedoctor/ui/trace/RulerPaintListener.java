@@ -28,11 +28,6 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 public class RulerPaintListener implements PaintListener {
 
 	/**
-	 * Sets the vertical padding value for the ruler to be threee pixels.
-	 */
-	private static final int VERTICAL_PADDING = 3;
-
-	/**
 	 * Sets the initial number of ticks per unit (in this case a second) to be
 	 * ten.
 	 */
@@ -110,8 +105,8 @@ public class RulerPaintListener implements PaintListener {
 
 		// Draw ruler
 		e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-		e.gc.drawLine(0, bounds.height - VERTICAL_PADDING, bounds.width,
-				bounds.height - VERTICAL_PADDING);
+		e.gc.drawLine(0, bounds.height - 1, bounds.width,
+				bounds.height - 1);
 
 		Font font = new Font(e.display, "Arial", FONT_SIZE, SWT.NORMAL);
 
@@ -150,16 +145,16 @@ public class RulerPaintListener implements PaintListener {
 
 		while (true) {
 			pos = (int) ((time - startTime) * pixelsPerTime);
-			e.gc.drawLine(pos, bounds.height - VERTICAL_PADDING, pos,
-					bounds.height - VERTICAL_PADDING - MAIN_TICK_HEIGHT);
+			e.gc.drawLine(pos, bounds.height - 1, pos,
+					bounds.height - 1 - MAIN_TICK_HEIGHT);
 			s = Times.timeToString(time, accuracy);
 			Point stringSize = e.gc.textExtent(s);
 			if (time == 0.0) {
-				e.gc.drawString(s, pos, bounds.height - VERTICAL_PADDING
+				e.gc.drawString(s, pos, bounds.height - 1
 						- LABEL_OFFSET - e.gc.textExtent(s).y);
 			} else {
 				e.gc.drawString(s, pos - (stringSize.x / 2), bounds.height
-						- VERTICAL_PADDING - LABEL_OFFSET
+						- 1 - LABEL_OFFSET
 						- e.gc.textExtent(s).y);
 			}
 			time += interval;
@@ -168,8 +163,8 @@ public class RulerPaintListener implements PaintListener {
 			}
 			for (int i = 0; i < count - 1; i++) {
 				pos = (int) ((time - startTime) * pixelsPerTime);
-				e.gc.drawLine(pos, bounds.height - VERTICAL_PADDING, pos,
-						bounds.height - VERTICAL_PADDING - TICK_HEIGHT);
+				e.gc.drawLine(pos, bounds.height - 1, pos,
+						bounds.height - 1 - TICK_HEIGHT);
 				time += interval;
 			}
 		}
