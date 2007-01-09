@@ -22,6 +22,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
@@ -105,10 +106,12 @@ public class TraceLineViewer implements ISashClient {
 		this.zoom = zoomData;
 		this.model = model;
 		
+		sectionViewer.addTraceLineViewer(this);
+		
 		createLabel(labelPane);		
 		createTrace(tracePane, traceCursorListener);
 		
-		traceLineSeparator = new TraceLineSeparator(labelPane, tracePane);
+		traceLineSeparator = new TraceLineSeparator(sectionViewer, labelPane, tracePane);
 		
 		SashListener sashListener = new SashListener(this, SWT.HORIZONTAL);
 		traceLineSeparator.addSelectionListener(sashListener);
@@ -180,6 +183,14 @@ public class TraceLineViewer implements ISashClient {
 	}
 
 	public void moveBelow(final TraceLineSeparator separator) {
+		SectionViewer targetSectionViewer = separator.getSectionViewer();
+		if (sectionViewer != targetSectionViewer) {
+			sectionViewer.removeTraceLineViewer(this);
+			targetSectionViewer.addTraceLineViewer(this);
+			
+			sectionViewer = targetSectionViewer;
+			traceLineSeparator.setSectionViewer(targetSectionViewer);
+		}
 		traceLineSeparator.moveBelow(separator);
 		separator.moveLineBelow(label, trace);
 		layout();

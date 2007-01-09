@@ -162,42 +162,45 @@ public class MainViewer implements IScrollClient, Observer {
 		TimeLine traceCursor = traceCursorFactory.createTraceCursor(CursorType.CURSOR);
 		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
 		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoomModel);
-		
-		createTraceLines(leftContent, rightContent, traceCursorListener);
-				
+
+		createTraceLines(traceCursorListener);
 		initializeScrollbars();		
 	}
 
 	/**
 	 * Creates the trace lines (label and canvas) in the main view.
 	 * 
-	 * @param left
-	 *            the left (label) composite
-	 * @param right
-	 *            the right (canvas) composite
-	 * @param traceSelectListener 
+	 * @param traceSelectListener
 	 * 			  The TraceSelectListener object
 	 */
-	private void createTraceLines(final Composite left,
-			final Composite right,
-			final TraceCursorListener traceCursorListener) {
-		final LineType[] values = LineType.values();
-		final SectionList sectionList = traceModel.getSections();
-
-		// Create sections in the order of LineType
-		for (LineType type : values) {
+	private void createTraceLines(final TraceCursorListener traceCursorListener) {
+		// Add lines in the order of lineType.
+		for (LineType type : LineType.values()) {
 			if (type != LineType.PORTS) {
+				SectionList sectionList = traceModel.getSections();
 				Section s = sectionList.getSection(type);				
 				if (s != null) {
-					SectionViewer section = new SectionViewer(this, left, right, s, zoomModel, traceModel, traceCursorListener);
-					sectionViewerArrayList.add(section);
-					section.setHeaderText(type.toString());
-					section.setHeaderColor(new Color(right.getDisplay(), COLORS[type.ordinal()]));
+					SectionViewer sectionViewer = createSectionViewer(type.toString());
+					sectionViewer.createTraceLines(leftContent, rightContent,
+							s, traceCursorListener);
 				}
 			}
 		}
 	}
 
+	private SectionViewer createSectionViewer(final String headerText) {
+		SectionViewer sectionViewer = new SectionViewer(this, leftContent, rightContent, zoomModel, traceModel);
+		sectionViewerArrayList.add(sectionViewer);
+		sectionViewer.setHeaderText(headerText);		
+		sectionViewer.setHeaderColor(createSectionColor(sectionViewerArrayList.size()));
+		return sectionViewer;
+	}
+
+	private Color createSectionColor(final int index) {
+		RGB rgb = COLORS[index % COLORS.length];
+		return new Color(leftContent.getDisplay(), rgb);
+	}
+	
 	/**
 	 * Initializes vertical and horizontal scrolling.
 	 */

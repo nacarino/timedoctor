@@ -30,6 +30,7 @@ public class TraceLineSeparator {
 	 */
 	private static final int SEPARATOR_HEIGHT = 2;
 	
+	private SectionViewer sectionViewer;
 	private Label labelSeparator;
 	private Sash traceSeparator;
 	private boolean isVisible = true;
@@ -38,9 +39,11 @@ public class TraceLineSeparator {
 	 * Constructs a new TraceLineSeparator.
 	 * 
 	 */
-	public TraceLineSeparator(final Composite labelPane,
+	public TraceLineSeparator(final SectionViewer sectionViewer,
+			final Composite labelPane,
 			final Composite tracePane) {
-
+		this.sectionViewer = sectionViewer;
+		
 		createContents(labelPane, tracePane);
 	}
 
@@ -73,6 +76,14 @@ public class TraceLineSeparator {
 		traceSeparator.setEnabled(false);
 		
 		setupReordering();
+	}
+	
+	public SectionViewer getSectionViewer() {
+		return sectionViewer;
+	}
+	
+	public void setSectionViewer(final SectionViewer sectionViewer) {
+		this.sectionViewer = sectionViewer;
 	}
 	
 	/**

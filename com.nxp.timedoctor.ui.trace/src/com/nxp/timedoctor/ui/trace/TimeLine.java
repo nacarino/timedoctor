@@ -96,7 +96,7 @@ public class TimeLine implements Observer {
 			// to ensure the user can easily select the widget for dragging/delete
 			// Also draw a nice flag in the extra space.
 			cursorSash.addPaintListener(new PaintListener() {
-				public void paintControl(PaintEvent e) {
+				public void paintControl(final PaintEvent e) {
 					// Draw a flag on top of marker lines
 					int pointArray[] = {0, 0, 0, flagWidth, flagWidth, 0};
 					e.gc.setBackground(e.display.getSystemColor(color));				

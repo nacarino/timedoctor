@@ -27,27 +27,12 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  */
 public class SectionViewer implements IExpandClient{
 
-	/**
-	 * The section in the model with which this view is associated.
-	 */
-	private Section section;
-
-	/**
-	 * Holds the labels for the trace lines.
-	 */
+	private TraceModel traceModel;
 	private SectionHeader sectionHeader;
-
-	/**
-	 * Model component containing current zoom/scroll information.
-	 */
-	private ZoomModel zoomData;
-	
+	private ZoomModel zoomModel;
 	private ArrayList<TraceLineViewer> traceLineViewerList;
-	
 	private boolean isExpanded = true;
-	
 	private Composite traceHeader;
-	
 	private MainViewer mainViewer;
 	
 	/**
@@ -60,31 +45,28 @@ public class SectionViewer implements IExpandClient{
 	 * @param rightPane
 	 *            the right pane of the view, where the trace canvases will be
 	 *            placed
-	 * @param section
-	 *            the section from which to get data
-	 * @param zoomData
+	 * @param zoomModel
 	 *            <code>Observable</code> containing current zoom/scroll data
-	 * @param model
+	 * @param traceModel
 	 *            the model containing data for the whole trace
 	 */
 	public SectionViewer(final MainViewer mainViewer,
 			final Composite leftPane, 
 			final Composite rightPane,
-			final Section section, 
-			final ZoomModel zoomData, 
-			final TraceModel model, 
-			final TraceCursorListener traceCursorListener) {
+			final ZoomModel zoomModel, 
+			final TraceModel traceModel) {
 		this.mainViewer = mainViewer;
-		this.section = section;
-		this.zoomData = zoomData;
+		this.traceModel = traceModel;
+		this.zoomModel = zoomModel;
 		
 		traceLineViewerList = new ArrayList<TraceLineViewer>();
 		
 		createLabelView(leftPane);
 		createTraceView(rightPane);
-
-		createTraceLines(leftPane, rightPane,
-				model, traceCursorListener);
+		
+		// Top separator in the section
+		TraceLineSeparator separator = new TraceLineSeparator(this, leftPane, rightPane);
+		separator.setBackground(rightPane.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		sectionHeader.addExpandClient(this);
 	}
@@ -149,27 +131,30 @@ public class SectionViewer implements IExpandClient{
 	 * @param model
 	 *            the model containing data on the whole trace
 	 */
-	private void createTraceLines(final Composite labelPane,
+	public void createTraceLines(final Composite labelPane,
 			final Composite tracePane, 
-			final TraceModel model, 
+			final Section section, 
 			final TraceCursorListener traceCursorListener) {
 				
-		// Top separator in the section
-		TraceLineSeparator separator = new TraceLineSeparator(labelPane, tracePane);
-		separator.setBackground(tracePane.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
 		for (SampleLine line : section.getLines()) {			
-			TraceLineViewer traceLine = new TraceLineViewer(this, 
+			new TraceLineViewer(this,					
 					labelPane, 
 					tracePane,
 					line,
-					zoomData, 
-					model, 
-					traceCursorListener);			
-			traceLineViewerList.add(traceLine);
+					zoomModel, 
+					traceModel, 
+					traceCursorListener);
 		}
 	}
 	
+	public void addTraceLineViewer(final TraceLineViewer traceLine) {
+		traceLineViewerList.add(traceLine);
+	}
+
+	public void removeTraceLineViewer(final TraceLineViewer traceLine) {
+		traceLineViewerList.remove(traceLine);
+	}
+
 	/**
 	 * Collapse the section by hiding all trace lines 
 	 */
