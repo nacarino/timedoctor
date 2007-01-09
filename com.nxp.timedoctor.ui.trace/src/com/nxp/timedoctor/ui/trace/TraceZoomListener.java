@@ -29,7 +29,7 @@ public class TraceZoomListener implements MouseListener {
 
 	private ZoomModel zoom;
 
-	private boolean mouseDownCalled = false;
+	private int mouseButton = 0;
 
 	/**
 	 * Constructor for TraceZoomListener class
@@ -53,9 +53,10 @@ public class TraceZoomListener implements MouseListener {
 	 * @see org.eclipse.swt.events.MouseTrackListener#mouseHover(org.eclipse.swt.events.MouseEvent)
 	 */
 	public void mouseDown(final MouseEvent e) {
-		drawStartTime = zoom.getTimeAtPosition(e.x, getWidth(e));
-
-		mouseDownCalled = true;
+		mouseButton = e.button;
+		if (mouseButton == 1) {
+			drawStartTime = zoom.getTimeAtPosition(e.x, getWidth(e));			
+		}
 	}
 
 	/**
@@ -67,28 +68,23 @@ public class TraceZoomListener implements MouseListener {
 	 * @see org.eclipse.swt.events.MouseTrackListener#mouseHover(org.eclipse.swt.events.MouseEvent)
 	 */
 	public void mouseUp(final MouseEvent e) {
-		if (!mouseDownCalled) {
-			// A boolean-guard against mouseUp events that are not associated
-			// with selection-zoom
-			return;
+		if (mouseButton == 1) {
+			drawEndTime = zoom.getTimeAtPosition(e.x, getWidth(e));
+
+			if (drawStartTime > drawEndTime) {
+				double temp = drawStartTime;
+				drawStartTime = drawEndTime;
+				drawEndTime = temp;
+			}
+
+			if ((drawStartTime > zoom.getStartTime())
+					&& (drawEndTime > zoom.getStartTime())
+					&& (drawStartTime != drawEndTime)) {
+				zoom.pushZoom(drawStartTime, drawEndTime);
+				zoom.setTimes(drawStartTime, drawEndTime);
+			}
 		}
-
-		drawEndTime = zoom.getTimeAtPosition(e.x, getWidth(e));
-
-		if (drawStartTime > drawEndTime) {
-			double temp = drawStartTime;
-			drawStartTime = drawEndTime;
-			drawEndTime = temp;
-		}
-
-		if ((drawStartTime > zoom.getStartTime())
-				&& (drawEndTime > zoom.getStartTime())
-				&& (drawStartTime != drawEndTime)) {
-			zoom.pushZoom(drawStartTime, drawEndTime);
-			zoom.setTimes(drawStartTime, drawEndTime);
-		}
-
-		mouseDownCalled = false; // Reset flag
+		mouseButton = 0;
 	}
 
 	private int getWidth(final MouseEvent e) {
