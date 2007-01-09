@@ -36,18 +36,18 @@ public class RulerPaintListener implements PaintListener {
 	/**
 	 * Sets the main tick height to eight pixels.
 	 */
-	private static final int MAIN_TICK_HEIGHT = 8;
+	private static final int MAIN_TICK_HEIGHT = 6;
 
 	/**
 	 * Constant setting the secondary tick height to five pixels.
 	 */
-	private static final int TICK_HEIGHT = 5;
+	private static final int TICK_HEIGHT = 3;
 
 	/**
 	 * Sets the offset of the bottom of the label from the ruler line to be nine
 	 * pixels.
 	 */
-	private static final int LABEL_OFFSET = 9;
+	private static final int LABEL_OFFSET = 7;
 
 	/**
 	 * Font size for labels, seven points.

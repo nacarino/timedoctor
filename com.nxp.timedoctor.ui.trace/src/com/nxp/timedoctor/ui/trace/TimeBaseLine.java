@@ -27,7 +27,7 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  */
 public class TimeBaseLine extends TimeLine {
 	private static final int FLAG_WIDTH = 8;
-	private static final int OFFSET = 12;
+	private static final int OFFSET = 11;
 
 	public TimeBaseLine(final Composite rulerPane, 
 			final Composite tracePane, 

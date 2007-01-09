@@ -45,7 +45,7 @@ public class HeaderViewer implements Observer {
 	/**
 	 * The height of the header in pixels.
 	 */
-	private static final int HEADER_HEIGHT = 50;
+	private static final int HEADER_HEIGHT = 42;
 	
 	/**
 	 * The logo composite, for spacing in the header (and eventual presence of a
