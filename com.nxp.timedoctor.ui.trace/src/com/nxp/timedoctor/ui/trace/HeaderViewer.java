@@ -59,6 +59,8 @@ public class HeaderViewer implements Observer {
 	private Canvas ruler;
 
 	private ZoomModel zoom;
+
+	private SampleLine selectedLine = null;
 	
 	/**
 	 * Constructs a header view in the given parent, and creates the contents of
@@ -134,21 +136,23 @@ public class HeaderViewer implements Observer {
 	 * @param data
 	 *            has no effect
 	 */
-	public final void update(final Observable o, final Object data) {
+	public final void update(final Observable o, final Object data) {		
 		updateLogo();
 	
 		ruler.redraw();
 		ruler.update();
 	}
 
-	private void updateLogo() {
-		SampleLine selectedLine = zoom.getSelectedLine();
-		if (selectedLine != null) {
-			SampleCPU cpu = selectedLine.getCPU();
+	private void updateLogo() {		
+		SampleLine line = zoom.getSelectedLine();
+		if ((line != null) && (line != selectedLine)) {
+			SampleCPU cpu = line.getCPU();
 			
 			String cpuFreqStr = String.format("CPU freq: %.0fHz", cpu.getClocksPerSec());
 			String memFreqStr = String.format("\nMemory freq: %.0fHz", cpu.getMemClocksPerSec());
 			logo.setText(cpuFreqStr + memFreqStr);
+			
+			selectedLine = line;
 		}
 	}
 }
