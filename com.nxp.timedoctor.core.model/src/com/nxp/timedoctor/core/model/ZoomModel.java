@@ -76,9 +76,11 @@ public class ZoomModel extends Observable {
      *            the new start time
      */
     public final void setStartTime(final double time) {
-        this.startTime = time;
-        setChanged();
-        notifyObservers();
+    	if (time != startTime) {
+    		this.startTime = time;
+    		setChanged();
+    		notifyObservers();
+    	}
     }
 
     /**
@@ -88,9 +90,11 @@ public class ZoomModel extends Observable {
      *            the new offset value
      */
     public final void setEndTime(final double time) {
-        this.endTime = time;
-        setChanged();
-        notifyObservers();
+        if (time != endTime) {
+        	this.endTime = time;
+        	setChanged();
+        	notifyObservers();
+        }
     }
 
     public final void setSelectTime(final double time) {
@@ -110,25 +114,25 @@ public class ZoomModel extends Observable {
      * updates all observers.
      * 
      * @param start
-     *            the start tim eof the visible portion
+     *            the start time of the visible portion
      * @param end
      *            the end time of the visible portion
      */
     // MR improve name (what times?)
     public final void setTimes(final double start, final double end) {
-    	if (start != end) {
-    		this.startTime = start;
-    		this.endTime = end;
-    		setChanged();
-    		notifyObservers();
-    	}
+    	if ((start != end) && ((start != startTime) || (end != endTime))) {
+			this.startTime = start;
+			this.endTime = end;
+			setChanged();
+			notifyObservers();
+		}
     }
 
     /**
-     * Returns the current zoom factor.
-     * 
-     * @return the current zoom factor
-     */
+	 * Returns the current zoom factor.
+	 * 
+	 * @return the current zoom factor
+	 */
     public final double getStartTime() {
         return startTime;
     }
