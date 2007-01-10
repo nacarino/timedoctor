@@ -172,6 +172,11 @@ public class TimeLine implements Observer {
 		setTimeLabel(cursorTime);
 	}
 
+	public double getTime(final int x) {
+		int width = cursorLabel.getParent().getBounds().width;
+		return zoom.getTimeAtPosition(x, width);
+	}
+	
 	public double getTime() {
 		return cursorTime;
 	}
@@ -196,7 +201,7 @@ public class TimeLine implements Observer {
 		cursorLabel.getParent().update();
 		
 		// Only update, not layout of trace window, 
-		// as here layout is done manually
+		// as here layout is done manually via setLocation()
 		cursorLine.getParent().update();
 	}
 	
@@ -232,7 +237,6 @@ public class TimeLine implements Observer {
 			int x = (int) ((time - startTime) * zoomFactor);
 			setPosition(x, width);
 			setTimeLabel(time);
-			setVisible(true);
 		}
 	}
 }

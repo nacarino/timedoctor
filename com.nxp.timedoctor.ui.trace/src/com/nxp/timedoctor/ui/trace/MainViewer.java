@@ -165,7 +165,11 @@ public class MainViewer implements IScrollClient, Observer {
 		traceCursorFactory.setTracePane(rightContent);
 		TimeLine traceCursor = traceCursorFactory.createTraceCursor(CursorType.CURSOR);
 		TimeLine baseLine = traceCursorFactory.createTraceCursor(CursorType.BASELINE);
-		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory, traceCursor, baseLine, zoomModel);
+		TraceCursorListener traceCursorListener = new TraceCursorListener(traceCursorFactory,
+				traceCursor,
+				baseLine,
+				traceModel,
+				zoomModel);
 
 		createTraceLines(traceCursorListener);
 		
