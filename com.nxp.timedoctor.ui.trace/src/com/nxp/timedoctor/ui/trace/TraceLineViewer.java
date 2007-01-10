@@ -119,8 +119,7 @@ public class TraceLineViewer implements ISashClient {
 		
 		setupReordering();
 				
-		// Set default height to minimum needed for label text
-		setHeight(0); 
+		setDefaultSashOffset(); 
 	}
 
 	/**
@@ -219,28 +218,24 @@ public class TraceLineViewer implements ISashClient {
 	}
 	
 	public final void setDefaultSashOffset() {
-		setHeight(0);
+		int minHeight = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		setHeight(minHeight);
 	}
 
 	public final boolean setSashOffset(final int offset) {
-		int height = offset - trace.getLocation().y;
-		if (height >= label.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).y) {
-			setHeight(height);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-
+		int height = offset - trace.getLocation().y;		
+		int minHeight = label.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).y;
+		int newHeight = Math.max(height, minHeight);
+		setHeight(newHeight);
+		return (height >= minHeight);
+	}	
+	
 	public void setHeight(final int height) {
-		int minHeight = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-		int lineHeight = Math.max(height, minHeight);
 		GridData labelGridData = (GridData) label.getLayoutData();
-		labelGridData.heightHint = lineHeight;
+		labelGridData.heightHint = height;
 			
 		GridData traceGridData = (GridData) trace.getLayoutData();
-		traceGridData.heightHint = lineHeight;
+		traceGridData.heightHint = height;
 			
 		// relayout and update vertical scrollbar, and left scroll setting
 		sectionViewer.layout();

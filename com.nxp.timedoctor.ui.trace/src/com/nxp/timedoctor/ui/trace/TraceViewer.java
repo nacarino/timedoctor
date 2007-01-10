@@ -116,19 +116,15 @@ public class TraceViewer implements ISashClient {
 	/**
 	 * Sets the sash offset to the given value.
 	 * 
-	 * @param offset
+	 * @param width
 	 *            the offset in pixels from the left of the parent's client area
 	 */
-	public final boolean setSashOffset(final int offset) {
-		int labelOffset = leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
-		if (offset <= labelOffset) {
-			((GridData) leftPane.getLayoutData()).widthHint = offset;
-			leftPane.getParent().layout(true);
-			leftPane.getParent().update();
-			return true;
-		}
-		else {
-			return false;
-		}
+	public final boolean setSashOffset(final int width) {
+		int minWidth = leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
+		int newWidth = Math.min(width, minWidth);
+		((GridData) leftPane.getLayoutData()).widthHint = newWidth;
+		leftPane.getParent().layout(true);
+		leftPane.getParent().update();
+		return (width <= minWidth);
 	}	
 }
