@@ -44,6 +44,8 @@ public class TimeLine implements Observer {
 	protected Composite cursorLine;
 	
 	private double cursorTime = -1;
+	private Composite rulerPane;
+	private ControlListener controlListener;
 	
 	public TimeLine(final Composite rulerPane, 
 			final Composite tracePane, 
@@ -52,6 +54,7 @@ public class TimeLine implements Observer {
 			final int color, 
 			final int offset) {
 		this.zoom = zoom;
+		this.rulerPane = rulerPane;
 		
 		// Ensure updates when zoom or horizontal scroll changes
 		zoom.addObserver(this);
@@ -60,9 +63,17 @@ public class TimeLine implements Observer {
 		createTraceContents(tracePane, color);
 	}
 
-	// Ensure that zoom does not call a deleted observer
+	/**
+	 * Make sure that other objects do not call listeners
+	 * of this object anymore after it is disposed.
+	 */
 	public void dispose() {
-		zoom.deleteObserver(this);		
+		zoom.deleteObserver(this);
+		rulerPane.removeControlListener(controlListener);
+		
+		cursorLabel.dispose();
+		cursorSash.dispose();
+		cursorLine.dispose();
 	}
 	
 	private void createRulerContents(final Composite parent,
@@ -118,16 +129,15 @@ public class TimeLine implements Observer {
 		
 		cursorSash.setVisible(false);
 
-		// Handle window resize and maximize events
-		// (Only one needed, either in ruler or trace area)
-		parent.addControlListener(new ControlListener(){
-			public void controlMoved(final ControlEvent e) {
-			}
-
-			public void controlResized(final ControlEvent e) {
-				updatePositionAndLabel(cursorTime);
-			}
-		});
+		controlListener = new ControlListener(){
+					public void controlMoved(final ControlEvent e) {
+					}
+		
+					public void controlResized(final ControlEvent e) {
+						updatePositionAndLabel(cursorTime);
+					}
+				};
+		parent.addControlListener(controlListener);
 	}
 	
 	private void createTraceContents(final Composite parent, final int color)
