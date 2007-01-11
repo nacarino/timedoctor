@@ -120,11 +120,18 @@ public class TraceViewer implements ISashClient {
 	 *            the offset in pixels from the left of the parent's client area
 	 */
 	public final boolean setSashOffset(final int width) {
-		int minWidth = leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
-		int newWidth = Math.min(width, minWidth);
-		((GridData) leftPane.getLayoutData()).widthHint = newWidth;
-		leftPane.getParent().layout(true);
-		leftPane.getParent().update();
-		return (width <= minWidth);
+		GridData leftPaneGridData = (GridData) leftPane.getLayoutData();
+		
+		int maxWidth = leftPane.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).x;
+		int newWidth = Math.min(width, maxWidth);
+		
+		if (leftPaneGridData.widthHint != newWidth) {
+			leftPaneGridData.widthHint = newWidth;
+		
+			// Update complete editor pane (left and right)
+			leftPane.getParent().layout(true);		
+			leftPane.getParent().update();
+		}
+		return (width <= maxWidth);
 	}	
 }
