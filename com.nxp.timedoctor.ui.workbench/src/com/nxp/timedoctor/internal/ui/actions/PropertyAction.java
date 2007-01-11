@@ -23,7 +23,7 @@ public class PropertyAction extends Action implements IWorkbenchAction {
 	
 	private final IWorkbenchWindow window;
 
-	public PropertyAction(IWorkbenchWindow window) {
+	public PropertyAction(final IWorkbenchWindow window) {
 		this.window = window;
 		setId(ID);
 		setText("&Property View");
@@ -31,6 +31,7 @@ public class PropertyAction extends Action implements IWorkbenchAction {
 		// TODO add image
 	}
 
+	@Override
 	public void run() {
 		IWorkbenchPage page = window.getActivePage();
 		try {

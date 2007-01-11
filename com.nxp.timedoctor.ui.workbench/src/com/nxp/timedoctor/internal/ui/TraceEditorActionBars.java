@@ -94,7 +94,8 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		goToTimeCommandHandler = new ActionHandler(goToTimeAction);
 	}
 
-	public void contributeToMenu(IMenuManager menuManager) {
+	@Override
+	public void contributeToMenu(final IMenuManager menuManager) {
 		super.contributeToMenu(menuManager);
 		
 		MenuManager traceMenu = new MenuManager("&Trace", "Trace");
@@ -111,14 +112,17 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		traceMenu.add(goToTimeAction);
 	}
 
+	@Override
 	public void dispose() {		
 	}
 
-	public void init(IActionBars bars, IWorkbenchPage page) {
+	@Override
+	public void init(final IActionBars bars, final IWorkbenchPage page) {
 		super.init(bars, page);
 	}
 
-	public void setActiveEditor(IEditorPart editor) {
+	@Override
+	public void setActiveEditor(final IEditorPart editor) {
 		super.setActiveEditor(editor);
 		
 		TraceEditor traceEditor = (TraceEditor) editor;
