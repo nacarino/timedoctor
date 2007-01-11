@@ -19,21 +19,18 @@ import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IPersistableElement;
 
 public class TraceEditorInput implements IPathEditorInput {
-	private String fileName;
+	private File file;
 
-	private String filePath;
-
-	private Path   file;
-
-	public TraceEditorInput(String name, String path) {
-		this.file = new Path(path + File.separator + name);
-		
-		this.fileName = name;
-		this.filePath = path;
+	public TraceEditorInput(final File file) {
+		this.file = file;
+	}
+	
+	public TraceEditorInput(final String name, final String path) {
+		this.file = new File(path + File.separator + name);
 	}
 
 	public boolean exists() {
-		return file.toFile().exists();
+		return file.exists();
 	}
 
 	public ImageDescriptor getImageDescriptor() {
@@ -41,7 +38,7 @@ public class TraceEditorInput implements IPathEditorInput {
 	}
 	
 	public String getName() {
-		return fileName;
+		return file.getName();
 	}
 
 	public IPersistableElement getPersistable() {
@@ -49,17 +46,18 @@ public class TraceEditorInput implements IPathEditorInput {
 	}
 
 	public String getToolTipText() {
-		return filePath;
+		return file.getAbsolutePath();
 	}
 
-	public Object getAdapter(Class adapter) {
+	public Object getAdapter(final Class adapter) {
 		return null;
 	}
 
 	/**
 	 * Used for checking if an editor for this file is already open
 	 */
-	public boolean equals(Object obj) {
+	@Override
+	public boolean equals(final Object obj) {
 		if (super.equals(obj)) {
 			return true;
 		}
@@ -67,10 +65,10 @@ public class TraceEditorInput implements IPathEditorInput {
 			return false;
 		}
 		TraceEditorInput other = (TraceEditorInput) obj;
-		return file.toString().equals(other.file.toString());
+		return file.getAbsolutePath().equals(other.file.getAbsolutePath());
 	}
 
 	public IPath getPath() {
-		return file;
+		return new Path(file.getAbsolutePath());
 	}
 }
