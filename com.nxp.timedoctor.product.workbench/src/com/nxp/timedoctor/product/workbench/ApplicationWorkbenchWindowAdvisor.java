@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.nxp.timedoctor.product.workbench;
 
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -23,6 +24,8 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
+import com.nxp.timedoctor.internal.ui.FileDropListener;
+
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private Control page;
 	private Control statusLine;
@@ -30,16 +33,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
 	private ApplicationActionBarAdvisor actionBars;
 
-    public ApplicationWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
+    public ApplicationWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
         super(configurer);
     }
 
-    public ActionBarAdvisor createActionBarAdvisor(IActionBarConfigurer configurer) {
+    @Override
+	public ActionBarAdvisor createActionBarAdvisor(final IActionBarConfigurer configurer) {
     	actionBars = new ApplicationActionBarAdvisor(configurer);
     	return actionBars;
     }
     
-	public void createWindowContents(Shell shell) {
+	@Override
+	public void createWindowContents(final Shell shell) {
 		IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
 		Menu menu = configurer.createMenuBar();
 		shell.setMenuBar(menu);
@@ -84,7 +89,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		}
 	}
 
-	public void setShowCoolBar(boolean visible) {
+	public void setShowCoolBar(final boolean visible) {
 		if (visible) {
 			if (coolBar.isVisible()) {
 				return;
@@ -108,10 +113,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	public boolean getShowCoolBar() {
-		return (coolBar != null && coolBar.isVisible());
+		return ((coolBar != null) && coolBar.isVisible());
 	}
 
-	public void setShowStatusLine(boolean visible) {
+	public void setShowStatusLine(final boolean visible) {
 		if (visible) {
 			if (statusLine.isVisible()) {
 				return;
@@ -135,12 +140,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	}
 
 	public boolean getShowStatusLine() {
-		return (statusLine != null && statusLine.isVisible());
+		return ((statusLine != null) && statusLine.isVisible());
 	}
     
-    public void preWindowOpen() {
+    @Override
+	public void preWindowOpen() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         configurer.setInitialSize(new Point(400, 300));
         configurer.setTitle("TimeDoctor Performance Visualizer");
+        
+        // Add support for dropping files onto the editor area.
+        configurer.addEditorAreaTransfer(FileTransfer.getInstance());
+        configurer.configureEditorAreaDropListener(new FileDropListener(configurer.getWindow()));        
     }
 }
