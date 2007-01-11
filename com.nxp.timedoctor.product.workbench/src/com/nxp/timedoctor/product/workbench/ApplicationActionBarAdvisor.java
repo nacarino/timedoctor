@@ -33,11 +33,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction aboutAction;
     private IWorkbenchAction helpAction;
     
-    public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
+    public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
         super(configurer);
     }
 
-    protected void makeActions(IWorkbenchWindow window) {
+    @Override
+	protected void makeActions(final IWorkbenchWindow window) {
     	openAction = new OpenAction(window);
     	register(openAction);
     	
@@ -60,7 +61,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         register(aboutAction);
     }
 
-    protected void fillMenuBar(IMenuManager menuBar) {
+    @Override
+	protected void fillMenuBar(final IMenuManager menuBar) {
         MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
         MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
         MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);

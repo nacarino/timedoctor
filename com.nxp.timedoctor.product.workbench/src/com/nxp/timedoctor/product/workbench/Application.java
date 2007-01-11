@@ -22,7 +22,7 @@ public class Application implements IPlatformRunnable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.core.runtime.IPlatformRunnable#run(java.lang.Object)
 	 */
-	public Object run(Object args) throws Exception {
+	public Object run(final Object args) throws Exception {
 		Display display = PlatformUI.createDisplay();
 		try {
 			int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());

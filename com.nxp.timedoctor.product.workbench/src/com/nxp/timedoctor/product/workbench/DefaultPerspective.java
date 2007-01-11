@@ -15,6 +15,6 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class DefaultPerspective implements IPerspectiveFactory {
 
-	public void createInitialLayout(IPageLayout layout) {
+	public void createInitialLayout(final IPageLayout layout) {
 	}
 }
