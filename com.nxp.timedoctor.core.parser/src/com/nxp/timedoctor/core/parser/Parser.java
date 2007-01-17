@@ -12,15 +12,11 @@ package com.nxp.timedoctor.core.parser;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 
 import com.nxp.timedoctor.core.model.CheckedIllegalArgumentException;
 import com.nxp.timedoctor.core.model.SampleCPU;
@@ -37,7 +33,7 @@ import com.nxp.timedoctor.core.model.lines.PortSampleLine;
  * monitor in the eclipse window. Parses the file and populates the model with
  * the data. 
  */
-public class Parser extends Job {
+public class Parser {
 
 	/**
 	 * Max number of arguments (including the command itself)
@@ -98,8 +94,6 @@ public class Parser extends Job {
 	 */
 	public Parser(final String name, final TraceModel model,
 			final File ioFile) {
-		super(name);
-
 		this.model = model;
 		this.ioFile = ioFile;
 	}
@@ -109,60 +103,72 @@ public class Parser extends Job {
 	 * 
 	 * @param monitor
 	 *            the progress monitor to update while running
-	 * @return its status
+	 * @throws InterruptedException 
+	 * 			  throws <code>InterruptedException</code> if a user presses cancel
+	 * @throws InvocationTargetException
+	 * 			  throws <code>InvocationTargetException</code> which embeds within it, an actual <code>Exception</code> thrown
 	 */
-	public final IStatus run(final IProgressMonitor monitor) {
+	public final void doParse(final IProgressMonitor monitor) throws InterruptedException, InvocationTargetException {
 		monitor.beginTask("Parsing trace...", IProgressMonitor.UNKNOWN);
 
-		parseFile();
-
-		compensateStartTime(calculateStartTime());
-		model.setEndTime();
-		closeLines();
-		model.computeMaxValues();
-
-		monitor.done();
-		return Status.OK_STATUS;
+		try {
+			parseFile(monitor);
+			compensateStartTime(calculateStartTime());
+			model.setEndTime();
+			closeLines();
+			model.computeMaxValues();
+		} catch (InterruptedException e) {
+			//User pressed cancel
+			throw e;
+		} catch (Exception e) {
+			//All other exceptions
+			throw new InvocationTargetException(e);
+		} finally {
+			monitor.done(); //to stop the monitor
+		}
 	}
 
 	/**
 	 * Parse the trace file and fill the model.
+	 * @param monitor
+	 * 				    the <code>IProgressMonitor</code> object. IProgressMonitor is checked, before parsing each line, if the user pressed cancel
+	 * @throws Exception 
+	 *                  throws any reported <code>Exception</code>
 	 */
-	private void parseFile() {
+	private void parseFile(final IProgressMonitor monitor) throws Exception {
 		BufferedReader file = null;
-		try {
-			file = new BufferedReader(new FileReader(ioFile));
 
-			String parseLine;
-			String[] tokens = new String[MAX_TAG_ARGS];
-			while ((parseLine = file.readLine())!= null) {
-				// Although it is deprecated, use a StringTokenizer
-				// instead of String.split(), for increased performance
-				// in simple splitting of strings separated by whitespaces
-				StringTokenizer tokenizer = new StringTokenizer(parseLine);
-		        for (tokenLength = 0; tokenizer.hasMoreTokens(); tokenLength++) {
-		            tokens[tokenLength] = tokenizer.nextToken();
-		        }
-				
-		        if (tokenLength > 0) {
-		        	parseLine(tokens);
-		        }
+		file = new BufferedReader(new FileReader(ioFile));
+
+		String parseLine;
+		String[] tokens = new String[MAX_TAG_ARGS];
+
+		while ((parseLine = file.readLine()) != null) {
+			if (monitor.isCanceled()) {
+				throw new InterruptedException("User interrupted");
 			}
-		} catch (FileNotFoundException e) {
-			// how to pop up an error? no shell accessible, can't throw the
-			// exception.
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+
+			// Although it is deprecated, use a StringTokenizer
+			// instead of String.split(), for increased performance
+			// in simple splitting of strings separated by whitespaces
+			StringTokenizer tokenizer = new StringTokenizer(parseLine);
+			
+			for (tokenLength = 0; tokenizer.hasMoreTokens(); tokenLength++) {
+				tokens[tokenLength] = tokenizer.nextToken();
+			}
+
+			if (tokenLength > 0) {
+				parseLine(tokens);
+			}
 		}
 	}
 
-	private void parseLine(String[] tokens) {
+	private void parseLine(final String[] tokens) throws Exception {
 		String command = tokens[TAG_CMD_INDEX];
 
 		if (command.compareTo("CPU") == 0) { // CPU <id> <name>
 			parseCpuCommand(tokens);
-		} else if (currentCPU == null && command.compareTo("TIME") != 0) {
+		} else if ((currentCPU == null) && (command.compareTo("TIME") != 0)) {
 			// Single-cpu file with no cpu tag
 			currentCPU = new SampleCPU(model, 0, null, 1);
 			model.addCPU(currentCPU);
@@ -336,19 +342,19 @@ public class Parser extends Job {
 			if (tasks != null) {
 				prod = tasks.getLine(prodCpu, prodID, lastTime);
 			}
-			if (prod == null && queues != null) {
+			if ((prod == null) && (queues != null)) {
 				prod = queues.getLine(prodCpu, prodID, lastTime);
 			}
-			if (prod == null && isrs != null) {
+			if ((prod == null) && (isrs != null)) {
 				prod = isrs.getLine(prodCpu, prodID, lastTime);
 			}
 			if (tasks != null) {
 				cons = tasks.getLine(consCPU, consID, lastTime);
 			}
-			if (cons == null && queues != null) {
+			if ((cons == null) && (queues != null)) {
 				cons = queues.getLine(consCPU, consID, lastTime);
 			}
-			if (cons == null && isrs != null) {
+			if ((cons == null) && (isrs != null)) {
 				cons = isrs.getLine(consCPU, consID, lastTime);
 			}
 			lastLine = new PortSampleLine(currentCPU, id, prod, cons);
@@ -368,7 +374,7 @@ public class Parser extends Job {
 	 * @param tokens
 	 *            the tokens array to parse from
 	 */
-	private void parseDelCommand(final String[] tokens) {
+	private void parseDelCommand(final String[] tokens) throws Exception {
 		LineType type = LineType.parseType(Integer.parseInt(tokens[TAG_ARG1_INDEX]));
 		Section section = model.getSections().getSection(type);
 		if (section != null) {
@@ -376,12 +382,7 @@ public class Parser extends Job {
 			double time = Double.parseDouble(tokens[TAG_ARG3_INDEX]);
 			lastTime = time / model.getTicksPerSec();
 			lastLine = section.getLine(currentCPU, id, lastTime);
-			try {
-				lastLine.setTimeDelete(lastTime);
-			} catch (CheckedIllegalArgumentException e) {
-				return;
-				// TODO how to properly handle this exception??
-			}
+			lastLine.setTimeDelete(lastTime);
 		}
 	}
 
@@ -394,8 +395,12 @@ public class Parser extends Job {
 	 * @param tokens
 	 *            the array of tokens to parse from
 	 */
-	private void parseStaCommand(final String[] tokens) {
+	private void parseStaCommand(final String[] tokens) throws CheckedIllegalArgumentException {
 		double time = Double.parseDouble(tokens[TAG_ARG3_INDEX]);
+		if (time < 0) {
+			throw new CheckedIllegalArgumentException("STA time is negative: " + time);
+		}
+		
 		LineType type = LineType.parseType(Integer.parseInt(tokens[TAG_ARG1_INDEX]));
 		int id = Integer.parseInt(tokens[TAG_ARG2_INDEX]);
 		lastTime = time / model.getTicksPerSec();
@@ -416,7 +421,7 @@ public class Parser extends Job {
 		}
 		
 		lastLine.addSample(SampleType.START, lastTime, val);
-		if (type == LineType.TASKS || type == LineType.ISRS) {
+		if ((type == LineType.TASKS) || (type == LineType.ISRS)) {
 			handlePreemption(SampleType.SUSPEND, lastTime, lastLine);
 		}
 	}
@@ -429,11 +434,16 @@ public class Parser extends Job {
 	 * @param tokens
 	 *            the tokens array to br parsed from
 	 */
-	private void parseStoCommand(final String[] tokens) {
+	private void parseStoCommand(final String[] tokens) throws CheckedIllegalArgumentException {
+		double time = Double.parseDouble(tokens[TAG_ARG3_INDEX]);
+		if (time < 0) {
+			throw new CheckedIllegalArgumentException("STO time is negative: " + time);
+		}
+		
 		LineType type = LineType.parseType(Integer.parseInt(tokens[TAG_ARG1_INDEX]));
 		int id = Integer.parseInt(tokens[TAG_ARG2_INDEX]);
 		double size = 1;
-		double time = Double.parseDouble(tokens[TAG_ARG3_INDEX]);
+
 		Section section = model.getSections().getSection(type);
 		if (tokenLength > TAG_ARG4_INDEX) {
 			size = Integer.parseInt(tokens[TAG_ARG4_INDEX]);
@@ -444,7 +454,7 @@ public class Parser extends Job {
 		}
 		if (lastLine != null) {
 			lastLine.addSample(SampleType.STOP, lastTime, size);
-			if (type == LineType.TASKS || type == LineType.ISRS) {
+			if ((type == LineType.TASKS) || (type == LineType.ISRS)) {
 				handlePreemption(SampleType.RESUME, lastTime, lastLine);
 			}
 		}
