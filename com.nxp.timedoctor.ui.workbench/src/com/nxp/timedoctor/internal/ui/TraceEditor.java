@@ -103,28 +103,21 @@ public class TraceEditor extends EditorPart {
 		
 		final Parser parser = new Parser("Opening trace", traceModel, ioFile);
 
-		// Non-threaded execution
 		IWorkbenchWindow window = this.getSite().getWorkbenchWindow();
 		try {
-			window.run(true, false, new IRunnableWithProgress() {
-				public void run(final IProgressMonitor monitor)
-						throws InvocationTargetException, InterruptedException {
-					parser.run(monitor);
+			window.run(true, true, new IRunnableWithProgress() {
+				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+					parser.doParse(monitor);
 				}
-
 			});
 		} catch (InvocationTargetException e) {
-			MessageDialog.openError(this.getSite().getShell(), "Error",
-					"Init failed: " + e.getMessage());
-			return;
+			// A parse exception
+			MessageDialog.openError(this.getSite().getShell(), "Error", "Parse failed, reason: " + e.getCause().getMessage());
+			throw new PartInitException(e.getCause().getMessage(), e.getCause());
 		} catch (InterruptedException e) {
-			MessageDialog.openError(this.getSite().getShell(), "Error",
-					"Init failed: " + e.getMessage());
-			return; //FIXME should throw PartInitException instead
+			// User pressed cancel
+			super.getSite().getPage().closeEditor(this, false);
 		}
-
-		// Threaded execution
-		// parser.schedule();
 	}
 
 	/**
