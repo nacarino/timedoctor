@@ -10,10 +10,14 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.canvases.TraceCanvas;
@@ -22,14 +26,12 @@ import com.nxp.timedoctor.ui.trace.canvases.TraceCanvas;
  * This class implements <code> MouseListener </code>. It will zoom the area
  * specified by the left mouse click and drag event.
  */
-public class TraceZoomListener implements MouseListener {
+public class TraceZoomListener implements MouseListener, MouseMoveListener {
 	private double drawStartTime = 0.0;
-
 	private double drawEndTime = 0.0;
-
 	private ZoomModel zoom;
-
 	private int mouseButton = 0;
+	private Cursor zoomCursor = null;
 
 	/**
 	 * Constructor for TraceZoomListener class
@@ -38,7 +40,7 @@ public class TraceZoomListener implements MouseListener {
 	 *            the observable model part containing zoom/scroll data
 	 */
 	public TraceZoomListener(final ZoomModel zoomData) {
-		this.zoom = zoomData;
+		this.zoom = zoomData;		
 	}
 
 	public void mouseDoubleClick(final MouseEvent e) {
@@ -59,6 +61,16 @@ public class TraceZoomListener implements MouseListener {
 		}
 	}
 
+	public void mouseMove(final MouseEvent e) {
+		if (mouseButton == 1) {
+			if (zoomCursor == null) {
+				// TODO cusor must be disposed explicitly
+				zoomCursor = new Cursor(e.display, SWT.CURSOR_SIZEE);
+			}
+			((Control) e.widget).setCursor(zoomCursor);
+		}		
+	}	
+	
 	/**
 	 * Records the mouse release position and performs the zoom opeartion.
 	 * 
@@ -77,12 +89,14 @@ public class TraceZoomListener implements MouseListener {
 				drawEndTime = temp;
 			}
 
-			if ((drawStartTime > zoom.getStartTime())
+			if ((drawStartTime >= zoom.getStartTime())
 					&& (drawEndTime > zoom.getStartTime())
 					&& (drawStartTime != drawEndTime)) {
 				zoom.pushZoom(drawStartTime, drawEndTime);
 				zoom.setTimes(drawStartTime, drawEndTime);
 			}
+
+			((Control) e.widget).setCursor(null);
 		}
 		mouseButton = 0;
 	}

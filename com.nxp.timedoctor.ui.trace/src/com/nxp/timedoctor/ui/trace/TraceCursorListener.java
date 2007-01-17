@@ -10,10 +10,13 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.widgets.Control;
 
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
@@ -30,6 +33,7 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	private int mouseButton = 0;
 	private double scrollTimeIncrement = 0;
 	private double traceEndTime;
+	private Cursor scrollCursor = null;
 	
 	/**
 	 * Constructor.
@@ -56,6 +60,12 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	 */
 	public final void mouseMove(final MouseEvent e) {
 		if (mouseButton == 3) {
+			if (scrollCursor == null) {
+				// TODO cusor must be disposed explicitly
+				scrollCursor = new Cursor(e.display, SWT.CURSOR_HAND);
+			}
+			((Control) e.widget).setCursor(scrollCursor);
+			
 			scrollToCursor(e.x);
 		}
 		else {
@@ -75,9 +85,11 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	}
 
 	public void mouseDoubleClick(final MouseEvent e) {
-		TimeLine marker = traceCursorFactory.createTraceCursor(CursorType.MARKER);
-		marker.setCursor(e.x);
-		marker.setVisible(true);
+		if (e.button == 1) {
+			TimeLine marker = traceCursorFactory.createTraceCursor(CursorType.MARKER);
+			marker.setCursor(e.x);
+			marker.setVisible(true);
+		}
 	}
 
 	public void mouseDown(final MouseEvent e) {
@@ -95,7 +107,11 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	}
 
 	public void mouseUp(final MouseEvent e) {
+		if (mouseButton == 3) {
+			((Control)e.widget).setCursor(null);
+		}
 		mouseButton = 0;
+		
 	}
 
 	/**

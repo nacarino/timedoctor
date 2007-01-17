@@ -61,7 +61,9 @@ public class TraceLineSelectListener implements MouseListener {
 	 *            MouseEvent containing detailed information about the event
 	 */
 	public final void mouseDown(final MouseEvent e) {
-		zoom.setSelectedLine(line); 
-		traceLineViewer.selectLine(e.display);		
+		if (e.button == 1) {
+			zoom.setSelectedLine(line); 
+			traceLineViewer.selectLine(e.display);
+		}
 	}
 }
