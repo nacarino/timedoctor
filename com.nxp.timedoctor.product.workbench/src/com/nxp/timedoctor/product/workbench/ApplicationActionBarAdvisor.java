@@ -23,11 +23,13 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 
 import com.nxp.timedoctor.internal.ui.actions.OpenAction;
 import com.nxp.timedoctor.internal.ui.actions.PropertyAction;
+import com.nxp.timedoctor.internal.ui.actions.StatisticsAction;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction openAction;
     private IWorkbenchAction closeAction;
     private IWorkbenchAction exitAction;
+    private IWorkbenchAction statisticsAction;
     private IWorkbenchAction propertyAction;
     private IWorkbenchAction preferenceAction;
     private IWorkbenchAction aboutAction;
@@ -48,6 +50,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         exitAction = ActionFactory.QUIT.create(window);
         register(exitAction);
 
+        statisticsAction = new StatisticsAction(window);
+        register(statisticsAction);
+        
         propertyAction = new PropertyAction(window);
         register(propertyAction);
 
@@ -80,6 +85,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         fileMenu.add(exitAction);
         
         // Window
+        windowMenu.add(statisticsAction);
         windowMenu.add(propertyAction);
         windowMenu.add(new Separator());
         windowMenu.add(preferenceAction);
@@ -88,6 +94,5 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         helpMenu.add(helpAction);
         helpMenu.add(new Separator());
         helpMenu.add(aboutAction);
-    }
-    
+    }    
 }
