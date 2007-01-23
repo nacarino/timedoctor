@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: TimeDoctor Statistics Plug-in
+Bundle-SymbolicName: com.nxp.timedoctor.ui.statistics; singleton:=true
+Bundle-Version: 1.3.0
+Bundle-Vendor: NXP Semiconductors B.V.
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ com.nxp.timedoctor.core.model
+Eclipse-LazyStart: true
+Export-Package: com.nxp.timedoctor.ui.statistics
