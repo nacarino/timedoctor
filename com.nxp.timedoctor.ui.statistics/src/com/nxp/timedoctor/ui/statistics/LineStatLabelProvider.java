@@ -23,7 +23,7 @@ import com.nxp.timedoctor.core.model.statistics.ExecutionStatistic;
 import com.nxp.timedoctor.core.model.statistics.InterruptStatistic;
 import com.nxp.timedoctor.core.model.statistics.Statistic;
 
-public class StatisticsLabelProvider extends LabelProvider implements ITableLabelProvider {
+public class LineStatLabelProvider extends LabelProvider implements ITableLabelProvider {
 	private final int TOTAL_COLUMN = 1;
 	private final int LOAD_COLUMN = 2;
 	private final int MIN_COLUMN = 3;

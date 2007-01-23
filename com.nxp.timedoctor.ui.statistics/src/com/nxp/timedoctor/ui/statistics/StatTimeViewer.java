@@ -26,13 +26,13 @@ import org.eclipse.swt.widgets.Text;
 
 import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
 
-public class StatisticsTimeViewer extends Composite implements Observer {
+public class StatTimeViewer extends Composite implements Observer {
 	private Text startInput;
 	private Text endInput;
 	
 	private StatisticsTimeModel timeModel = null;
 
-	public StatisticsTimeViewer(final Composite parent) {
+	public StatTimeViewer(final Composite parent) {
 		super(parent, SWT.NONE);
 		
 		createContents(parent);		

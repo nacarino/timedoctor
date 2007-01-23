@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 import com.nxp.timedoctor.core.model.statistics.Statistic;
 
-public class StatisticsTreeViewer {
+public class LineStatTreeViewer {
 	private final String ITEM_HEADING 	= "statistic";
 	private final String TOTAL_HEADING 	= "total";
 	private final String LOAD_HEADING 	= "load";
@@ -38,7 +38,7 @@ public class StatisticsTreeViewer {
 			MAX_HEADING
 	};
 	
-	public StatisticsTreeViewer(final Composite parent) {
+	public LineStatTreeViewer(final Composite parent) {
 		createTreeViewer(createTree(parent));		
 	}
 	
@@ -53,8 +53,8 @@ public class StatisticsTreeViewer {
 	
 	private void createTreeViewer(final Tree tree) {
 		viewer = new TreeViewer(tree);
-		viewer.setContentProvider(new StatisticsContentProvider());
-		viewer.setLabelProvider(new StatisticsLabelProvider());
+		viewer.setContentProvider(new StatContentProvider());
+		viewer.setLabelProvider(new LineStatLabelProvider());
 		
 		viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 	}

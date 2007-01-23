@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.Viewer;
 import com.nxp.timedoctor.core.model.statistics.Statistic;
 
 
-public class StatisticsContentProvider implements ITreeContentProvider {
+public class StatContentProvider implements ITreeContentProvider {
 	public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 	}
 	
