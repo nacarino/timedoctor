@@ -21,4 +21,19 @@
             id="com.nxp.timedoctor.ui.preferences.keys">
       </page>
    </extension>
+   
+   <extension
+        point="org.eclipse.ui.views">
+      <category
+            name="TimeDoctor"
+            id="com.nxp.timedoctor.ui.workbench.statistics">
+      </category>
+      <view
+            name="Statistics"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            category="com.nxp.timedoctor.ui.workbench.statistics"
+            class="com.nxp.timedoctor.internal.ui.StatisticsView"
+            id="com.nxp.timedoctor.ui.workbench.StatisticsView">
+      </view>
+   </extension>
  </plugin>
