@@ -23,13 +23,15 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 
 import com.nxp.timedoctor.internal.ui.actions.OpenAction;
 import com.nxp.timedoctor.internal.ui.actions.PropertyAction;
-import com.nxp.timedoctor.internal.ui.actions.StatisticsAction;
+import com.nxp.timedoctor.internal.ui.actions.LineStatAction;
+import com.nxp.timedoctor.internal.ui.actions.TraceStatAction;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction openAction;
     private IWorkbenchAction closeAction;
     private IWorkbenchAction exitAction;
     private IWorkbenchAction statisticsAction;
+    private IWorkbenchAction lineStatisticsAction;
     private IWorkbenchAction propertyAction;
     private IWorkbenchAction preferenceAction;
     private IWorkbenchAction aboutAction;
@@ -49,9 +51,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     	
         exitAction = ActionFactory.QUIT.create(window);
         register(exitAction);
-
-        statisticsAction = new StatisticsAction(window);
+        
+        statisticsAction = new TraceStatAction(window);
         register(statisticsAction);
+
+        lineStatisticsAction = new LineStatAction(window);
+        register(lineStatisticsAction);
         
         propertyAction = new PropertyAction(window);
         register(propertyAction);
@@ -85,7 +90,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         fileMenu.add(exitAction);
         
         // Window
-        windowMenu.add(statisticsAction);
+        MenuManager statisticsMenu = new MenuManager("&Statistics", "Statistics");
+        windowMenu.add(statisticsMenu);
+        
+        statisticsMenu.add(statisticsAction);
+        statisticsMenu.add(lineStatisticsAction);
+        
         windowMenu.add(propertyAction);
         windowMenu.add(new Separator());
         windowMenu.add(preferenceAction);
