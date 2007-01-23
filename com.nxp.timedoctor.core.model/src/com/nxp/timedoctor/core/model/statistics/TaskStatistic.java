@@ -20,19 +20,17 @@ public class TaskStatistic extends Statistic {
 	private TraceModel traceModel;
 	private SampleLine line;
 
-	private Statistic executionStat;
-	private Statistic incExecutionStat;
-	private Statistic exExecutionStat;
-	private Statistic interruptStat;
-	private Statistic intExecutionStat;
-	private Statistic counterStats;
+	private InterruptStatistic executionStat;
+	private ExecutionStatistic incExecutionStat;
+	private ExecutionStatistic exExecutionStat;
+	private InterruptStatistic interruptStat;
+	private ExecutionStatistic intExecutionStat;
+	private CompositeStatistic counterStats;
 	
-	public TaskStatistic() {
-		super(null, "");
-	}
-	
-	public TaskStatistic(final TraceModel traceModel, final SampleLine line) {
-		super(null, "");
+	public TaskStatistic(final Statistic parent,
+			final TraceModel traceModel, 
+			final SampleLine line) {
+		super(parent, line.getName());
 		this.traceModel = traceModel;
 		this.line = line;
 		
@@ -40,9 +38,6 @@ public class TaskStatistic extends Statistic {
 	}
 
 	private void createContents() {		
-		Statistic task = new CompositeStatistic(this, line.getName());
-		addChild(task);
-		
 		Statistic executions = new CompositeStatistic(this, "Executions");
 		executionStat = new InterruptStatistic(this, "Nr. executions");
 		executions.addChild(executionStat);
@@ -50,10 +45,10 @@ public class TaskStatistic extends Statistic {
 		executions.addChild(incExecutionStat);
 		exExecutionStat = new ExecutionStatistic(executions, "Time ex. interrupts");
 		executions.addChild(exExecutionStat);
-		task.addChild(executions);
+		addChild(executions);
 
 		Statistic interrupts = new CompositeStatistic(this, "Interrupts");
-		task.addChild(interrupts);		
+		addChild(interrupts);		
 		interruptStat = new InterruptStatistic(this, "Nr. interrupts");
 		interrupts.addChild(interruptStat);
 		intExecutionStat = new ExecutionStatistic(interrupts, "Interrupt time");
@@ -65,7 +60,7 @@ public class TaskStatistic extends Statistic {
 			for (SampleLine line : cycles.getLines()) {
 				counterStats.addChild(new CounterStatistic(executions, line));
 			}
-			task.addChild(counterStats);
+			addChild(counterStats);
 		}
 	}
 	
@@ -151,5 +146,17 @@ public class TaskStatistic extends Statistic {
 
 			counterStats.consolidate();
 		}
+	}
+	
+	public InterruptStatistic getInterruptStatistic() {
+		return interruptStat;
+	}
+	
+	public InterruptStatistic getExecutionsStatistic() {
+		return executionStat;
+	}
+	
+	public ExecutionStatistic getExExecTimeStatistic() {
+		return exExecutionStat;
 	}
 }
