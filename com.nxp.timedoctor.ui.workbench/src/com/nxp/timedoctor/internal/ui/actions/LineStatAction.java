@@ -16,19 +16,19 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 
-import com.nxp.timedoctor.internal.ui.StatisticsView;
+import com.nxp.timedoctor.internal.ui.LineStatView;
 
-public class StatisticsAction extends Action implements IWorkbenchAction {
+public class LineStatAction extends Action implements IWorkbenchAction {
 	
 	public final static String ID = "com.nxp.timedoctor.ui.trace";
 	
 	private final IWorkbenchWindow window;
 
-	public StatisticsAction(final IWorkbenchWindow window) {
+	public LineStatAction(final IWorkbenchWindow window) {
 		this.window = window;
 		setId(ID);
-		setText("&Statistics View");
-		setToolTipText("Open the statistics view for the selected trace.");
+		setText("&Selected Row");
+		setToolTipText("Open the statistics view for the selected trace line.");
 		// TODO add image
 	}
 
@@ -36,7 +36,7 @@ public class StatisticsAction extends Action implements IWorkbenchAction {
 	public void run() {
 		IWorkbenchPage page = window.getActivePage();
 		try {
-			page.showView(StatisticsView.ID);
+			page.showView(LineStatView.ID);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}

@@ -29,11 +29,20 @@
             id="com.nxp.timedoctor.ui.workbench.statistics">
       </category>
       <view
-            name="Statistics"
-            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            allowMultiple="false"
             category="com.nxp.timedoctor.ui.workbench.statistics"
-            class="com.nxp.timedoctor.internal.ui.StatisticsView"
-            id="com.nxp.timedoctor.ui.workbench.StatisticsView">
+            class="com.nxp.timedoctor.internal.ui.LineStatView"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            id="com.nxp.timedoctor.ui.workbench.LineStatView"
+            name="Trace Line Statistics">
+      </view>
+        <view
+            allowMultiple="false"
+            category="com.nxp.timedoctor.ui.workbench.statistics"
+            class="com.nxp.timedoctor.internal.ui.TraceStatView"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            id="com.nxp.timedoctor.ui.workbench.TraceStatView"
+            name="Task Statistics">
       </view>
    </extension>
  </plugin>
