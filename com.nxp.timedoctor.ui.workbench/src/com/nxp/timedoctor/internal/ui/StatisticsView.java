@@ -55,6 +55,9 @@ public class StatisticsView extends ViewPart implements IPartListener2, ISelecti
 	public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 	}
 
+	/**
+	 * Needed when the user selects an editor
+	 */
 	public void partActivated(final IWorkbenchPartReference partRef) {
 		if ((partRef.getPart(true) instanceof IEditorPart)
 			&& (getViewSite().getPage().isPartVisible(this))) {
@@ -62,12 +65,19 @@ public class StatisticsView extends ViewPart implements IPartListener2, ISelecti
 		}
 	}
 
+	/** 
+	 * Only needed when the view or editor is brought to top programatically
+	 * (when done by user partActivated is also called)
+	 */
 	public void partBroughtToTop(final IWorkbenchPartReference partRef) {
 		if (partRef.getPart(true) == StatisticsView.this) {
 			editorActivated(getViewSite().getPage().getActiveEditor());
 		}		
 	}
 
+	/**
+	 * Needed when the last editor is closed
+	 */
 	public void partClosed(final IWorkbenchPartReference partRef) {
 		if (partRef.getPart(true) instanceof IEditorPart) {
 			IEditorPart editor = getViewSite().getPage().getActiveEditor();
@@ -86,13 +96,23 @@ public class StatisticsView extends ViewPart implements IPartListener2, ISelecti
 	public void partInputChanged(final IWorkbenchPartReference partRef) {
 	}
 
+	/**
+	 * Needed when the statistics view is opened
+	 */
 	public void partOpened(final IWorkbenchPartReference partRef) {
 		if (partRef.getPart(true) == StatisticsView.this) {
 			editorActivated(getViewSite().getPage().getActiveEditor());
 		}
 	}
 
+	/**
+	 * Needed when a view is hidden behind another view and the TraceEditor
+	 * changed while it was hidden
+	 */
 	public void partVisible(final IWorkbenchPartReference partRef) {
+		if (partRef.getPart(true) == StatisticsView.this) {
+			editorActivated(getViewSite().getPage().getActiveEditor());
+		}
 	}
 	
 	protected void editorActivated(final IEditorPart editor) {
