@@ -27,7 +27,7 @@ import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
 import com.nxp.timedoctor.core.model.statistics.TaskStatistic;
 
 //TODO: button to select between seconds, cycles, or %
-public class LineStatViewer {
+public class LineStatViewer implements Observer {
 	private TraceModel traceModel;
 	private ZoomModel zoomModel;
 	private StatisticsTimeModel timeModel;
@@ -54,14 +54,30 @@ public class LineStatViewer {
 		treeViewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
 		treeViewer.setInput(null);
 	}
-	
+
 	public void setModels(final TraceModel traceModel, 
 			final ZoomModel zoomModel,
 			final StatisticsTimeModel timeModel) {
+		
+		// TODO THIS IS A HACK!! 
+		// add this as an observer to the zoom model to get updates when the
+		// selection has changed.
+		// SHOULD BE REMOVED when the TraceEditor provides ISelection events
+		// and triggers the selection listener in LineStatView
+		// In that case, only listen to the ISelection event and get the selected 
+		// trace line and zoom times from there.
+		if (this.zoomModel != null) {
+			this.zoomModel.deleteObserver(this);
+		}
+		if (zoomModel != null) {
+			zoomModel.addObserver(this);
+		}
+		// END HACK
+		
 		this.traceModel = traceModel;
 		this.zoomModel = zoomModel;
 		this.timeModel = timeModel;
-
+		
 		timeViewer.setTimeModel(timeModel);
 		
 		if ((traceModel != null) && (timeModel != null)) {		
@@ -70,6 +86,12 @@ public class LineStatViewer {
 			treeViewer.setInput(null);
 			treeViewer.refresh();
 		}					
+	}
+
+	// THIS IS A HACK
+	// part of the hack above in setModels
+	public void update(Observable o, Object arg) {
+		selectionChanged();				
 	}
 	
 	public void selectionChanged() {
@@ -122,6 +144,13 @@ public class LineStatViewer {
 			}
 		};
 		timeModel.addObserver(timeObserver);
+		
+		// Recalculate even when timeModel is not changed, 
+		// since the sample line may have changed
+		// TODO needs some cleanup, use ISelection information here
+		taskStat.calculate(timeModel.getStartTime(), timeModel
+				.getEndTime());	
+		treeViewer.refresh();
 		
 		return taskStat;
 	}
