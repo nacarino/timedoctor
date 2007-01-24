@@ -20,12 +20,12 @@ import org.eclipse.swt.widgets.TreeColumn;
 import com.nxp.timedoctor.core.model.statistics.Statistic;
 
 public class LineStatTreeViewer {
-	private final String ITEM_HEADING 	= "statistic";
-	private final String TOTAL_HEADING 	= "total";
-	private final String LOAD_HEADING 	= "load";
-	private final String MIN_HEADING 	= "min/exec";
-	private final String AVG_HEADING 	= "avg/exec";
-	private final String MAX_HEADING 	= "max/exec";
+	private final String ITEM_HEADING 	= "Statistic";
+	private final String TOTAL_HEADING 	= "Total";
+	private final String LOAD_HEADING 	= "Load";
+	private final String MIN_HEADING 	= "Minimum/Execution";
+	private final String AVG_HEADING 	= "Average/Execution";
+	private final String MAX_HEADING 	= "Maximum/Execution";
 
 	private TreeViewer viewer;
 	
@@ -63,7 +63,7 @@ public class LineStatTreeViewer {
 		for (int i = 0; i < columnNames.length; i++) {
 			TreeColumn column = new TreeColumn(tree, SWT.LEFT, i);
 			column.setText(columnNames[i]);
-
+			
 			// TODO compute optimal width per column (possible?)
 			column.setWidth((i==0)? 150: 80);
 		}		

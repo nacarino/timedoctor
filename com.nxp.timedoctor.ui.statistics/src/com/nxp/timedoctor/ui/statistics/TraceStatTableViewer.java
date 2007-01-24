@@ -19,11 +19,11 @@ import org.eclipse.swt.widgets.TableColumn;
 import com.nxp.timedoctor.core.model.statistics.Statistic;
 
 public class TraceStatTableViewer {
-	private final String TASK_HEADING 		= "task";
-	private final String EXECUTIONS_HEADING = "# exec";
-	private final String EXEC_RATE_HEADING 	= "# exec/s";
-	private final String LOAD_HEADING 		= "% (ex int)";
-	private final String INT_RATE_HEADING 	= "int/s";
+	private final String TASK_HEADING 		= "Task";
+	private final String EXECUTIONS_HEADING = "Nr. Executions";
+	private final String EXEC_RATE_HEADING 	= "Nr. Executions/Second";
+	private final String LOAD_HEADING 		= "Load (%)";
+	private final String INT_RATE_HEADING 	= "Interrupts/Second";
 
 	private TableViewer viewer;
 	
