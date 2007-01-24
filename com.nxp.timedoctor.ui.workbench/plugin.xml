@@ -32,7 +32,7 @@
             allowMultiple="false"
             category="com.nxp.timedoctor.ui.workbench.statistics"
             class="com.nxp.timedoctor.internal.ui.LineStatView"
-            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/line_statistic_view.gif"
             id="com.nxp.timedoctor.ui.workbench.LineStatView"
             name="Trace Line Statistics">
       </view>
@@ -40,7 +40,7 @@
             allowMultiple="false"
             category="com.nxp.timedoctor.ui.workbench.statistics"
             class="com.nxp.timedoctor.internal.ui.TraceStatView"
-            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/trace_statistic_view.gif"
             id="com.nxp.timedoctor.ui.workbench.TraceStatView"
             name="Task Statistics">
       </view>
