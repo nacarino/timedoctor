@@ -30,9 +30,9 @@ the sample sequence in the file in random order:
 <ul>
        <li> When sampling is started after execution has already started and many task have been created, some artifacts may occur. These are the result of STO samples without corresponding STA samples.  TimeDoctor will essentially ignore these STO samples. </li>
 
-       <li> TimeDoctor assumes that always exactly one task is active per CPU. It is possible, but not recommended to have 0 tasks active. This means that a context switch should always specify a STO &lttask1&gt / STA &lttask2&gt sequence of samples in the file. </li>
+       <li> TimeDoctor assumes that always exactly one task is active per CPU. It is possible, but not recommended to have 0 tasks active. This means that a context switch should always specify a STO &lt;task1&gt; / STA &lt;task2&gt; sequence of samples in the file. </li>
 
-       <li>  Interrupts can be displayed interrupting tasks and other interrupts. Interrupts may even interrupt itself. This means that only for Isr’s (not Tasks, see above) nested occurrences of STA/STO pairs may occur. </li>
+       <li>  Interrupts can be displayed interrupting tasks and other interrupts. Interrupts may even interrupt itself. This means that only for Isr's (not Tasks, see above) nested occurrences of STA/STO pairs may occur. </li>
 
        <li>   Queue sizes are derived by adding 1 (or the optional size value) for each send and subtracting 1 (or the optional size value) for each receive, limiting at 0. Some startup artifacts may occur when sampling starts when queues are already non-empty. Similar artifacts occur for Semaphores and Queues. </li>
 

@@ -11,32 +11,32 @@ http://www.eclipse.org/legal/epl-v10.html">
 <body>
 <a name="cpu"></a> 
 <h2>
-<code>CPU &ltid&gt [&ltname&gt]</code>
+<code>CPU &lt;id&gt; [&lt;name&gt;]</code>
 </h2>
 <p>
 Used in multiple CPU sample files. Indicates name of CPU, and assumed all tags following until next CPU tag pertain to this CPU.  
 A multiple CPU file may use different values for SPEED and MEMSPEED, but must use a single time base (ie. TIME value and sample offset).
-Failing to do so will result in sample lines from different CPU’s depicted with incorrectly correlated timing.
+Failing to do so will result in sample lines from different CPU's depicted with incorrectly correlated timing.
 In essence a multi-CPU TDI file is a concatenation of multiple single CPU TDI file each preceded by a CPU tag. 
 Id numbers of tasks, etc. only have to be uniqie within the range of a CPU tag, not accross CPUs.
 </p>
 <a name="speed"></a> 
 <h2>
-<code>SPEED &ltclocks per sec&gt</code>
+<code>SPEED &lt;clocks per sec&gt;</code>
 </h2>
 <p>
 Indicates the number of true clock cycles per second in the target system's time base.  This tag must appear once as the first or second line in the file and is mandatory.
 </p>
 <a name="memspeed"></a> 
 <h2>
-<code>MEMSPEED &ltclocks per sec&gt</code>
+<code>MEMSPEED &lt;clocks per sec&gt;</code>
 </h2>
 <p>
-Indicates the number of true clock memory cycles per second on the target system's memory bus.  This tag must appear once as the third line in the file and is required only if “VAL 9” tags are used.
+Indicates the number of true clock memory cycles per second on the target system's memory bus.  This tag must appear once as the third line in the file and is required only if "VAL 9" tags are used.
 </p>
 <a name="time"></a> 
 <h2>
-<code>TIME &ltticks per sec&gt</code>
+<code>TIME &lt;ticks per sec&gt;</code>
 </h2>
 <p>
 Indicates the number of ticks per second that the STA/STO samples use as a time base.
@@ -45,7 +45,7 @@ This value may be different from the value indicated by SPEED, but does not need
 </p>
 <a name="cre"></a> 
 <h2>
-<code>CRE &lttype&gt &ltid&gt &lttime&gt [&ltprod_id&gt &ltcons_id&gt] [&ltprod_cpu_id&gt &ltcons_cpu_id&gt]</code>
+<code>CRE &lt;type&gt; &lt;id&gt; &lt;time&gt; [&lt;prod_id&gt; &lt;cons_id&gt;] [&lt;prod_cpu_id&gt; &lt;cons_cpu_id&gt;]</code>
 </h2>
 <p>
 Represents a creation of a task, isr, queue, or connection. The type parameter indicates the type of event that the event pertains to. 
@@ -69,20 +69,20 @@ The prod_cpu_id and cons_cpu_id are the idsof the respective CPUs on which the p
 The following example sets up a buffered connected between two tasks A and B.
 </p>
 <code>
-CRE 0 &lttask_a_id&gt &lttime&gt<br>
-CRE 0 &lttask_b_id&gt &lttime&gt<br>
-CRE 3 &ltqueue_id&gt &lttime&gt<br>
-CRE 11 &lta_port_id&gt &lttime&gt &lttask_a_id&gt &lttask_a_cpu_id&gt &ltqueue_id&gt &ltqueue_cpu_id&gt<br>
-CRE 11 &ltb_port_id&gt &lttime&gt &ltqueue_id&gt &ltqueue_cpu_id&gt &lttask_b_id&gt &lttask_b_cpu_id&gt<br>
-STA 11 &lta_port_id&gt &lttime&gt 10<br>
-STO 11 &ltb_port_id&gt &lttime&gt 5<br>
+CRE 0 &lt;task_a_id&gt; &lt;time&gt;<br>
+CRE 0 &lt;task_b_id&gt; &lt;time&gt;<br>
+CRE 3 &lt;queue_id&gt; &lt;time&gt;<br>
+CRE 11 &lt;a_port_id&gt; &lt;time&gt; &lt;task_a_id&gt; &lt;task_a_cpu_id&gt; &lt;queue_id&gt; &lt;queue_cpu_id&gt;<br>
+CRE 11 &lt;b_port_id&gt; &lt;time&gt; &lt;queue_id&gt; &lt;queue_cpu_id&gt; &lt;task_b_id&gt; &lt;task_b_cpu_id&gt;<br>
+STA 11 &lt;a_port_id&gt; &lt;time&gt; 10<br>
+STO 11 &lt;b_port_id&gt; &lt;time&gt; 5<br>
 </code>
 <p> 
 In the above example, task A writes 10 samples to the queue via its output port a_port_id, and task B consumes 5 samples from the queue via its input port b_port_id. 
 </p>
 <a name="del"></a> 
 <h2>
-DEL &lttype&gt &ltid&gt &lttime&gt
+<code> DEL &lt;type&gt; &lt;id&gt; &lt;time&gt; </code>
 </h2>
 <p> 
 Represents a destruction of a task, isr, queue, or connection. The type parameter indicates the type of event that the event pertains to. Possible values for type are:
@@ -102,7 +102,7 @@ The id parameter is a 32-bit integer indicating the specific task/isr/queue/conn
 </p>
 <a name="sta"></a> 
 <h2>
-<code>STA &lttype&gt &ltid&gt &lttime&gt [&ltsize&gt]</code>
+<code>STA &lt;type&gt; &lt;id&gt; &lt;time&gt; [&lt;size&gt;]</code>
 </h2>
 <p>
 Represents a start sample of a task, isr, etc. The type parameter indicates the type of event that the event pertains to. Possible values of for type are:
@@ -128,7 +128,7 @@ The time parameter is a double precision floating point value indicating the tim
 
 <a name="sto"></a> 
 <h2>
-<code>STO &lttype&gt &ltid&gt &lttime&gt [&ltsize&gt]</code>
+<code>STO &lt;type&gt; &lt;id&gt; &lt;time&gt; [&lt;size&gt;]</code>
 </h2>
 <p>
 Represents a stop sample for a task, isr, etc. The type parameter indicates the type of event that the event pertains to. Possible values of for type are:
@@ -152,7 +152,7 @@ Id numbers do not need to be consecutive, but should be unique within the scope 
 </p>
 <a name="occ"></a> 
 <h2>
-<code>OCC &lttype&gt &ltid&gt &lttime&gt</code>
+<code>OCC &lt;type&gt; &lt;id&gt; &lt;time&gt;</code>
 </h2>
 <p>
 Represents an occurrence of a generic event. The type parameter indicates the type of event that the event pertains to. Possible values of for type are:
@@ -169,14 +169,14 @@ Finally the time parameter is a double precision floating point value indicating
  
 <a name="tim"></a> 
 <h2>
-<code>TIM &lttime&gt</code>
+<code>TIM &lt;time&gt;</code>
 </h2>
 <p>
 Specifies a time without adding a sample to any line. Used in combination with VAL tag for values not associated with any STA/STO/OCC events.
 </p>
  <a name="val"></a> 
 <h2>
-<code>VAL &lttype&gt &ltid&gt &ltvalue&gt</code>
+<code>VAL &lt;type&gt; &lt;id&gt; &lt;value&gt;</code>
 </h2>
 <p>
 Represents a value sample for a counter that counts either clock cycles or generic quantities. The type parameter indicates the type of event that the event pertains to.
@@ -196,7 +196,7 @@ The value parameter is assumed to be a sampled counter, and thus should be incre
 </p>
 <a name="dsc"></a> 
 <h2>
-<code>DSC &lttype&gt &ltid&gt &ltvalue&gt</code>
+<code>DSC &lt;type&gt; &lt;id&gt; &lt;value&gt;</code>
 </h2>
   <p>
     Represents a description of a preceding sample (STA/STO/OCC). The type parameter indicates the type of description provided. Possible values of for type are:
@@ -212,16 +212,16 @@ The id parameter is a 32-bit integer indicating the specific variable described.
 </p>
 <a  name="dnm"></a> 
 <h2>
-<code>DNM &lttype&gt &ltid&gt &ltname&gt</code>
+<code>DNM &lt;type&gt; &lt;id&gt; &lt;name&gt;</code>
 </h2>
 <p>
 Specifies the display name for the given description id. The type parameter is ignored, so the id must be globally unique across all DSC types. 
-The value specified is used in the mouse hover event to specify what description was given. A “DNM 3 &ltx&gt &lty&gt” tag will never be used.
+The value specified is used in the mouse hover event to specify what description was given. A "DNM 3 &lt;x&gt; &lt;y&gt;" tag will never be used.
 </p>
  
 <a name="nam"></a>
 <h2>
-<code>NAM &lttype&gt &ltid&gt &ltname&gt</code>
+<code>NAM &lt;type&gt; &lt;id&gt; &lt;name&gt;</code>
 </h2>
 <p>
 Specifies the display name for the given sample line. The id must be globally unique across all line types within the scope of successive CRE and DEL statements.
