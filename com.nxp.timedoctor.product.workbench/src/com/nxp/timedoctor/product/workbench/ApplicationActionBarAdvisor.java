@@ -11,28 +11,24 @@
 package com.nxp.timedoctor.product.workbench;
 
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
 import com.nxp.timedoctor.internal.ui.actions.OpenAction;
-import com.nxp.timedoctor.internal.ui.actions.PropertyAction;
-import com.nxp.timedoctor.internal.ui.actions.LineStatAction;
-import com.nxp.timedoctor.internal.ui.actions.TraceStatAction;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction openAction;
     private IWorkbenchAction closeAction;
     private IWorkbenchAction exitAction;
-    private IWorkbenchAction statisticsAction;
-    private IWorkbenchAction lineStatisticsAction;
-    private IWorkbenchAction propertyAction;
     private IWorkbenchAction preferenceAction;
     private IWorkbenchAction aboutAction;
     private IWorkbenchAction helpAction;
@@ -51,16 +47,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     	
         exitAction = ActionFactory.QUIT.create(window);
         register(exitAction);
-        
-        statisticsAction = new TraceStatAction(window);
-        register(statisticsAction);
-
-        lineStatisticsAction = new LineStatAction(window);
-        register(lineStatisticsAction);
-        
-        propertyAction = new PropertyAction(window);
-        register(propertyAction);
-
+ 
         preferenceAction = ActionFactory.PREFERENCES.create(window);
         register(preferenceAction);
 
@@ -73,6 +60,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
 	protected void fillMenuBar(final IMenuManager menuBar) {
+    	IWorkbenchWindow window = getActionBarConfigurer().getWindowConfigurer().getWindow();
+    	
         MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
         MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
         MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
@@ -86,17 +75,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         // File
         fileMenu.add(openAction);
         fileMenu.add(closeAction);
+        IContributionItem recentFileList = ContributionItemFactory.REOPEN_EDITORS.create(window);
+        fileMenu.add(recentFileList);
         fileMenu.add(new Separator());
         fileMenu.add(exitAction);
         
         // Window
-        MenuManager statisticsMenu = new MenuManager("&Statistics", "Statistics");
-        windowMenu.add(statisticsMenu);
-        
-        statisticsMenu.add(statisticsAction);
-        statisticsMenu.add(lineStatisticsAction);
-        
-        windowMenu.add(propertyAction);
+        MenuManager viewMenu = new MenuManager("Show View");
+        IContributionItem showViewList = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
+        viewMenu.add(showViewList);
+        windowMenu.add(viewMenu);
         windowMenu.add(new Separator());
         windowMenu.add(preferenceAction);
         
