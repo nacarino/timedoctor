@@ -57,58 +57,80 @@ public class TraceToolTipListener implements MouseMoveListener {
 
 	private int getSampleIndex(final MouseEvent e) {
 		int width = getWidth(e);
+		
 		double zoomFactor = zoom.getPixelsPerTime(width);
 		double time = zoom.getTimeAtPosition(e.x, width);
-
 		int index = line.binarySearch(time);
-		while ((index > 0) && (line.getSample(index).time > time)) {
-			index--;
-		}
-		while ((index < line.getCount() - 1)
-				&& (line.getSample(index + 1).time < time)) {
-			index++;
-		}
-
-		if ((line.getType() == LineType.EVENTS)
-				|| (line.getType() == LineType.SEMAPHORES)
-				|| (line.getType() == LineType.QUEUES)
-				|| (line.getType() == LineType.NOTES)) {
-			double timeDifference = Math
-					.abs(line.getSample(index).time - time);
+		
+		LineType lineType = line.getType();
+		
+		switch(lineType) {
+		case EVENTS:
+		case SEMAPHORES:
+		case QUEUES:
+		case NOTES:
+		{
+			double timeDifference = Math.abs(line.getSample(index).time - time);
 			int dx = (int) (timeDifference * zoomFactor);
+			
 			if (dx < POPUP_CURSOR_OFFSET) {
 				return index;
 			}
+			
 			index++;
-			timeDifference = Math.abs(line.getSample(index).time
-					- time);
-			dx = (int) (timeDifference * zoomFactor);
-			if (dx < POPUP_CURSOR_OFFSET) {
-				return index;
-			}
-			return -1;
-		} else {
-			if ((line.getSample(index).time > time)
-					|| (line.getSample(index + 1).time < time)) {
+			
+			try {
+				timeDifference = Math.abs(line.getSample(index).time - time);
+			} catch (IndexOutOfBoundsException e1) {
 				return -1;
 			}
-			if ((line.getType() == LineType.VALUES)
-					|| (line.getType() == LineType.CYCLES)
-					|| (line.getType() == LineType.MEM_CYCLES)) {
-				if (index < line.getCount() - 2) {
-					return index;
-				} else {
-					return -1;
-				}
-			} else {
-				if (((line.getSample(index).type == SampleType.START)
-						|| (line.getSample(index).type == SampleType.SUSPEND) || (line
-						.getSample(index).type == SampleType.RESUME))) {
-					return index;
-				} else {
-					return -1;
-				}
+			
+			dx = (int) (timeDifference * zoomFactor);
+			
+			if (dx < POPUP_CURSOR_OFFSET) {
+				return index;
+			}			
+			
+			return -1;			
+		}
+		
+		case VALUES:
+		case CYCLES:
+		case MEM_CYCLES:
+		{
+			if (line.getSample(index).time > time) {
+				return -1;
 			}
+			
+			if (index < line.getCount() - 2) {
+				return index;
+			}
+			
+			return -1;
+		}
+		
+		case TASKS:
+		case ISRS:
+		case AGENTS:
+		{
+			if (line.getSample(index).time > time) {
+				return -1;
+			}
+			
+			SampleType taskSampleType = line.getSample(index).type;
+			
+			switch(taskSampleType){
+			case START:
+			case SUSPEND:
+			case RESUME:
+				return index;
+			default:
+				return -1;			
+			}			
+		}
+		
+		default:
+			return -1;
 		}
 	}
 
