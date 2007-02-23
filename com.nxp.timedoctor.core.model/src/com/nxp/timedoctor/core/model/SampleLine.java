@@ -333,15 +333,21 @@ public abstract class SampleLine {
 		this.name = lineName;
 	}
 
-	// MR add check on array bounds
 	/**
 	 * Return the sample at the given index.
 	 * 
 	 * @param i
-	 *            the index of the desired sample
-	 * @return the sample at that index
+	 * 			the index of the desired sample
+	 * @return
+	 * 			the sample at that index
+	 * @throws IndexOutOfBoundsException 
+	 * 			Thrown, if index < 0 or index >= size
 	 */
-	public final Sample getSample(final int i) {
+	public final Sample getSample(final int i) throws IndexOutOfBoundsException {
+		if (i < 0 || i >= sampleCount) {
+			throw new IndexOutOfBoundsException(i + " is out of range");
+		}
+		
 		return samples[i];
 	}
 
@@ -615,7 +621,7 @@ public abstract class SampleLine {
 		double[] result = new double[2];
 		int ff = binarySearch(from);
 		int tt = binarySearch(to);
-		if (samples[tt].time <= to && tt < sampleCount) {
+		if (samples[tt].time <= to && tt < (sampleCount - 1)) {
 			tt++;
 		}
 		double newTime = samples[tt].time - samples[ff].time;

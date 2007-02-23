@@ -231,15 +231,20 @@ public class TaskSampleLine extends SampleLine {
 			return true;
 		} else {
 			// startIndex is same as endIndex
-			if (getSample(startIndex).type == SampleType.STOP) {
+			if (getSample(startIndex).type == SampleType.STOP
+					|| getSample(startIndex).type == SampleType.END) {
 				// No samples in between and the last sample before startTime is
 				// a stop
 				return false;
 			}
 
 			double startIndexTime = getSample(startIndex).time;
-			double nextIndexTime = getSample(startIndex + 1).time;
-
+			double nextIndexTime;
+			try {
+				nextIndexTime = getSample(startIndex + 1).time;
+			} catch (IndexOutOfBoundsException e) {
+				return false;
+			}
 			if (startTime < nextIndexTime && endTime > startIndexTime) {
 				// The specified times overlap with the sample times
 				return true;
