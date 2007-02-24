@@ -23,7 +23,8 @@ public abstract class TraceAction extends Action {
 		setText(label);
 	}
 	
-	protected void gotoTime(double time) {
+	protected void gotoTime(final double gotoTime) {
+		double time = gotoTime;
 		time = Math.min(time, traceModel.getEndTime());
 		time = Math.max(0, time);
 		
