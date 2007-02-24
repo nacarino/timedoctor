@@ -120,7 +120,9 @@ public abstract class SampleLine {
 		/**
 		 * @deprecated use QUEUE instead
 		 */
-		CHANNEL, PORTS;
+        @Deprecated
+		CHANNEL, 
+		PORTS;
 
 		/**
 		 * Parses strings containing integers to their associated line types.
@@ -223,6 +225,7 @@ public abstract class SampleLine {
 		case PORTS: // ONLY TO BE USED if a port line is used in a command
 			// without prior CRE command
 			line = new PortSampleLine(cpu, id, null, null);
+			break;
 		case QUEUES:
 			line = new QueueSampleLine(cpu, id);
 			break;
