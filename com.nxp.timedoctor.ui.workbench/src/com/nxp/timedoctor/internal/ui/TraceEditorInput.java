@@ -49,6 +49,7 @@ public class TraceEditorInput implements IPathEditorInput {
 		return file.getAbsolutePath();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Object getAdapter(final Class adapter) {
 		return null;
 	}
