@@ -154,7 +154,7 @@ public class Section {
 	 * 
 	 * @return an iterator over the <code>lines</code> ArrayList
 	 */
-	public final Iterator getIterator() {
+	public final Iterator<SampleLine> getIterator() {
 		return lines.iterator();
 	}
 
