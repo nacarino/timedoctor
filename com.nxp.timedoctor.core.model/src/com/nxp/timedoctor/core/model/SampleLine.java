@@ -239,7 +239,6 @@ public abstract class SampleLine {
 			line = new ValueSampleLine(cpu, id);
 			break;
 		default:
-			line = null;
 			break;
 		}
 
