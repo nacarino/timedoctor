@@ -87,7 +87,7 @@ public class AgentSampleLine extends SampleLine {
                     n--;
                     int j = st[n];
                     getSample(j).val = i;
-                    getSample(i).val = (double) clr[n];
+                    getSample(i).val = clr[n];
                     if (getSample(i).type == SampleType.STOP) {
                         setMaxSampleDuration(Math.max(getMaxSampleDuration(),
                                 getSample(i).time - getSample(j).time));

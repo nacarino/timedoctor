@@ -58,8 +58,8 @@ public class CyclesSampleLine extends SampleLine {
 		for (int i = 0; i < getCount(); i++) {
 			getSample(i).val += baseVal;
 			if (getSample(i).val < val) {
-				baseVal += (double) OVERFLOW_CONSTANT;
-				getSample(i).val += (double) OVERFLOW_CONSTANT;
+				baseVal += OVERFLOW_CONSTANT;
+				getSample(i).val += OVERFLOW_CONSTANT;
 			}
 			val = getSample(i).val;
 		}
