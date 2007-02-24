@@ -213,6 +213,7 @@ public class CpuLabel {
 		case AGENTS:
 			color[0] = new Color(parent.getDisplay(), Colors.SEA_GREEN);
 			color[1] = new Color(parent.getDisplay(), Colors.MINT_CREAM);
+			break;
 		case MEM_CYCLES:
 			color[0] = new Color(parent.getDisplay(), Colors.DARK_MAGENTA);
 			color[1] = new Color(parent.getDisplay(), Colors.LIGHT_CYAN);
@@ -221,6 +222,10 @@ public class CpuLabel {
 			color[0] = new Color(parent.getDisplay(), Colors.DARK_MAGENTA);
 			color[1] = new Color(parent.getDisplay(), Colors.LIGHT_CYAN);
 			break;
+		default:
+		color[0] = null;
+		color[1] = null;
+		break;
 		}
 	}
 }
