@@ -40,6 +40,7 @@ public class MemCyclesSampleLine extends SampleLine {
 	 * Implements inherited abstract method.
 	 * @param endTime the time to which to perform calculations
 	 */
+	@Override
 	public final void calculate(final double endTime) {
 		if (getName() == null) {
 			setName(String.format("MemCycles 0x%x", getID()));

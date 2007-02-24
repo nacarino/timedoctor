@@ -35,6 +35,7 @@ public class EventSampleLine extends SampleLine {
 	 * Implements abstract method from superclass.
 	 * @param endTime the time to which to calculate sample data
 	 */
+	@Override
 	public final void calculate(final double endTime) {
 		if (getName() == null) {
 			setName(String.format("Event 0x%x", getID()));

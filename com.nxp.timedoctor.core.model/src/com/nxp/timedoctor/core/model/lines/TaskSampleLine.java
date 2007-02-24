@@ -57,6 +57,7 @@ public class TaskSampleLine extends SampleLine {
 	 * @param val
 	 *            the value associated with the sample
 	 */
+	@Override
 	public final void addSample(final SampleType type, final double time,
 			final double val) {
 		if (getCount() == 0 && type == SampleType.STOP) {
@@ -116,6 +117,7 @@ public class TaskSampleLine extends SampleLine {
 	 * @param endTime
 	 *            the time at which to end calculation
 	 */
+	@Override
 	public final void calculate(final double endTime) {
 		int[] clr = new int[getCount() + 1];
 		int[] st = new int[getCount() + 1];
