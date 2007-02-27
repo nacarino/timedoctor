@@ -96,7 +96,6 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 		mouseButton = e.button;	// Store for later use in MouseMove
 		if (mouseButton == 1) {
 			baseLine.setCursor(e.x);
-			baseLine.setVisible(true);
 		
 			// Baseline time is stored to be used in timeModel actions, etc.
 			timeModel.setSelectTime(baseLine.getTime());

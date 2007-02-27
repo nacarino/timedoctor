@@ -247,6 +247,7 @@ public class TimeLine implements Observer {
 			int x = (int) ((time - startTime) * zoomFactor);
 			setPosition(x, width);
 			setTimeLabel(time);
+			setVisible(true);
 		}
 	}
 }
