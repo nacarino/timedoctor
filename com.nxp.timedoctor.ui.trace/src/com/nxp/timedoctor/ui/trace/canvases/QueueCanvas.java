@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -45,8 +44,8 @@ public class QueueCanvas extends TraceCanvas {
 			final TraceModel model) {
 		super(parent, zoom, new QueueSampleInfo(line));
 		
-		addPaintListener(new QueuePaintListener(new Color(getDisplay(),
-				Colors.DARK_RED), new Color(getDisplay(), Colors.MISTY_ROSE),
+		addPaintListener(new QueuePaintListener(Colors.getColorRegistry().get(Colors.DARK_RED), 
+				Colors.getColorRegistry().get(Colors.MISTY_ROSE),
 				line, zoom, model));
 	}
 }

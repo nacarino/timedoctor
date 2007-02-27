@@ -17,8 +17,6 @@ import org.eclipse.swt.dnd.DragSource;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -34,11 +32,6 @@ import com.nxp.timedoctor.ui.trace.canvases.TraceCanvas;
  * organizational purposes.
  */
 public class TraceLineViewer implements ISashClient {
-	/**
-	 * The font size in points of the label's text.
-	 */
-	private static final int LABEL_FONT_SIZE = 8;
-
 	/**
 	 * Static variable to track which label in the entire editor is selected.
 	 */
@@ -129,30 +122,9 @@ public class TraceLineViewer implements ISashClient {
 	 *            the labels composite
 	 */
 	private void createLabel(final Composite labelPane) {
-		Image icon = null;
-		String cpuName = null;
-
-		if (line.getCPU() != null)
-		{
-			cpuName = line.getCPU().getName();
-		}
-		if (cpuName != null) {
-			CpuLabel cpuLabel = new CpuLabel(labelPane, line.getType(), cpuName);
-			icon = cpuLabel.getImage();
-		}
-
-		label = new CLabel(labelPane, SWT.NONE);
+		label = new CPULabel(labelPane, line);
+		
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
-		label.setBackground(labelPane.getDisplay().getSystemColor(
-				SWT.COLOR_WHITE));
-
-		label.setImage(icon);
-		label.setText(line.getName());
-
-		// Small text font to allow minimal trace line height
-		label.setFont(new Font(labelPane.getDisplay(), "Tahoma",
-				LABEL_FONT_SIZE, SWT.NORMAL));
-
 		label.addMouseListener(new TraceLineSelectListener(this, line, zoom));
 	}
 

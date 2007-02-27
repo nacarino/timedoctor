@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -46,8 +45,7 @@ public class AgentCanvas extends TraceCanvas {
 			final TraceModel model) {
 		super(parent, zoom, new TaskSampleInfo(line));
 
-		addPaintListener(new TaskPaintListener(new Color(getDisplay(),
-				Colors.SEA_GREEN), line, zoom, model));
+		addPaintListener(new TaskPaintListener(Colors.getColorRegistry().get(Colors.SEA_GREEN), line, zoom, model));
 	}
 
 }

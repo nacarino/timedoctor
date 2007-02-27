@@ -11,7 +11,6 @@
 package com.nxp.timedoctor.ui.trace.canvases;
 
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.graphics.Color;
 
 import com.nxp.timedoctor.ui.trace.Colors;
 
@@ -40,7 +39,7 @@ public class TracePaintListener {
 	protected void drawGridLines(final PaintEvent e, 
 			final int canvasHeight,
 			final int traceHeight) {
-		e.gc.setForeground(new Color(e.gc.getDevice(), Colors.LIGHT_YELLOW));
+		e.gc.setForeground(Colors.getColorRegistry().get(Colors.LIGHT_YELLOW));
 				
 		for (int y = GRID_SPACING; y <= traceHeight; y += GRID_SPACING) {
 			e.gc.drawLine(e.x, canvasHeight - y, 

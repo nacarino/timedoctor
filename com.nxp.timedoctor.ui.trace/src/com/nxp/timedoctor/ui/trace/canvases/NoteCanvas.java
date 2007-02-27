@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -37,8 +36,7 @@ public class NoteCanvas extends TraceCanvas {
 			final SampleLine line,
 			final ZoomModel zoom) {
 		super(parent, zoom, new NoteSampleInfo(line));
-		addPaintListener(new NotePaintListener(new Color(getDisplay(),
-				Colors.DARK_GOLDENROD), line, zoom));
+		addPaintListener(new NotePaintListener(Colors.getColorRegistry().get(Colors.DARK_GOLDENROD), line, zoom));
 		
 	}
 

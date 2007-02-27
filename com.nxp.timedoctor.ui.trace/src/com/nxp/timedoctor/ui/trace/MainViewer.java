@@ -19,7 +19,6 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -51,7 +50,7 @@ public class MainViewer implements IScrollClient, Observer {
 	 * Array of colors to be used in setting section header colors based on
 	 * section type. Indexed by type ordinal.
 	 */
-	private static final RGB[] COLORS = { Colors.DARK_BLUE, Colors.DARK_GREEN,
+	private static final String[] ColorsArray = { Colors.DARK_BLUE, Colors.DARK_GREEN,
 			Colors.DARK_VIOLET, Colors.DARK_RED, Colors.DARK_MAGENTA,
 			Colors.DARK_CYAN, Colors.DARK_CYAN, Colors.DARK_GOLDENROD,
 			Colors.SEA_GREEN, Colors.DARK_CYAN };
@@ -215,8 +214,8 @@ public class MainViewer implements IScrollClient, Observer {
 	}
 
 	private Color createSectionColor(final int index) {
-		RGB rgb = COLORS[index % COLORS.length];
-		return new Color(leftContent.getDisplay(), rgb);
+		final String colorName = ColorsArray[index % ColorsArray.length];
+		return Colors.getColorRegistry().get(colorName);
 	}
 	
 	/**

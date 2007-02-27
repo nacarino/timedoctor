@@ -14,7 +14,6 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -33,9 +32,6 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  * position with the sash in the lower pane.
  */
 public class HeaderViewer implements Observer {
-
-	private static final int LOGO_FONT_SIZE = 8;
-	
 	/**
 	 * Constant for use in form layouts, to indicate that a given attachment is
 	 * to be at 100% of the parent's client area.
@@ -100,8 +96,7 @@ public class HeaderViewer implements Observer {
 		logo.setLayoutData(logoGridData);
 
 		logo.setForeground(logo.getDisplay().getSystemColor(SWT.COLOR_BLUE));
-		logo.setFont(new Font(logo.getDisplay(), "Tahoma",
-				LOGO_FONT_SIZE, SWT.NORMAL));
+		logo.setFont(Fonts.getFontRegistry().get(Fonts.HEADER_LOGO_FONT));
 				
 		// Ruler pane
 		Composite rulerPane = new Composite(rightPane, SWT.NONE);

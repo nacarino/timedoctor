@@ -14,7 +14,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -22,6 +21,7 @@ import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.Sample.SampleType;
+import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
  * Contains the code to paint a task, ISR, or agent.
@@ -38,16 +38,16 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 	/**
 	 * Contains the list of colors which are used to paint the event.
 	 */
-	private static final RGB[] colorList = new RGB[] { 
-        new RGB(0XEF, 0X00, 0X00),        
-		new RGB(0x00, 0x00, 0xEF),
-        new RGB(0xFF, 0xFF, 0x00),        
-        new RGB(0xFF, 0x00, 0xFF),
-        new RGB(0x94, 0x00, 0xD3),
-		new RGB(0XFF, 0XB0, 0X8A), 
-        new RGB(0x80, 0xFF, 0xFF),
-		new RGB(0x00, 0xFF, 0x80) 
-        };
+	private static final String[] colorList = new String[] {
+		Colors.TASKCOLOR1,
+		Colors.TASKCOLOR2,
+		Colors.TASKCOLOR3,
+		Colors.TASKCOLOR4,
+		Colors.TASKCOLOR5,
+		Colors.TASKCOLOR6,
+		Colors.TASKCOLOR7,
+		Colors.TASKCOLOR8
+     };
 
 	/**
 	 * Length of <code>colorList</code>.
@@ -170,8 +170,8 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 							e.gc.setBackground(canvas.getDisplay()
                                     .getSystemColor(SWT.COLOR_WHITE));
 						} else {
-							e.gc.setBackground(new Color(canvas.getDisplay(),
-									colorList[colorIndex % MAX_COLORS]));
+							final String colorType = colorList[colorIndex % MAX_COLORS];
+							e.gc.setBackground(Colors.getColorRegistry().get(colorType));
 						}
 
 						if (xStart == xEnd) {

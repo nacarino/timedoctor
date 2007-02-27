@@ -50,11 +50,6 @@ public class RulerPaintListener implements PaintListener {
 	private static final int LABEL_OFFSET = 7;
 
 	/**
-	 * Font size for labels, seven points.
-	 */
-	private static final int FONT_SIZE = 7;
-
-	/**
 	 * Sets the initial time interval size.
 	 */
 	private static final int INITIAL_INTERVAL = 1000;
@@ -108,7 +103,8 @@ public class RulerPaintListener implements PaintListener {
 		e.gc.drawLine(0, bounds.height - 1, bounds.width,
 				bounds.height - 1);
 
-		Font font = new Font(e.display, "Arial", FONT_SIZE, SWT.NORMAL);
+		final Font font = Fonts.getFontRegistry().get(Fonts.RULER_FONT);
+		e.gc.setFont(font);
 
 		double drawStartTime = startTime + (e.x / pixelsPerTime);
 		double drawEndTime = drawStartTime + (e.width / pixelsPerTime);
@@ -168,6 +164,5 @@ public class RulerPaintListener implements PaintListener {
 				time += interval;
 			}
 		}
-		font.dispose();
 	}
 }

@@ -10,7 +10,6 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -39,8 +38,8 @@ public class SemaphoreCanvas extends TraceCanvas {
             final ZoomModel zoom) {
         super(parent, zoom, new SemaphoreSampleInfo(line));
         
-        addPaintListener(new EventPaintListener(new Color(getDisplay(),
-                Colors.DARK_VIOLET), new Color(getDisplay(), Colors.THISTLE),
+        addPaintListener(new EventPaintListener(Colors.getColorRegistry().get(Colors.DARK_VIOLET), 
+        		Colors.getColorRegistry().get(Colors.THISTLE),
                 line, zoom));
     }
 

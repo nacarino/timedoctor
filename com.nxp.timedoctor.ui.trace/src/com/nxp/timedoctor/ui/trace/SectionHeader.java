@@ -12,7 +12,6 @@ package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -26,7 +25,6 @@ import org.eclipse.swt.widgets.Label;
  */
 public class SectionHeader extends Composite implements IExpandClient {
 	 	 
-	private static final int HEADER_FONT_SIZE = 8;
 	private static final int LABEL_HOR_INDENT = 5;
 
 	private Label label;
@@ -102,8 +100,7 @@ public class SectionHeader extends Composite implements IExpandClient {
 		
 		label.setForeground(getDisplay().getSystemColor(
 				SWT.COLOR_WHITE));
-		label.setFont(new Font(getDisplay(), "Tahoma",
-				HEADER_FONT_SIZE, SWT.BOLD));
+		label.setFont(Fonts.getFontRegistry().getBold(Fonts.SECTION_HEADER_FONT));
 				
 		expandButton = new Button(this, SWT.ARROW);
 		GridData buttonGridData = new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1);
