@@ -522,24 +522,31 @@ public abstract class SampleLine {
 	 * @return a formatted string containing all the descriptions at that time
 	 */
 	public final String descrString(final double time) {
+		String s = "";
+		
+		if (descCount == 0) {
+			return s;
+		}
+		
 		/*
 		 * Binary search for first description sample
 		 */
 		// MR extract generic method to do binary search on an array of time
 		// elements
 		int low = 0;
-		int high = sampleCount;
+		int high = descCount;
 		int pivot;
+		
 		while (low < (high - 1)) {
 			pivot = (low + high) >> 1;
-			if (samples[pivot].time < time) {
+			if (descriptions[pivot].time < time) {
 				low = pivot;
-			} else if (samples[pivot].time >= time) {
+			} else if (descriptions[pivot].time > time) {
 				high = pivot;
+			} else {
+				low = pivot;
+				break;
 			}
-		}
-		if (samples[low].time < time) {
-			low++;
 		}
 
 		// MR move to description class
@@ -547,31 +554,30 @@ public abstract class SampleLine {
 		 * Create description string
 		 */
 		String modelDescString;
-		String s = "";
 
 		for (; low < descCount && descriptions[low].time == time; low++) {
-			s += "\n";
-			
 			modelDescString = model.findDescrName(descriptions[low].id);
 			if (modelDescString == null) {
-				s += "String (" + descriptions[low].id + ")";
-			} else {
-				s += modelDescString;
+				modelDescString = "String (" + descriptions[low].id + ")";
 			}
+			
+			modelDescString = "\n" + modelDescString;
 
 			switch (descriptions[low].type) {
 			case STRING:
-				s += " = " + descriptions[low].text;
+				modelDescString += " = " + descriptions[low].text;
 				break;
 			case NUMBER:
-				s += " = " + (int) descriptions[low].value;
+				modelDescString += " = " + (int) descriptions[low].value;
 				break;
 			case CYCLES:
-				s += " = " + Times.timeToString(descriptions[low].value);
+				modelDescString += " = " + Times.timeToString(descriptions[low].value);
 				break;				
 			default:
-				s = "";
+				modelDescString = "";
 			}
+			
+			s += modelDescString;
 		}
 		return s;
 	}
