@@ -10,6 +10,9 @@
  *******************************************************************************/
 package com.nxp.timedoctor.internal.ui;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.commands.ActionHandler;
@@ -20,6 +23,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.EditorActionBarContributor;
 
+import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.actions.GoToTimeAction;
@@ -34,7 +38,7 @@ import com.nxp.timedoctor.ui.trace.actions.ZoomOutAction;
 /**
  * This class performs retargetable actions for menu items.
  */
-public class TraceEditorActionBars extends EditorActionBarContributor {
+public class TraceEditorActionBars extends EditorActionBarContributor implements Observer {
 	private final static String PLUGIN_COMMAND_ID = "com.nxp.timedoctor.ui.commands";
 
 	private ZoomInAction zoomInAction;
@@ -58,6 +62,8 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 	private TraceAction goToTimeAction;
 	private ActionHandler goToTimeCommandHandler;
 
+	private ZoomModel zoomModel;
+	
 	/**
 	 * Constructor for TraceEditorActionBars.
 	 */
@@ -127,7 +133,7 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		
 		TraceEditor traceEditor = (TraceEditor) editor;
 		
-		ZoomModel zoomModel = traceEditor.getZoomModel();
+		zoomModel = traceEditor.getZoomModel();
 		TraceModel traceModel = traceEditor.getTraceModel();
 		
 		zoomInAction.updateModel(traceModel, zoomModel);
@@ -148,5 +154,38 @@ public class TraceEditorActionBars extends EditorActionBarContributor {
 		service.activateHandler(nextAction.getActionDefinitionId(), nextCommandHandler);
 		service.activateHandler(previousAction.getActionDefinitionId(), previousCommandHandler);
 		service.activateHandler(goToTimeAction.getActionDefinitionId(), goToTimeCommandHandler);
+		
+		zoomModel.addObserver(this);
+		updateActionState();
+	}
+
+	/**
+	 * Updates the action buttons when a baseline position is changed.
+	 * 
+	 * @param o
+	 *            the <code>Observable</code> calling the update
+	 * @param data
+	 *            has no effect
+	 */
+	public void update(Observable o, Object data) {		
+		updateActionState();
+	}
+
+	private void updateActionState() {
+		final SampleLine selectedLine = zoomModel.getSelectedLine();
+		final double     selectTime   = zoomModel.getSelectTime();
+
+		// we are ignoring the the last sample which is of type END. 
+		if ((selectTime >= 0) && (selectedLine.getSample(selectedLine.getCount() - 2)).time > selectTime) {
+			nextAction.setEnabled(true);
+		} else {
+			nextAction.setEnabled(false);
+		}
+
+		if ((selectTime >= 0) && selectTime > selectedLine.getStartTime()) {
+			previousAction.setEnabled(true);
+		} else {
+			previousAction.setEnabled(false);
+		}		
 	}
 }

@@ -177,4 +177,13 @@ public class TraceEditor extends EditorPart {
 	public final TraceModel getTraceModel() {
 		return traceModel;
 	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+	 */
+	@Override
+	public void dispose() {	
+		zoomModel.deleteObservers();
+		super.dispose();		
+	}
 }
