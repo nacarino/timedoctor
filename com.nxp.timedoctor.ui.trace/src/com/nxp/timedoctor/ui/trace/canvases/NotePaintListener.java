@@ -103,7 +103,7 @@ public class NotePaintListener extends TracePaintListener implements PaintListen
             e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
             e.gc.fillRectangle(e.x, e.y, e.width, e.height);
 
-            for (int xOld = -1; index < line.getCount(); index++) {
+            for (int xOld = -1; index < line.getCount() - 1; index++) {
 
                 if (line.getSample(index).time > drawEndTime) {
                     break;
