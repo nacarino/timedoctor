@@ -155,7 +155,10 @@ public class TraceEditorActionBars extends EditorActionBarContributor implements
 		service.activateHandler(previousAction.getActionDefinitionId(), previousCommandHandler);
 		service.activateHandler(goToTimeAction.getActionDefinitionId(), goToTimeCommandHandler);
 		
-		zoomModel.addObserver(this);
+		nextAction.setEnabled(false);
+		previousAction.setEnabled(false); //Will get enabled in updateActionState(), if necessary
+		
+		zoomModel.addObserver(this); //Has no effect if the same observer is added twice
 		updateActionState();
 	}
 
@@ -173,19 +176,31 @@ public class TraceEditorActionBars extends EditorActionBarContributor implements
 
 	private void updateActionState() {
 		final SampleLine selectedLine = zoomModel.getSelectedLine();
-		final double     selectTime   = zoomModel.getSelectTime();
+		
+		if (selectedLine != null) {
+			final double selectTime = zoomModel.getSelectTime();
+			
+			double startTime = selectedLine.getStartTime();
+			double endTime;
+			
+			// we are ignoring the last sample which is of type END.
+			if (selectedLine.getCount() < 2) {
+				endTime = -1;
+			} else {
+				endTime = selectedLine.getSample(selectedLine.getCount() - 2).time;
+			}
+			
+			if (selectTime < endTime) {
+				nextAction.setEnabled(true);
+			} else {
+				nextAction.setEnabled(false);
+			}
 
-		// we are ignoring the the last sample which is of type END. 
-		if ((selectTime >= 0) && (selectedLine.getSample(selectedLine.getCount() - 2)).time > selectTime) {
-			nextAction.setEnabled(true);
-		} else {
-			nextAction.setEnabled(false);
+			if (selectTime > startTime) {
+				previousAction.setEnabled(true);
+			} else {
+				previousAction.setEnabled(false);
+			}
 		}
-
-		if ((selectTime >= 0) && selectTime > selectedLine.getStartTime()) {
-			previousAction.setEnabled(true);
-		} else {
-			previousAction.setEnabled(false);
-		}		
 	}
 }
