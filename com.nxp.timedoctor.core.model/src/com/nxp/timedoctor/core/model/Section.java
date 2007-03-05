@@ -139,7 +139,7 @@ public class Section {
 		if (lineList != null) {
 			// MR add comment explaining this
 			for (SampleLine line : lineList) {
-				if (line.isValid(time)) {
+				if (line.isValid(time) && cpu.equals(line.getCPU())) {
 					activeLine = line;
 					break;
 				}
