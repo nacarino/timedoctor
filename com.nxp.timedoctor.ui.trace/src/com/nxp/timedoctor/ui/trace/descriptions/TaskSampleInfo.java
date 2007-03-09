@@ -31,6 +31,7 @@ public class TaskSampleInfo extends SampleInfo {
 		text += timeIntervalToCyclesStr(startTime, endTime);
 		
 		String description = line.descrString(startTime);
+		description += line.descrString(endTime);
 		if (description != null) {
 			text += description;
 		}
