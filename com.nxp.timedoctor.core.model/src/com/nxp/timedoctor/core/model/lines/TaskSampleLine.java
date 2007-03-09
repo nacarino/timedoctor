@@ -156,30 +156,11 @@ public class TaskSampleLine extends SampleLine {
 				st[n++] = i;
 			} else if (getSample(i).type == SampleType.STOP
 					|| getSample(i).type == SampleType.RESUME) {
-				int stopColor = -1;
-				for (; ii < getDescCount(); ii++) {
-					if (getDescription(ii).time >= getSample(i).time) {
-						break;
-					}
-				}
-				for (; ii < getDescCount(); ii++) {
-					if (getDescription(ii).time == getSample(i).time) {
-						if (getDescription(ii).type == DescrType.COLOR) {
-							stopColor = (int) getDescription(ii).value;
-						}
-					} else {
-						break;
-					}
-				}
 				if (n > 0) {
 					n--;
 					int j = st[n];
 					getSample(j).val = i;
-					if (stopColor >= 0) {
-						getSample(i).val = stopColor;
-					} else {
-						getSample(i).val = clr[n];
-					}
+					getSample(i).val = clr[n];
 					if (getSample(i).type == SampleType.STOP) {
 						setMaxSampleDuration(Math.max(getMaxSampleDuration(),
 								getSample(i).time - getSample(j).time));
