@@ -44,7 +44,6 @@ public class MainViewer implements IScrollClient, Observer {
 	 */
 	private static final int HOR_SCROLL_MAX = 1000000;
 	private static final int HOR_SCROLL_INCREMENT = 10000;
-	private static final int HOR_SCROLL_PAGE = 100000;
 	
 	/**
 	 * Array of colors to be used in setting section header colors based on
@@ -249,7 +248,7 @@ public class MainViewer implements IScrollClient, Observer {
 	private void initializeHorizontalScroll() {
 		horizontalScroll.setMaximum(HOR_SCROLL_MAX);
 		horizontalScroll.setIncrement(HOR_SCROLL_INCREMENT);
-		horizontalScroll.setPageIncrement(HOR_SCROLL_PAGE);
+		
 		setHorizontalScroll();
 		
 		horizontalScroll.addSelectionListener(new SelectionAdapter() {
@@ -301,6 +300,8 @@ public class MainViewer implements IScrollClient, Observer {
 		double zoomFactor = zoomInterval / modelEndTime;
 		int newZoomPercentage = (int) (zoomFactor * (HOR_SCROLL_MAX));
 		int selection = (int) (zoomStartTime * (HOR_SCROLL_MAX) / modelEndTime);
+		
+		horizontalScroll.setPageIncrement((int) (zoomInterval * (HOR_SCROLL_MAX) / modelEndTime));
 		
 		// Should only be executed on zoomModel, not on scroll to 
 		// avoid ping-pong between update and the scrollbar selection listener
