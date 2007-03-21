@@ -40,7 +40,6 @@ public class ScrollListener implements SelectionListener, ControlListener {
 	public void widgetSelected(final SelectionEvent e) {
 		ScrollBar bar = ((ScrollBar) e.widget);
 		client.setScroll(bar.getSelection());
-		
 	}
 
 	public void controlMoved(final ControlEvent e) {
@@ -49,11 +48,18 @@ public class ScrollListener implements SelectionListener, ControlListener {
 	public void controlResized(final ControlEvent e) {
 		ScrollBar bar = ((ScrolledComposite) e.widget).getVerticalBar();
 		int selection = 0;
+		
 		if (bar.getVisible()) {
 			selection = bar.getSelection();
+			
+			final int height = ((ScrolledComposite)e.widget).getBounds().height;
+			
+			// Page increment set to the height of the client area
+			// Single-scroll increment is set to height/10
+			bar.setIncrement(height/10); 
+			bar.setPageIncrement(height);
 		}
+		
 		client.setScroll(selection);		
 	}
-
-
 }
