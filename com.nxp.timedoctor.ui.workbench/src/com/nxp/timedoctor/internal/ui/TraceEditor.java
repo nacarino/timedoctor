@@ -150,6 +150,7 @@ public class TraceEditor extends EditorPart {
 	@Override
 	public final void createPartControl(final Composite parent) {
 		traceViewer = new TraceViewer(parent, traceModel, zoomModel);
+		getSite().setSelectionProvider(traceViewer.getSelectionProvider());
 	}
 
 	/**

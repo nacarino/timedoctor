@@ -10,20 +10,11 @@
  *******************************************************************************/
 package com.nxp.timedoctor.internal.ui;
 
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPart;
-
-import com.nxp.timedoctor.core.model.TraceModel;
-import com.nxp.timedoctor.core.model.ZoomModel;
-import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
+import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
 import com.nxp.timedoctor.ui.statistics.LineStatViewer;
 
 public class LineStatView extends StatisticsView {
 	public static final String ID = "com.nxp.timedoctor.ui.workbench.LineStatView";
-	
-	private LineStatViewer viewer;
 	
 	/**
 	 * The constructor.
@@ -31,34 +22,11 @@ public class LineStatView extends StatisticsView {
 	public LineStatView() {		
 	}
 
-	/**
-	 * This is a callback that will allow us
-	 * to create the viewer and initialize it.
-	 */
 	@Override
-	public void createPartControl(final Composite parent) {
-		super.createPartControl(parent);
+	protected IStatisticsViewPage getPage(final TraceEditor editor) {
+		LineStatViewer viewer = new LineStatViewer();		
+		viewer.setModels(editor.getZoomModel(), editor.getTraceModel());
 		
-		viewer = new LineStatViewer(parent);					
-	}
-	
-	@Override
-	public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-		viewer.selectionChanged();
-	}
-
-	@Override
-	protected void editorActivated(final IEditorPart editor) {
-		if (editor instanceof TraceEditor) {				
-			TraceModel traceModel = ((TraceEditor)editor).getTraceModel();				
-			ZoomModel zoomModel = ((TraceEditor)editor).getZoomModel();
-			StatisticsTimeModel timeModel = new StatisticsTimeModel();
-			viewer.setModels(traceModel, zoomModel, timeModel);
-		}
-	}
-	
-	@Override
-	protected void editorClosed() {
-		viewer.setModels(null, null, null);
+		return viewer;
 	}
 }

@@ -11,113 +11,105 @@
 package com.nxp.timedoctor.internal.ui;
 
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.part.IPage;
+import org.eclipse.ui.part.IPageBookViewPage;
+import org.eclipse.ui.part.MessagePage;
+import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.part.PageBookView;
 
-public class StatisticsView extends ViewPart implements IPartListener2, ISelectionListener {
+import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
+import com.nxp.timedoctor.ui.trace.TraceSelection;
+
+public abstract class StatisticsView extends PageBookView implements ISelectionListener {
 	
 	/**
 	 * The constructor.
 	 */
 	public StatisticsView() {
-	}
-
-	/**
-	 * This is a callback that will allow us
-	 * to create the viewer and initialize it.
-	 */
-	@Override
-	public void createPartControl(final Composite parent) {
-		getSite().getPage().addPartListener(this);
-		
-		// add this view as a selection listener to the workbench page,
-		// which only listens to selection changes from the trace editor
-		//getSite().getPage().addSelectionListener(TraceEditor.ID, (ISelectionListener) this);
-		// Temporarily listen to all selection events (as the TraceEditor does not have a selectionProvider yet)
-		getSite().getPage().addSelectionListener(this);
+		super();
 	}
 	
 	@Override
+	public void init(IViewSite site) throws PartInitException {
+		site.getPage().addSelectionListener(this);
+		super.init(site);		
+	}
+
+	@Override
 	public void dispose() {
-		getSite().getPage().removePartListener(this);
+		super.dispose();
+		
 		getSite().getPage().removeSelectionListener(this);
 	}
 
-	@Override
-	public void setFocus() {
-	}
-
 	public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-	}
-
-	/**
-	 * Needed when the user selects an editor
-	 */
-	public void partActivated(final IWorkbenchPartReference partRef) {
-		if ((partRef.getPart(true) instanceof IEditorPart)
-			&& (getViewSite().getPage().isPartVisible(this))) {
-				editorActivated(getViewSite().getPage().getActiveEditor());
+		if (part == this || selection == null || selection.isEmpty() || !(selection instanceof TraceSelection)) {
+			return;
+		}
+		
+		IStatisticsViewPage page = (IStatisticsViewPage) getCurrentPage();
+		if (page != null) {
+			page.selectLine(((TraceSelection)selection).getLine());
 		}
 	}
 
-	/** 
-	 * Only needed when the view or editor is brought to top programatically
-	 * (when done by user partActivated is also called)
-	 */
-	public void partBroughtToTop(final IWorkbenchPartReference partRef) {
-		if (partRef.getPart(true) == StatisticsView.this) {
-			editorActivated(getViewSite().getPage().getActiveEditor());
-		}		
+	@Override
+	protected IPage createDefaultPage(PageBook book) {
+		MessagePage page = new MessagePage();
+        initPage(page);
+        page.createControl(book);
+        page.setMessage("Statistics unavailable");
+        return page;
 	}
 
-	/**
-	 * Needed when the last editor is closed
-	 */
-	public void partClosed(final IWorkbenchPartReference partRef) {
-		if (partRef.getPart(true) instanceof IEditorPart) {
-			IEditorPart editor = getViewSite().getPage().getActiveEditor();
-			if (editor == null) {
-				editorClosed();
+	@Override
+	protected PageRec doCreatePage(IWorkbenchPart part) {
+		IStatisticsViewPage page = getPage((TraceEditor)part);
+		
+		if (page != null) {
+			if (page instanceof IPageBookViewPage) {
+				initPage((IPageBookViewPage) page);
 			}
+			
+			page.createControl(getPageBook());
+			return new PageRec(part, page);
 		}
-	}
-
-	public void partDeactivated(final IWorkbenchPartReference partRef) {
-	}
-
-	public void partHidden(final IWorkbenchPartReference partRef) {
-	}
-
-	public void partInputChanged(final IWorkbenchPartReference partRef) {
-	}
-
-	/**
-	 * Needed when the statistics view is opened
-	 */
-	public void partOpened(final IWorkbenchPartReference partRef) {
-		if (partRef.getPart(true) == StatisticsView.this) {
-			editorActivated(getViewSite().getPage().getActiveEditor());
-		}
-	}
-
-	/**
-	 * Needed when a view is hidden behind another view and the TraceEditor
-	 * changed while it was hidden
-	 */
-	public void partVisible(final IWorkbenchPartReference partRef) {
-		if (partRef.getPart(true) == StatisticsView.this) {
-			editorActivated(getViewSite().getPage().getActiveEditor());
-		}
+		
+		//Use the default page
+		return null;
 	}
 	
-	protected void editorActivated(final IEditorPart editor) {
+	protected abstract IStatisticsViewPage getPage(TraceEditor editor);
+
+	@Override
+	protected void doDestroyPage(IWorkbenchPart part, PageRec pageRecord) {
+		IStatisticsViewPage page = (IStatisticsViewPage) pageRecord.page;
+		page.dispose();
+		pageRecord.dispose();
 	}
-	
-	protected void editorClosed() {
+
+	@Override
+	protected IWorkbenchPart getBootstrapPart() {
+		IWorkbenchPage page = getSite().getPage();
+        if (page != null) {
+			return page.getActiveEditor();
+		}
+
+        return null;
+	}
+
+	@Override
+	protected boolean isImportant(IWorkbenchPart part) {		
+		return (part instanceof TraceEditor);
+	}
+
+	@Override
+	public void partBroughtToTop(IWorkbenchPart part) {		
+		super.partActivated(part);
 	}
 }
