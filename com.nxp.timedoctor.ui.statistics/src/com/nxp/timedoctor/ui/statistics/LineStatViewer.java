@@ -14,144 +14,150 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IActionBars;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
-import com.nxp.timedoctor.core.model.statistics.Statistic;
 import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
 import com.nxp.timedoctor.core.model.statistics.TaskStatistic;
 
-//TODO: button to select between seconds, cycles, or %
-public class LineStatViewer implements Observer {
-	private TraceModel traceModel;
-	private ZoomModel zoomModel;
+public class LineStatViewer implements IStatisticsViewPage, Observer {
+	private static final String DEFAULT_LABEL = "Select a TASK/ISR/AGENT trace-line";
+	
+	private TraceModel          traceModel;
+	private ZoomModel           zoomModel;
 	private StatisticsTimeModel timeModel;
 	
-	private StatTimeViewer timeViewer;
+	private CLabel             taskLabel;
+	private StatTimeViewer     timeViewer;
 	private LineStatTreeViewer treeViewer;
 	
-	private Observer timeObserver = null;
+	private Composite topComposite;
+
+	private TaskStatistic taskStat;
 	
 	/**
 	 * The constructor.
 	 */
-	public LineStatViewer(final Composite parent) {
+	public LineStatViewer() {
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nxp.timedoctor.ui.statistics.IStatisticsViewPage#setModels(com.nxp.timedoctor.core.model.ZoomModel, com.nxp.timedoctor.core.model.TraceModel)
+	 */
+	public void setModels(ZoomModel zoomModel, TraceModel traceModel) {
+		this.zoomModel  = zoomModel;
+		this.traceModel = traceModel;		
+		this.timeModel  = new StatisticsTimeModel();
+		
+		this.timeModel.addObserver(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
+	 */
+	public void createControl(Composite parent) {
+		topComposite = new Composite(parent, SWT.NONE);
+		
 		GridLayout parentLayout = new GridLayout(1, false);
 		parentLayout.marginHeight = 0;
 		parentLayout.marginWidth = 0;
 		parentLayout.verticalSpacing = 0;
-		parent.setLayout(parentLayout);
+		topComposite.setLayout(parentLayout);
 		
-		timeViewer = new StatTimeViewer(parent);
+		taskLabel = new CLabel(topComposite,SWT.CENTER | SWT.BORDER);
+		taskLabel.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
+		
+		timeViewer = new StatTimeViewer(topComposite, timeModel);
 		timeViewer.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false, 1, 1));
 		
-		treeViewer = new LineStatTreeViewer(parent);
+		treeViewer = new LineStatTreeViewer(topComposite);
 		treeViewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		treeViewer.setInput(null);
-	}
-
-	public void setModels(final TraceModel traceModel, 
-			final ZoomModel zoomModel,
-			final StatisticsTimeModel timeModel) {
 		
-		// TODO THIS IS A HACK!! 
-		// add this as an observer to the zoom model to get updates when the
-		// selection has changed.
-		// SHOULD BE REMOVED when the TraceEditor provides ISelection events
-		// and triggers the selection listener in LineStatView
-		// In that case, only listen to the ISelection event and get the selected 
-		// trace line and zoom times from there.
-		if (this.zoomModel != null) {
-			this.zoomModel.deleteObserver(this);
-		}
-		if (zoomModel != null) {
-			zoomModel.addObserver(this);
-		}
-		// END HACK
-		
-		this.traceModel = traceModel;
-		this.zoomModel = zoomModel;
-		this.timeModel = timeModel;
-		
-		timeViewer.setTimeModel(timeModel);
-		
-		if ((traceModel != null) && (timeModel != null)) {		
-			selectionChanged();
-		} else {
-			treeViewer.setInput(null);
-			treeViewer.refresh();
-		}					
-	}
-
-	// THIS IS A HACK
-	// part of the hack above in setModels
-	public void update(Observable o, Object arg) {
-		selectionChanged();				
+		selectLine(zoomModel.getSelectedLine());
 	}
 	
-	public void selectionChanged() {
-		if ((zoomModel == null) || (traceModel == null) || (timeModel == null)) {
+	public void update(Observable o, Object arg) {
+		if (taskStat != null) {
+			taskStat.calculate(timeModel.getStartTime(), timeModel.getEndTime());
+			treeViewer.setInput(taskStat);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nxp.timedoctor.ui.statistics.IStatisticsViewPage#selectLine(com.nxp.timedoctor.core.model.SampleLine)
+	 */
+	public void selectLine(final SampleLine sampleLine) {
+		if (sampleLine == null) {
+			defaultView();
 			return;
 		}
 		
-		// TODO check ISelection on what has changed, only update accordingly
-		// Now, assume the ISelection event is sent when the line has changed, or the selected
-		// zoom window has changed
-		SampleLine line = zoomModel.getSelectedLine();
-		if (line != null) {
-			// Update selected line
-			sampleLineChanged(line);
-
-			// Update selected time window
-			timeModel.setTimes(zoomModel.getStartTime(), zoomModel.getEndTime());
-		}
-		else {
-			treeViewer.setInput(null);
-			treeViewer.refresh();
-		}
-	}
-	
-	private void sampleLineChanged(final SampleLine line) {
-		if (timeObserver != null) {
-			timeModel.deleteObserver(timeObserver);
-		}
-
-		Statistic input = null;
-		LineType type = line.getType();		
+		LineType type = sampleLine.getType();
 		if ((type == LineType.TASKS) || (type == LineType.ISRS) || (type == LineType.AGENTS)) {
-			// Task statistics are specific per line, create a new one
-			input = createTaskStatistic(line);
+			updateView(sampleLine);
+		} else {
+			defaultView();
 		}
-		treeViewer.setInput(input);
 	}
-	
-	private TaskStatistic createTaskStatistic(final SampleLine line) {
-		final TaskStatistic taskStat = new TaskStatistic(null, traceModel, line);	
+
+	private void defaultView() {
+		treeViewer.setInput(null);
+		timeViewer.enableWidgets(false);
+		updateLabel(null);
+	}
+
+	private void updateView(final SampleLine sampleLine) {
+		taskStat = new TaskStatistic(null, traceModel, sampleLine);
+		// Update selected time window
+		timeModel.setTimes(zoomModel.getStartTime(), zoomModel.getEndTime());
+		taskStat.calculate(timeModel.getStartTime(), timeModel.getEndTime());
+		treeViewer.setInput(taskStat);
 		
-		// Recalculate when the start and end times change, either by ISelection events,
-		// or by local events from the StatTimeViewer
-		timeObserver = new Observer() {
-			public void update(final Observable o, final Object arg) {
-				// Show statistics for the current zoom range
-				taskStat.calculate(timeModel.getStartTime(), timeModel
-						.getEndTime());										
-				treeViewer.refresh();
-			}
-		};
-		timeModel.addObserver(timeObserver);
-		
-		// Recalculate even when timeModel is not changed, 
-		// since the sample line may have changed
-		// TODO needs some cleanup, use ISelection information here
-		taskStat.calculate(timeModel.getStartTime(), timeModel
-				.getEndTime());	
-		treeViewer.refresh();
-		
-		return taskStat;
+		timeViewer.enableWidgets(true);
+		updateLabel(sampleLine);
+	}
+
+	private void updateLabel(final SampleLine line) {
+		if (line == null) {
+			taskLabel.setText(DEFAULT_LABEL);
+		} else {
+			taskLabel.setText("Statistics for " + line.getName());
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#dispose()
+	 */
+	public void dispose() {
+		this.timeModel.deleteObserver(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#getControl()
+	 */
+	public Control getControl() {
+		return topComposite;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#setActionBars(org.eclipse.ui.IActionBars)
+	 */
+	public void setActionBars(IActionBars actionBars) {
+		// TODO: button to select between seconds, cycles, or %
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#setFocus()
+	 */
+	public void setFocus() {
+		// Do nothing
 	}
 }

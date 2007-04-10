@@ -32,11 +32,12 @@ public class StatTimeViewer extends Composite implements Observer {
 	
 	private StatisticsTimeModel timeModel = null;
 
-	public StatTimeViewer(final Composite parent) {
+	public StatTimeViewer(final Composite parent, final StatisticsTimeModel timeModel) {
 		super(parent, SWT.NONE);
+		createContents(parent);	
 		
-		createContents(parent);		
-		init();
+		this.timeModel = timeModel;
+		this.timeModel.addObserver(this);
 	}
 	
 	private void createContents(final Composite parent) {
@@ -45,11 +46,15 @@ public class StatTimeViewer extends Composite implements Observer {
 		
 		startInput = createTimeSelector(parent, "Start time (sec):");
 		endInput = createTimeSelector(parent, "End time (sec):");
+		
+		startInput.setText("0.0");
+		endInput.setText("0.0");
 
 		startInput.addModifyListener(new ModifyListener() {			
 			public void modifyText(final ModifyEvent e) {
-				if (timeModel != null) {
-					double time = Double.parseDouble(startInput.getText());
+				String inputText = startInput.getText();
+				if ((timeModel != null) && (inputText.length() != 0)) {
+					double time = Double.parseDouble(inputText);
 					timeModel.setStartTime(time);
 				}				
 			}
@@ -57,12 +62,15 @@ public class StatTimeViewer extends Composite implements Observer {
 		
 		endInput.addModifyListener(new ModifyListener() {
 			public void modifyText(final ModifyEvent e) {
-				if (timeModel != null) {
-					double time = Double.parseDouble(endInput.getText());
+				String inputText = endInput.getText();
+				if ((timeModel != null) && (inputText.length() != 0)) {
+					double time = Double.parseDouble(inputText);
 					timeModel.setEndTime(time);
 				}				
 			}
 		});
+		
+		enableWidgets(true);
 	}
 	
 	private Text createTimeSelector(final Composite parent, final String labelText) {
@@ -86,25 +94,15 @@ public class StatTimeViewer extends Composite implements Observer {
 		return timeInput;
 	}
 
-	private void init() {
-		startInput.setText("0.0");
-		endInput.setText("0.0");
-	}
-	
-	public void setTimeModel(final StatisticsTimeModel timeModel) {
-		this.timeModel = timeModel;
-		if (timeModel != null) {
-			timeModel.addObserver(this);
-		}
-		else {
-			init();
-		}
-	}
-
 	public void update(final Observable o, final Object arg) {
 		setSelection(startInput, timeModel.getStartTime());
 		setSelection(endInput, timeModel.getEndTime());
-	}	
+	}
+	
+	public void enableWidgets(boolean enabled) {
+		startInput.setEnabled(enabled);
+		endInput.setEnabled(enabled);
+	}
 	
 	private void setSelection(final Text timeInput, final double selectTime)	{
 		String timeStr = Double.toString(selectTime);

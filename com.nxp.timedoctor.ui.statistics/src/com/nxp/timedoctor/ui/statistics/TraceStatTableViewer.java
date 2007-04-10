@@ -36,7 +36,8 @@ public class TraceStatTableViewer {
 	};
 	
 	public TraceStatTableViewer(final Composite parent) {
-		createTableViewer(createTable(parent));		
+		createTableViewer(createTable(parent));
+		updateColumnSize();
 	}
 	
 	private Table createTable(final Composite parent) {
@@ -58,9 +59,6 @@ public class TraceStatTableViewer {
 		for (int i = 0; i < columnNames.length; i++) {
 			TableColumn column = new TableColumn(tree, SWT.LEFT, i);
 			column.setText(columnNames[i]);
-
-			// TODO compute optimal width per column (possible?)
-			column.setWidth((i==0)? 150: 80);
 		}		
 	}
 
@@ -74,5 +72,12 @@ public class TraceStatTableViewer {
 	
 	public void refresh() {
 		viewer.refresh(true);
+		updateColumnSize();
+	}
+	
+	private void updateColumnSize() {
+		for (TableColumn column : viewer.getTable().getColumns()) {
+			column.pack();
+		}
 	}
 }

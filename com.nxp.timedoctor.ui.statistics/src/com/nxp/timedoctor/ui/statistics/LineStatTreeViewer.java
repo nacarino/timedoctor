@@ -39,7 +39,8 @@ public class LineStatTreeViewer {
 	};
 	
 	public LineStatTreeViewer(final Composite parent) {
-		createTreeViewer(createTree(parent));		
+		createTreeViewer(createTree(parent));
+		updateColumnSize();
 	}
 	
 	private Tree createTree(final Composite parent) {
@@ -63,10 +64,7 @@ public class LineStatTreeViewer {
 		for (int i = 0; i < columnNames.length; i++) {
 			TreeColumn column = new TreeColumn(tree, SWT.LEFT, i);
 			column.setText(columnNames[i]);
-			
-			// TODO compute optimal width per column (possible?)
-			column.setWidth((i==0)? 150: 80);
-		}		
+		}
 	}
 
 	public void setLayoutData(final Object layoutData) {
@@ -75,9 +73,18 @@ public class LineStatTreeViewer {
 	
 	public void setInput(final Statistic input) {
 		viewer.setInput(input);
+		viewer.getTree().setEnabled(input != null);
+		refresh();
+	}
+
+	private void refresh() {
+		viewer.refresh(true);
+		updateColumnSize();
 	}
 	
-	public void refresh() {
-		viewer.refresh(true);
+	private void updateColumnSize() {
+		for (TreeColumn column : viewer.getTree().getColumns()) {
+			column.pack();
+		}
 	}
 }

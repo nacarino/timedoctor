@@ -17,112 +17,111 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.IActionBars;
 
+import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
 import com.nxp.timedoctor.core.model.statistics.TraceStatistic;
 
-//TODO: button to select between seconds, cycles, or %
-public class TraceStatViewer implements Observer {
-	private TraceModel traceModel;
+public class TraceStatViewer implements Observer, IStatisticsViewPage {
 	private ZoomModel zoomModel;
 	private StatisticsTimeModel timeModel;
 	
-	private StatTimeViewer timeViewer;
 	private TraceStatTableViewer tableViewer;
+	private TraceStatistic traceStat;
 	
-	private Observer timeObserver = null;
+	private Composite topComposite;
 	
 	/**
 	 * The constructor.
 	 */
-	public TraceStatViewer(final Composite parent) {
+	public TraceStatViewer() {		
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+	 */
+	public void update(Observable o, Object arg) {
+		if (o instanceof ZoomModel) {
+			timeModel.setTimes(zoomModel.getStartTime(), zoomModel.getEndTime());
+		} else {
+			// Show statistics for the current zoom range
+			traceStat.calculate(timeModel.getStartTime(), timeModel.getEndTime());
+			tableViewer.refresh();
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.nxp.timedoctor.ui.statistics.IStatisticsViewPage#setModels(com.nxp.timedoctor.core.model.ZoomModel, com.nxp.timedoctor.core.model.TraceModel)
+	 */
+	public void setModels(final ZoomModel zoomModel, final TraceModel traceModel) {
+		this.zoomModel = zoomModel;		
+		this.timeModel = new StatisticsTimeModel();
+		
+		traceStat = new TraceStatistic(traceModel);
+		
+		this.zoomModel.addObserver(this);
+		this.timeModel.addObserver(this);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
+	 */
+	public void createControl(Composite parent) {
+		topComposite = new Composite(parent, SWT.NONE);
+		
 		GridLayout parentLayout = new GridLayout(1, false);
 		parentLayout.marginHeight = 0;
 		parentLayout.marginWidth = 0;
 		parentLayout.verticalSpacing = 0;
-		parent.setLayout(parentLayout);
+		topComposite.setLayout(parentLayout);
 		
-		timeViewer = new StatTimeViewer(parent);
+		StatTimeViewer timeViewer = new StatTimeViewer(topComposite, timeModel);
 		timeViewer.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false, 1, 1));
 		
-		tableViewer = new TraceStatTableViewer(parent);
-		tableViewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
-		tableViewer.setInput(null);
-	}
-
-	public void setModels(final TraceModel traceModel, 
-			final ZoomModel zoomModel,
-			final StatisticsTimeModel timeModel) {
-
-		// TODO THIS IS A HACK!! 
-		// add this as an observer to the zoom model to get updates when the
-		// selection has changed.
-		// SHOULD BE REMOVED when the TraceEditor provides ISelection events
-		// and triggers the selection listener in LineStatView
-		// In that case, only listen to the ISelection event and get the selected 
-		// trace line and zoom times from there.
-		if (this.zoomModel != null) {
-			this.zoomModel.deleteObserver(this);
-		}
-		if (zoomModel != null) {
-			zoomModel.addObserver(this);
-		}
-		// END HACK
+		tableViewer = new TraceStatTableViewer(topComposite);
+		tableViewer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));		
+		tableViewer.setInput(traceStat);
 		
-		this.traceModel = traceModel;
-		this.zoomModel = zoomModel;
-		this.timeModel = timeModel;
-
-		timeViewer.setTimeModel(timeModel);
-		
-		if ((traceModel != null) && (timeModel != null)) {		
-			tableViewer.setInput(createTraceStatistic());
-			selectionChanged();
-		} else {
-			tableViewer.setInput(null);
-			tableViewer.refresh();
-		}					
-	}
-	
-	// THIS IS A HACK
-	// part of the hack above in setModels
-	public void update(Observable o, Object arg) {
-		selectionChanged();				
-	}
-	
-	public void selectionChanged() {
-		if ((zoomModel == null) || (traceModel == null) || (timeModel == null)) {
-			return;
-		}
-		
-		// TODO check ISelection on what has changed, only update accordingly
-		// Now, assume the ISelection event is sent when the line has changed, or the selected
-		// zoom window has changed
 		timeModel.setTimes(zoomModel.getStartTime(), zoomModel.getEndTime());
 	}
-	
 
-	private TraceStatistic createTraceStatistic() {
-		if (timeObserver != null) {
-			timeModel.deleteObserver(timeObserver);
-		}
-		
-		final TraceStatistic traceStat = new TraceStatistic(traceModel);	
-		
-		// Recalculate when the start and end times change, either by ISelection events,
-		// or by local events from the StatTimeViewer
-		timeObserver = new Observer() {
-			public void update(final Observable o, final Object arg) {
-				// Show statistics for the current zoom range
-				traceStat.calculate(timeModel.getStartTime(), timeModel
-						.getEndTime());										
-				tableViewer.refresh();
-			}
-		};
-		timeModel.addObserver(timeObserver);
-		
-		return traceStat;
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#getControl()
+	 */
+	public Control getControl() {
+		return topComposite;
+	}
+
+	/* (non-Javadoc)
+	 * @see com.nxp.timedoctor.ui.statistics.IStatisticsViewPage#selectLine(com.nxp.timedoctor.core.model.SampleLine)
+	 */
+	public void selectLine(SampleLine line) {
+		//Do nothing
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#setActionBars(org.eclipse.ui.IActionBars)
+	 */
+	public void setActionBars(IActionBars actionBars) {
+		//TODO: button to select between seconds, cycles, or %
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#setFocus()
+	 */
+	public void setFocus() {
+		//Do nothing
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.IPage#dispose()
+	 */
+	public void dispose() {
+		zoomModel.deleteObserver(this);
+		timeModel.deleteObserver(this);
 	}
 }
