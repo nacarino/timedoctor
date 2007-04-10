@@ -10,11 +10,13 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.Section;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -30,7 +32,7 @@ public class SectionViewer implements IExpandClient{
 	private TraceModel traceModel;
 	private SectionHeader sectionHeader;
 	private ZoomModel zoomModel;
-	private ArrayList<TraceLineViewer> traceLineViewerList;
+	private HashMap<SampleLine, TraceLineViewer> traceLineViewerMap = new HashMap<SampleLine, TraceLineViewer>();
 	private boolean isExpanded = true;
 	private Composite traceHeader;
 	private MainViewer mainViewer;
@@ -58,9 +60,7 @@ public class SectionViewer implements IExpandClient{
 		this.mainViewer = mainViewer;
 		this.traceModel = traceModel;
 		this.zoomModel = zoomModel;
-		
-		traceLineViewerList = new ArrayList<TraceLineViewer>();
-		
+				
 		createLabelView(leftPane);
 		createTraceView(rightPane);
 		
@@ -147,12 +147,12 @@ public class SectionViewer implements IExpandClient{
 		}
 	}
 	
-	public void addTraceLineViewer(final TraceLineViewer traceLine) {
-		traceLineViewerList.add(traceLine);
+	public void addTraceLineViewer(final TraceLineViewer traceLineViewer) {
+		traceLineViewerMap.put(traceLineViewer.getLine(), traceLineViewer);
 	}
 
-	public void removeTraceLineViewer(final TraceLineViewer traceLine) {
-		traceLineViewerList.remove(traceLine);
+	public void removeTraceLineViewer(final TraceLineViewer traceLineViewer) {
+		traceLineViewerMap.remove(traceLineViewer.getLine());
 	}
 
 	/**
@@ -161,7 +161,7 @@ public class SectionViewer implements IExpandClient{
 	public void collapse() {
 		isExpanded = false;
 		
-		for (TraceLineViewer traceLineViewer : traceLineViewerList) {
+		for (TraceLineViewer traceLineViewer : traceLineViewerMap.values()) {
 			traceLineViewer.setVisible(isExpanded);
 		}
 		layout();
@@ -178,7 +178,7 @@ public class SectionViewer implements IExpandClient{
 	
 	public void updateAutoHide() {
 		if (isExpanded) {
-			for (TraceLineViewer traceLineViewer : traceLineViewerList) {
+			for (TraceLineViewer traceLineViewer : traceLineViewerMap.values()) {
 				traceLineViewer.updateAutoHide();
 			}
 		}
@@ -186,5 +186,15 @@ public class SectionViewer implements IExpandClient{
 	
 	public void layout() {
 		mainViewer.layout();
+	}
+	
+	/**
+	 * Selects or deselects a line
+	 * 
+	 * @param line The {@link SampleLine} to select or deselect
+	 * @param select true to select, false to deselect
+	 */
+	public void selectLine(final SampleLine line, boolean select) {
+		traceLineViewerMap.get(line).selectLine(select);
 	}
 }

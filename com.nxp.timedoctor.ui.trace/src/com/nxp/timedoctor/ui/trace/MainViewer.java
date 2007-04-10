@@ -10,10 +10,16 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -25,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Slider;
 
+import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.Section;
 import com.nxp.timedoctor.core.model.SectionList;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -36,7 +43,7 @@ import com.nxp.timedoctor.ui.trace.TraceCursorFactory.CursorType;
  * The main view, containing sashes, sections, labels, and traces. Vertical
  * scrolling is automatic when the content is larger than the client area.
  */
-public class MainViewer implements IScrollClient, Observer {
+public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 	
 	/**
 	 * Horizontal scrollbar settings.
@@ -95,7 +102,11 @@ public class MainViewer implements IScrollClient, Observer {
 	 */
 	private int zoomPercentage = 0;
 	
-	private ArrayList<SectionViewer> sectionViewerArrayList;
+	private HashMap<Section, SectionViewer> sectionViewerMap = new HashMap<Section, SectionViewer>();
+	
+	private ListenerList selectionChangedListeners = new ListenerList();
+	
+	private SampleLine currentSelectedLine = null;
 	
 	/**
 	 * Constructs the MainViewer in the given parent, setting up vertical
@@ -115,8 +126,6 @@ public class MainViewer implements IScrollClient, Observer {
 			final ZoomModel zoomModel) {
 		this.traceModel = traceModel;
 		this.zoomModel = zoomModel;
-		
-		sectionViewerArrayList = new ArrayList<SectionViewer>();
 		
 		zoomModel.setTimes(0, traceModel.getEndTime() / 2);
 		zoomModel.addObserver(this);
@@ -187,7 +196,7 @@ public class MainViewer implements IScrollClient, Observer {
 				SectionList sectionList = traceModel.getSections();
 				Section s = sectionList.getSection(type);				
 				if (s != null) {
-					SectionViewer sectionViewer = createSectionViewer(type.toString(), type.ordinal());
+					SectionViewer sectionViewer = createSectionViewer(type, s);
 					sectionViewer.createTraceLines(leftContent, rightContent,
 							s, traceCursorListener);
 				}
@@ -203,12 +212,11 @@ public class MainViewer implements IScrollClient, Observer {
 		traceBottom.setBackground(rightContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 	}
 
-	private SectionViewer createSectionViewer(final String headerText,
-			final int colorIndex) {
+	private SectionViewer createSectionViewer(final LineType type, final Section section) {
 		SectionViewer sectionViewer = new SectionViewer(this, leftContent, rightContent, zoomModel, traceModel);
-		sectionViewerArrayList.add(sectionViewer);
-		sectionViewer.setHeaderText(headerText);		
-		sectionViewer.setHeaderColor(createSectionColor(colorIndex));
+		sectionViewerMap.put(section, sectionViewer);
+		sectionViewer.setHeaderText(type.toString());		
+		sectionViewer.setHeaderColor(createSectionColor(type.ordinal()));
 		return sectionViewer;
 	}
 
@@ -281,11 +289,25 @@ public class MainViewer implements IScrollClient, Observer {
 	 */
 	public final void update(final Observable o, final Object data) {
 		setHorizontalScroll();
-		updateAutoHide();	
+		updateAutoHide();
+		updateSelection(zoomModel.getSelectedLine());
+	}
+	
+	private void updateSelection(final SampleLine newSelectionLine) {
+		if (currentSelectedLine != newSelectionLine) {
+			if (currentSelectedLine != null) {
+				sectionViewerMap.get(currentSelectedLine.getSection()).selectLine(currentSelectedLine, false);
+			}
+			
+			sectionViewerMap.get(newSelectionLine.getSection()).selectLine(newSelectionLine, true);			
+			currentSelectedLine = newSelectionLine;
+		}
+		
+		fireSelectionChanged(newSelectionLine);
 	}
 
 	private void updateAutoHide() {
-		for (SectionViewer currentSection : sectionViewerArrayList) {
+		for (SectionViewer currentSection : sectionViewerMap.values()) {
 			currentSection.updateAutoHide();
 		}
 		layout();
@@ -345,5 +367,50 @@ public class MainViewer implements IScrollClient, Observer {
 	public void setScroll(final int selection) {
 		((GridData) leftContent.getLayoutData()).verticalIndent = - selection;
 		leftContent.getParent().layout(false);
-	}	
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		selectionChangedListeners.add(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+		selectionChangedListeners.remove(listener);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
+	public ISelection getSelection() {
+		return new TraceSelection(currentSelectedLine);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
+	public void setSelection(final ISelection selection) {
+		if (selection.isEmpty() || !(selection instanceof TraceSelection)) 
+			return;
+		
+		updateSelection(((TraceSelection)selection).getLine());
+	}
+	
+	private void fireSelectionChanged(final SampleLine selectedLine) {
+		final SelectionChangedEvent event = new SelectionChangedEvent(this, new TraceSelection(selectedLine));
+		
+        Object[] listeners = selectionChangedListeners.getListeners();
+        for (int i = 0; i < listeners.length; ++i) {
+            final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
+            SafeRunnable.run(new SafeRunnable() {
+                public void run() {
+                    l.selectionChanged(event);
+                }
+            });
+        }
+    }
 }

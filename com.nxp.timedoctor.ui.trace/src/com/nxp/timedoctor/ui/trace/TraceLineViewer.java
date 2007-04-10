@@ -19,7 +19,6 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -32,11 +31,6 @@ import com.nxp.timedoctor.ui.trace.canvases.TraceCanvas;
  * organizational purposes.
  */
 public class TraceLineViewer implements ISashClient {
-	/**
-	 * Static variable to track which label in the entire editor is selected.
-	 */
-	private static CLabel selectedLabel = null;
-
 	private TraceLineSeparator traceLineSeparator;
 	
 	/**
@@ -125,7 +119,7 @@ public class TraceLineViewer implements ISashClient {
 		label = new CPULabel(labelPane, line);
 		
 		label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
-		label.addMouseListener(new TraceLineSelectListener(this, line, zoom));
+		label.addMouseListener(new TraceLineSelectListener(line, zoom));
 	}
 
 	/**
@@ -145,7 +139,7 @@ public class TraceLineViewer implements ISashClient {
 		//traceGridData.heightHint = 16; // TODO
 		trace.setLayoutData(traceGridData);
 
-		trace.addMouseListener(new TraceLineSelectListener(this, line, zoom));
+		trace.addMouseListener(new TraceLineSelectListener(line, zoom));
 		
 		trace.addMouseMoveListener(traceCursorListener);
 		trace.addMouseTrackListener(traceCursorListener);
@@ -170,28 +164,6 @@ public class TraceLineViewer implements ISashClient {
 		traceLineSeparator.moveBelow(separator);
 		separator.moveLineBelow(label, trace);
 		layout();
-	}
-	
-	/**
-	 * Sets line selection to the line associated with the given label.
-	 * Unselects whichever label is stored in <code>selected</code>, and sets
-	 * <code>selected</code> to be <code>label</code>.
-	 * 
-	 * @param label
-	 *            the label to be set as selected
-	 * @param display
-	 *            the display object associated with the label
-	 */
-	public void selectLine(final Display display) {
-		// Check if the selected label still exists, it may belong to a
-		// label of another editor that has been closed in the meantime
-		if ((selectedLabel != null) && !selectedLabel.isDisposed()) {
-			selectedLabel.setBackground(selectedLabel.getDisplay().getSystemColor(SWT.COLOR_WHITE)); 
-			selectedLabel.setForeground(selectedLabel.getParent().getForeground());			
-		}
-		label.setBackground(display.getSystemColor(SWT.COLOR_DARK_BLUE));
-		label.setForeground(display.getSystemColor(SWT.COLOR_WHITE));
-		selectedLabel = label;
 	}
 	
 	public final void setDefaultSashOffset() {
@@ -275,5 +247,28 @@ public class TraceLineViewer implements ISashClient {
 	private void layout() {
 		label.getParent().layout();
 		trace.getParent().layout();
-	}		
+	}
+	
+	/**
+	 * Returns the {@link SampleLine} which is represented by this {@link TraceLineViewer}
+	 * @return The {@link SampleLine}
+	 */
+	public SampleLine getLine() {
+		return line;
+	}
+	
+	/**
+	 * Selects or deselects this {@link TraceLineViewer}
+	 *  
+	 * @param select true, to select; false, to deselect
+	 */
+	public void selectLine(boolean select) {
+		if (select){
+			label.setBackground(label.getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
+			label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		} else {
+			label.setBackground(label.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+			label.setForeground(label.getParent().getForeground());
+		}
+	}
 }

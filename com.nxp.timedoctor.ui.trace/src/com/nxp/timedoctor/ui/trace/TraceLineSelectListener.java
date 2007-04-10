@@ -22,16 +22,12 @@ import com.nxp.timedoctor.core.model.ZoomModel;
  */
 public class TraceLineSelectListener implements MouseListener {
 
-	private TraceLineViewer traceLineViewer;
-
 	private SampleLine line = null;
 	
 	private ZoomModel zoom;
 	
-	public TraceLineSelectListener(final TraceLineViewer traceLineViewer, 
-			final SampleLine line, 
-			final ZoomModel zoom) {
-		this.traceLineViewer = traceLineViewer;		
+	public TraceLineSelectListener(final SampleLine line, 
+			final ZoomModel zoom) {		
 		this.line = line;
 		this.zoom = zoom;
 	}
@@ -62,8 +58,7 @@ public class TraceLineSelectListener implements MouseListener {
 	 */
 	public final void mouseDown(final MouseEvent e) {
 		if (e.button == 1) {
-			zoom.setSelectedLine(line); 
-			traceLineViewer.selectLine(e.display);
+			zoom.setSelectedLine(line);
 		}
 	}
 }

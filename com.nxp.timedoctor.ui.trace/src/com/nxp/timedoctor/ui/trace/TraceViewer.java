@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -35,6 +36,8 @@ public class TraceViewer implements ISashClient {
 	private Composite leftPane;
 
 	private Composite rightPane;
+	
+	private MainViewer mainViewer;
 
 	/**
 	 * Creates the <code>TraceViewer</code> contents in the parent composite,
@@ -98,7 +101,7 @@ public class TraceViewer implements ISashClient {
 		TraceCursorFactory traceCursorFactory = new TraceCursorFactory(zoomModel);
 
 		new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomModel);
-		new MainViewer(leftPane, rightPane, traceCursorFactory, traceModel, zoomModel);
+		mainViewer = new MainViewer(leftPane, rightPane, traceCursorFactory, traceModel, zoomModel);
 		
 		SashListener sashListener = new SashListener(this, SWT.VERTICAL);
 		mainSash.addSelectionListener(sashListener);
@@ -133,5 +136,14 @@ public class TraceViewer implements ISashClient {
 			leftPane.getParent().update();
 		}
 		return (width <= maxWidth);
-	}	
+	}
+	
+	/**
+	 * Returns the {@link ISelectionProvider} 
+	 * 
+	 * @return The {@link ISelectionProvider} object
+	 */
+	public ISelectionProvider getSelectionProvider() {
+		return mainViewer;
+	}
 }
