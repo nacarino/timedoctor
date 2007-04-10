@@ -129,7 +129,7 @@ public abstract class SampleLine {
 		 * For use in file parsing.
 		 * 
 		 * @param type
-		 *            TODO
+		 *            Returns the {@link LineType}
 		 * 
 		 * @return the associated type, or null if none exists
 		 */
@@ -735,6 +735,15 @@ public abstract class SampleLine {
 	}
 
 	/**
+	 * Returns the {@link Section} to which this SampleLine belongs to
+	 * 
+	 * @return {@link Section}
+	 */
+	public Section getSection() {
+		return section;
+	}
+
+	/**
 	 * Sets the maximum value of the line.
 	 * 
 	 * @param value
@@ -785,7 +794,7 @@ public abstract class SampleLine {
 		}
 		section = s;
 	}
-
+	
 	/**
 	 * Returns the current number of descriptions associated with the line.
 	 * 
