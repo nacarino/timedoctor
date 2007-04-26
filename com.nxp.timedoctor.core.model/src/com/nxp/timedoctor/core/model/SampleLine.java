@@ -100,6 +100,8 @@ public abstract class SampleLine {
 	private double timeCreate = 0;
 
 	private double timeDelete = Double.MAX_VALUE;
+	
+	private boolean isVisible = true;
 
 	/**
 	 * Enumerates the possible line types, and provides a static method to parse
@@ -841,5 +843,22 @@ public abstract class SampleLine {
 					- samples[sampleCount - 1].val);
 		}
 		sampleCount++;
+	}
+
+	/**
+	 * Whether the {@link SampleLine} is visible or not
+	 * 
+	 * @return true, if visible; false otherwise
+	 */
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+	/**
+	 * Sets the visible property of the {@link SampleLine}
+	 * @param isVisible true, if visible; false otherwise
+	 */
+	public void setVisible(boolean isVisible) {
+		this.isVisible = isVisible;
 	}
 }

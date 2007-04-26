@@ -43,11 +43,14 @@ public class SemaphoreSampleLine extends SampleLine {
 		/*
 		 * Value on start/stop is number of open semaphores
 		 */
+		setMaxSampleValue(0);
 		for (int i = 0, n = 0; i < getCount(); i++) {
 			if (getSample(i).type == SampleType.START) {
 				n++;
 				getSample(i).val = n;
+				setMaxSampleValue(Math.max(getMaxSampleValue(), n));
 			} else if (getSample(i).type == SampleType.STOP) {
+				setMaxSampleValue(Math.max(getMaxSampleValue(), n));
 				n = Math.max(0, n - 1);
 				getSample(i).val = n;
 			}

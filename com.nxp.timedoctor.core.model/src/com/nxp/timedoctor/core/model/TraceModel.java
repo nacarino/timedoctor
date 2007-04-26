@@ -12,12 +12,15 @@ package com.nxp.timedoctor.core.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Observable;
+
+import com.nxp.timedoctor.core.model.SampleLine.LineType;
 
 /**
  * The main TimeDoctor model class. Keeps track of all sections and cpus, as
  * well as having a registry of description names by id.
  */
-public class TraceModel {
+public class TraceModel extends Observable {
 	/**
 	 * The end time of all activity on all cpus in the model.
 	 */
@@ -39,18 +42,8 @@ public class TraceModel {
 	// Checkstyle not updated for type parameterization in J2SE5
 	private ArrayList < SampleCPU > cpus = new ArrayList < SampleCPU > ();
 
-	// MR what does this do? Why not in the queue class?
-	/**
-	 * Maximum queue sample.
-	 */
-	private double maxQueuesSample = 1;
-
-	// MR what does this do? Improve comment or refactor
-	/**
-	 * Maximum value sample.
-	 */
-	private double maxValuesSample = 1;
-
+	private HashMap<LineType, Double> maxValueMap = new HashMap<LineType, Double>();
+	
 	/**
 	 * Hash table of description names keyed by description id.
 	 */
@@ -177,24 +170,37 @@ public class TraceModel {
 	}
 
 	/**
-	 * Computes and sets the internal max queue sample and max value sample
-	 * variables.
+	 * Computes and sets the max value for each LineType
 	 */
 	public final void computeMaxValues() {
-		Section queues = sections.getSection(SampleLine.LineType.QUEUES);
-		Section values = sections.getSection(SampleLine.LineType.VALUES);
-		// MR move functionality to section class, genneric implementation
-		if (queues != null) {
-			for (SampleLine line : queues.getLines()) {
-				maxQueuesSample = Math.max(line.getMaxSampleValue(),
-						maxQueuesSample);
+		for(LineType type:LineType.values()) {
+			computeMaxSample(type);
+		}
+	}
+	
+	private void computeMaxSample(final LineType type) {
+		double maxSample = 1;
+		
+		Section section = sections.getSection(type);
+		if (section != null) {
+			for (SampleLine line: section.getLines()) {
+				maxSample = Math.max(line.getMaxSampleValue(), maxSample);
 			}
 		}
-		if (values != null) {
-			for (SampleLine line : values.getLines()) {
-				maxValuesSample = Math.max(line.getMaxSampleValue(),
-						maxValuesSample);
-			}
-		}
+		
+		maxValueMap.put(type, maxSample);
+	}
+	
+	public double getMaxSampleValue(final LineType type) {
+		return maxValueMap.get(type);
+	}
+
+	/* (non-Javadoc)
+	 * @see java.util.Observable#setChanged()
+	 */
+	@Override
+	public synchronized void setChanged() {
+		super.setChanged();
+		super.notifyObservers();
 	}
 }

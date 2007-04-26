@@ -17,8 +17,9 @@ import java.util.Iterator;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
 
 /**
- * Represents a collection of trace lines of a single type. The section itself
- * has no knowledge of what that type is.
+ * Represents a collection of trace lines. The section itself
+ * has no knowledge of what that type is. It uses an {@link ArrayList} to
+ * store, retrieve and manipulate the collection.
  */
 public class Section {
 // MR change name, little more clear what a "key" is
@@ -90,7 +91,8 @@ public class Section {
 	}
 
 	/**
-	 * Adds a line to the section and registers it.
+	 * Adds a line to the section and registers it. The {@link SampleLine} is
+	 * added to the end of the section
 	 * 
 	 * @param line
 	 *            the line to be added
@@ -100,6 +102,41 @@ public class Section {
 		// MR can this not be done during line creation, as constructor argument?
 		line.setSection(this);	
 		registerLine(line);
+	}
+	
+	/**
+	 * Adds the specified {@link SampleLine} to the Section, at a specified index
+	 * 
+	 * @param index An int value, representing the data at which to insert the {@link SampleLine}
+	 * @param line The {@link SampleLine} to be added
+	 * @throws IndexOutOfBoundsException Thrown if index < -1 or index > size
+	 */
+	public final void addLine(final int index, final SampleLine line) throws IndexOutOfBoundsException {
+		lines.add(index, line);
+		line.setSection(this);
+		registerLine(line);
+	}
+	
+	/**
+	 * Returns the order or the index of the {@link SampleLine} in the section
+	 * 
+	 * @param line The {@link SampleLine} for which the index is required
+	 * @return An int value representing the index
+	 */
+	public final int getIndex(final SampleLine line) {
+		return lines.indexOf(line);
+	}
+	
+	/**
+	 * Returns the {@link SampleLine} at the requested index
+	 * 
+	 * @param index The specified index
+	 * @return The {@link SampleLine} at the index
+	 * 
+	 * @throws IndexOutOfBoundsException Thrown if index < 0 or index >= size
+	 */
+	public final SampleLine getLine(final int index) throws IndexOutOfBoundsException {
+		return lines.get(index);
 	}
 
 	/**
@@ -116,6 +153,22 @@ public class Section {
 			hash.put(key, lineList);
 		}
 		lineList.add(line);
+	}
+	
+	/**
+	 * Removes a {@link SampleLine} from this section. 
+	 *  
+	 * @param line The {@link SampleLine} to be removed
+	 */
+	public final void removeLine(final SampleLine line) {
+		boolean success = lines.remove(line);
+		if (success) {
+			line.setSection(null);
+			
+			int key = line.hashCode();
+			ArrayList < SampleLine > lineList = hash.get(key);
+			lineList.remove(line);
+		}
 	}
 
 	/**
@@ -166,5 +219,21 @@ public class Section {
 	public final LineType getType() {
 		return type;
 	}
+	
+	/**
+	 * Returns the name of the section
+	 * 
+	 * @return Name of the section 
+	 */
+	public String getName() {
+		return type.name();
+	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return type.name();
+	}
 }
