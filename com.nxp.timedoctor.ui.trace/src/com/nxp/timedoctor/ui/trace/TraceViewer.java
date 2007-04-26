@@ -59,6 +59,11 @@ public class TraceViewer implements ISashClient {
 		
 		createContents(parent);
 	}
+	
+	public void dispose() {
+		mainViewer.dispose();
+		mainViewer = null;
+	}
 
 	/**
 	 * Creates the contents of the view within the parent composite. Handles all

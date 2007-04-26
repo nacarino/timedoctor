@@ -21,11 +21,18 @@ import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.widgets.Control;
 
+import com.nxp.timedoctor.core.model.SampleLine;
+import com.nxp.timedoctor.core.model.Section;
+
 public class LabelReorderListener implements DragSourceListener, DropTargetListener {
 	private class LabelDragSource {
 		public Control control;
 		public int drawIndex;
 		public TraceLineViewer traceLineViewer;
+		public SampleLine targetLine = null;
+		public Section targetSection = null;
+		public int targetIndex = -1;
+		public boolean movedUp = false;
 
 		public LabelDragSource(final Control controls[], final DragSourceEvent event) {
 			// Store the drag source for reference during
@@ -39,7 +46,25 @@ public class LabelReorderListener implements DragSourceListener, DropTargetListe
 		}
 		
 		public void moveBelow(final SeparatorDropTarget separatorDropTarget) {
+			updateModel(traceLineViewer.getLine());
 			traceLineViewer.moveBelow(separatorDropTarget.traceLineSeparator);
+		}
+
+		private void updateModel(final SampleLine sourceLine) {
+			Section sourceSection = sourceLine.getSection();
+			
+			if (!movedUp && !sourceSection.equals(targetSection) && targetLine != null) {
+				//A case where a TraceLine is moved below another traceLine of a different section 
+				targetIndex++;
+			}
+			
+			sourceSection.removeLine(sourceLine);
+			
+			try {
+				targetSection.addLine(targetIndex, sourceLine);
+			} catch (IndexOutOfBoundsException e) {
+				targetSection.addLine(sourceLine);
+			}
 		}
 	}
 	
@@ -53,23 +78,46 @@ public class LabelReorderListener implements DragSourceListener, DropTargetListe
 			Control selectedControl = ((DropTarget) event.widget).getControl();
 			int selectedIndex = getControlIndex(controls, selectedControl);
 			
+			Object controlData = selectedControl.getData();
+			final boolean movedUp = selectedControl.getLocation().y < labelDragSource.control.getLocation().y;
+			
 			// If the selected control is a Label, select the closest visible
 			// separator above or below the label
-			if (selectedControl.getData() instanceof TraceLineViewer) {
+			if (controlData instanceof TraceLineViewer) {
 				int dropTargetIndex;
-				if (selectedControl.getLocation().y < labelDragSource.control.getLocation().y) {
+				
+				if (movedUp) {
 					dropTargetIndex = getTopControlIndex(controls, selectedIndex);
 				} else {
 					dropTargetIndex = getBottomControlIndex(controls, selectedIndex);
 				}
 				control = controls[dropTargetIndex];
-			}		
-			else {
+				
+				labelDragSource.targetLine    = ((TraceLineViewer)controlData).getLine();
+				labelDragSource.targetSection = labelDragSource.targetLine.getSection();
+				labelDragSource.targetIndex   = labelDragSource.targetSection.getIndex(labelDragSource.targetLine);
+			} else {
+				//It is a TraceLineSeparator
 				control = selectedControl;
+				
+				Control topControl = controls[selectedIndex - 1];
+				
+				if (topControl instanceof SectionHeader) {
+					labelDragSource.targetLine    = null;
+					labelDragSource.targetSection = ((TraceLineSeparator)controlData).getSectionViewer().getSection();
+					labelDragSource.targetIndex   = 0;
+				} else {
+					//topControl is a TraceLineViewer
+					labelDragSource.targetLine    = ((TraceLineViewer)topControl.getData()).getLine();
+					labelDragSource.targetSection = ((TraceLineSeparator)controlData).getSectionViewer().getSection();
+					labelDragSource.targetIndex   = labelDragSource.targetSection.getIndex(labelDragSource.targetLine);
+					
+					if (movedUp) 
+						labelDragSource.targetIndex++;
+				}
 			}
-			if (!(control.getData() instanceof TraceLineSeparator)) {
-				traceLineSeparator = null;
-			}		
+
+			labelDragSource.movedUp = movedUp;
 			traceLineSeparator = (TraceLineSeparator) control.getData();
 		}
 		

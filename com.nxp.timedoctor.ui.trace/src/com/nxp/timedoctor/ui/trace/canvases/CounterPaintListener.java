@@ -46,27 +46,20 @@ public class CounterPaintListener extends TracePaintListener implements PaintLis
 	 */
 	private SampleLine line;
 
-	/**
-	 * Vertical padding value on the bottom of trace lines.
-	 */
-	private static final int VERTICAL_PADDING = 2;
-
 	private double frequency;
 	
+	private int traceHeight;
+	private int traceMinHeight = -1;
+
 	/**
 	 * Constructs a new <code>CounterPaintListener</code> with the given
 	 * color,filling color, sample line, and source of zoom/scroll data.
 	 * 
-	 * @param col
-	 *            the color with which to paint the line
-	 * @param fillCol
-	 *            the color used to fill the line
-	 * @param sampleLine
-	 *            contains the data to be displayed
-	 * @param zoomData
-	 *            contains data on the zoom/scroll state of the system
+	 * @param color The {@link Color} with which to paint the line
+	 * @param fillColor The {@link Color} used to fill the line
+	 * @param sampleLine The {@link SampleLine} to be drawn
+	 * @param zoomData  Contains data on the zoom/scroll state of the system
 	 */
-
 	public CounterPaintListener(final Color color, 
 			final Color fillColor,
 			final SampleLine sampleLine, 
@@ -76,6 +69,10 @@ public class CounterPaintListener extends TracePaintListener implements PaintLis
 		this.line = sampleLine;
 		this.zoom = zoomData;
 		
+		intializeFrequency();
+	}
+
+	private void intializeFrequency() {
 		if (line.getType() == SampleLine.LineType.MEM_CYCLES) {
 			this.frequency = line.getCPU().getMemClocksPerSec();
 		}
@@ -103,9 +100,16 @@ public class CounterPaintListener extends TracePaintListener implements PaintLis
 			// guarantees trace drawing is unaffected by appearance of vertical
 			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
-			// TODO calculate height for proportional counters
-			int canvasHeight = canvas.getBounds().height; 
-			int traceHeight = canvasHeight - VERTICAL_PADDING;
+			int canvasHeight = canvas.getBounds().height;
+			
+			int traceDrawHeight;
+			
+			if (traceHeight > traceMinHeight) {
+				traceDrawHeight = canvasHeight;
+			} else {
+				traceDrawHeight = traceHeight * (canvasHeight/traceMinHeight);
+			}
+			
 			double startTime = zoom.getStartTime();
 			double endTime = zoom.getEndTime();
 			double pixelsPerSec = fullWidth / (endTime - startTime);
@@ -118,9 +122,9 @@ public class CounterPaintListener extends TracePaintListener implements PaintLis
 			
 			// Draw the bottom line
 			e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
-			e.gc.drawLine(e.x, traceHeight, e.x + e.width, traceHeight);
+			e.gc.drawLine(e.x, canvasHeight, e.x + e.width, canvasHeight);
 			
-			drawGridLines(e, canvasHeight, traceHeight);
+			drawGridLines(e, canvasHeight);
 
 			e.gc.setForeground(color);
 			e.gc.setBackground(fillColor);
@@ -160,18 +164,18 @@ public class CounterPaintListener extends TracePaintListener implements PaintLis
 				int curFillHeight = 0;
 				if (curFilling > 0) {
 					// Show at least one pixel if there is something in the counter
-					curFillHeight = Math.max(1, (int) (traceHeight * curFilling));
+					curFillHeight = Math.max(1, (int) (traceDrawHeight * curFilling));
 				}
 
 				// Get min filling in pixels
 				int minFillHeight = 0;
 				if (curMinFilling > 0) {
 					// Show at least one pixel if there is something in the counter
-					minFillHeight = Math.max(1, (int) (traceHeight * curMinFilling));
+					minFillHeight = Math.max(1, (int) (traceDrawHeight * curMinFilling));
 				}
 
 				// Get max buffer filling in pixels
-				int maxFillHeight = (int) (traceHeight * curMaxFilling);
+				int maxFillHeight = (int) (traceDrawHeight * curMaxFilling);
 
 				// Note: fillRectangle is drawn (verified for MS Windows) from the left-upper origin
 				// including the origin, up to (excluding) width, height
@@ -212,5 +216,12 @@ public class CounterPaintListener extends TracePaintListener implements PaintLis
 				curMinFilling = curFilling;
 			}
 		}			
+	}
+
+	public void setTraceHeight(int height) {
+		if (traceMinHeight == -1) {
+			traceMinHeight = height;
+		}
+		traceHeight = height;
 	}
 }

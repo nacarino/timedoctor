@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -40,4 +41,7 @@ public class NoteCanvas extends TraceCanvas {
 		
 	}
 
+	public void propertyChange(PropertyChangeEvent event) {
+		//Do nothing
+	}
 }

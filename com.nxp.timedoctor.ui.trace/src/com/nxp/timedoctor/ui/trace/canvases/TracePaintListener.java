@@ -37,11 +37,10 @@ public class TracePaintListener {
 	private static final int GRID_SPACING = 10;
 
 	protected void drawGridLines(final PaintEvent e, 
-			final int canvasHeight,
-			final int traceHeight) {
+			final int canvasHeight) {
 		e.gc.setForeground(Colors.getColorRegistry().get(Colors.LIGHT_YELLOW));
 				
-		for (int y = GRID_SPACING; y <= traceHeight; y += GRID_SPACING) {
+		for (int y = GRID_SPACING; y <= canvasHeight; y += GRID_SPACING) {
 			e.gc.drawLine(e.x, canvasHeight - y, 
 					e.x + e.width, canvasHeight - y);
 		}

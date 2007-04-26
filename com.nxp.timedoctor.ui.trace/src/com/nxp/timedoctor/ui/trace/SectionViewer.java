@@ -36,6 +36,7 @@ public class SectionViewer implements IExpandClient{
 	private boolean isExpanded = true;
 	private Composite traceHeader;
 	private MainViewer mainViewer;
+	private Section section;
 	
 	/**
 	 * Constructs a new SectionViewer, and creates and lays out the trace lines.
@@ -136,6 +137,7 @@ public class SectionViewer implements IExpandClient{
 			final Section section, 
 			final TraceCursorListener traceCursorListener) {
 				
+		this.section = section;
 		for (SampleLine line : section.getLines()) {			
 			new TraceLineViewer(this,					
 					labelPane, 
@@ -165,6 +167,7 @@ public class SectionViewer implements IExpandClient{
 			traceLineViewer.setVisible(isExpanded);
 		}
 		layout();
+		traceModel.setChanged();
 	}
 
 	/**
@@ -174,6 +177,7 @@ public class SectionViewer implements IExpandClient{
 		isExpanded = true;
 		updateAutoHide();
 		layout();
+		traceModel.setChanged();
 	}
 	
 	public void updateAutoHide() {
@@ -181,6 +185,12 @@ public class SectionViewer implements IExpandClient{
 			for (TraceLineViewer traceLineViewer : traceLineViewerMap.values()) {
 				traceLineViewer.updateAutoHide();
 			}
+		}
+	}
+	
+	public void updateVisibility() {
+		for (TraceLineViewer traceLineViewer : traceLineViewerMap.values()) {
+			traceLineViewer.updateVisibility();
 		}
 	}
 	
@@ -196,5 +206,14 @@ public class SectionViewer implements IExpandClient{
 	 */
 	public void selectLine(final SampleLine line, boolean select) {
 		traceLineViewerMap.get(line).selectLine(select);
+	}
+
+	/**
+	 * Returns the {@link Section} to which this {@link SectionViewer} belongs to
+	 * 
+	 * @return The {@link Section}
+	 */
+	public Section getSection() {
+		return section;
 	}
 }

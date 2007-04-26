@@ -11,3 +11,4 @@ Require-Bundle: org.eclipse.ui,
 Eclipse-LazyStart: true
 Export-Package: com.nxp.timedoctor.ui.trace,
  com.nxp.timedoctor.ui.trace.actions
+Bundle-Activator: com.nxp.timedoctor.ui.trace.TracePluginActivator

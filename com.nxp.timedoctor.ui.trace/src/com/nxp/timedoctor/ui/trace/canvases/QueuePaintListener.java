@@ -20,16 +20,12 @@ import org.eclipse.swt.widgets.Composite;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.core.model.SampleLine.LineType;
 
 /**
  * Contains the code to paint a queue.
  */
 public class QueuePaintListener extends TracePaintListener implements PaintListener {
-
-	/**
-	 * Vertical padding value on the bottom of trace lines.
-	 */
-	private static final int VERTICAL_PADDING = 2;
 
 	/**
 	 * The line containing zoom to visualize.
@@ -51,6 +47,9 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 	 */
 	private ZoomModel zoom;
 
+	private int traceHeight;
+	private int traceMinHeight = -1;
+	
 	/**
 	 * Constructs a new <code>TaskPaintListener</code> with the given color,
 	 * sample line, and source of zoom/scroll zoom.
@@ -64,7 +63,7 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 	 * @param zoom
 	 *            contains the zoom/scroll state of the system
 	 * @param tdModel
-	 *            contains all trace zoom
+	 *            model containing all trace information
 	 */
 	public QueuePaintListener(final Color color, final Color fillColor,
 			final SampleLine sampleLine, final ZoomModel zoom,
@@ -94,9 +93,16 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 			// guarantees trace drawing is unaffected by appearance of vertical
 			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
-			// TODO calculate height for proportional queues
 			int canvasHeight = canvas.getBounds().height;
-			int traceHeight = canvasHeight - VERTICAL_PADDING;
+			
+			int traceDrawHeight;
+			
+			if (traceHeight > traceMinHeight) {
+				traceDrawHeight = canvasHeight;
+			} else {
+				traceDrawHeight = traceHeight * (canvasHeight/traceMinHeight);
+			}
+			
 			double startTime = zoom.getStartTime();
 			double endTime = zoom.getEndTime();
 			double pixelsPerSec = fullWidth / (endTime - startTime);
@@ -106,8 +112,8 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
 			e.gc.fillRectangle(e.x, e.y, e.width, e.height);
-
-			drawGridLines(e, canvasHeight, traceHeight);
+			
+			drawGridLines(e, canvasHeight); 
 
 			int index = Math.max(1, line.binarySearch(drawStartTime));
 			double curMaxFilling = 0;
@@ -117,7 +123,10 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 				int xNext = boundedInt((line.getSample(index).time - startTime) * pixelsPerSec);
 
 				// TODO hide >> 32 in model interface
-				double curFilling = (((long) line.getSample(index - 1).val) >> 32);
+				double curFilling = line.getSample(index - 1).val;
+				if (line.getType() == LineType.QUEUES) {
+					curFilling = (long)(curFilling) >> 32;
+				}
 				
 				// Compute maximum and minimum over the last queue events that fall within the same pixel
 				// Always at least include the previous queue event to ensure the contour line is
@@ -134,18 +143,18 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 				int curFillHeight = 0;
 				if (curFilling > 0) {
 					// Show at least one pixel if there is something in the queue
-					curFillHeight = Math.max(1, (int) (traceHeight * curFilling / maxFilling));
+					curFillHeight = Math.max(1, (int) (traceDrawHeight * curFilling / maxFilling));
 				}
 
 				// Get min buffer filling in pixels
 				int minFillHeight = 0;
 				if (curMinFilling > 0) {
 					// Show at least one pixel if there is something in the queue
-					minFillHeight = Math.max(1, (int) (traceHeight * curMinFilling / maxFilling));
+					minFillHeight = Math.max(1, (int) (traceDrawHeight * curMinFilling / maxFilling));
 				}
 
 				// Get max buffer filling in pixels
-				int maxFillHeight = (int) (traceHeight * curMaxFilling / maxFilling);
+				int maxFillHeight = (int) (traceDrawHeight * curMaxFilling / maxFilling);
 
 				// Note: fillRectangle is drawn (verified for MS Windows) from the left-upper origin
 				// including the origin, up to (excluding) width, height
@@ -186,5 +195,12 @@ public class QueuePaintListener extends TracePaintListener implements PaintListe
 				curMinFilling = curFilling;
 			}
 		}
+	}
+
+	public void setTraceHeight(int height) {
+		if (traceMinHeight == -1) {
+			traceMinHeight = height;
+		}
+		traceHeight = height;
 	}
 }

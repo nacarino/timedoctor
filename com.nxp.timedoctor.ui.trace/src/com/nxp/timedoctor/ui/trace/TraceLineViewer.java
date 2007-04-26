@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.dnd.DND;
@@ -62,6 +63,8 @@ public class TraceLineViewer implements ISashClient {
 	private boolean isVisible = true;
 	
 	private SectionViewer sectionViewer;
+
+	private IPreferenceStore preferenceStore;
 	
 	/**
 	 * Constructs a new TraceLineViewer.
@@ -106,7 +109,8 @@ public class TraceLineViewer implements ISashClient {
 		
 		setupReordering();
 				
-		setDefaultSashOffset(); 
+		setDefaultSashOffset();
+		preferenceStore = TracePluginActivator.getDefault().getPreferenceStore(); 
 	}
 
 	/**
@@ -132,11 +136,9 @@ public class TraceLineViewer implements ISashClient {
 			final TraceCursorListener traceCursorListener) {
 
 		trace = TraceCanvas.createCanvas(sectionTrace, line, zoom, model);
+		trace.setMinHeight(label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y); //Set the initial height same as that of the label 
+		
 		final GridData traceGridData = new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1);
-		// Since the labels define the height of the trace section,
-		// we must ensure that the initial trace height is equal
-		// to or less than the height of the labels for proper layout.
-		//traceGridData.heightHint = 16; // TODO
 		trace.setLayoutData(traceGridData);
 
 		trace.addMouseListener(new TraceLineSelectListener(line, zoom));
@@ -164,18 +166,25 @@ public class TraceLineViewer implements ISashClient {
 		traceLineSeparator.moveBelow(separator);
 		separator.moveLineBelow(label, trace);
 		layout();
+		model.setChanged(); //Notify TraceModel listeners
 	}
 	
 	public final void setDefaultSashOffset() {
-		int minHeight = label.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+		int minHeight = trace.getHeight();
 		setHeight(minHeight);
+		
+		// relayout and update vertical scrollbar, and left scroll setting
+		sectionViewer.layout();
 	}
 
 	public final boolean setSashOffset(final int offset) {
 		int height = offset - trace.getLocation().y;		
-		int minHeight = label.computeSize(SWT.DEFAULT, SWT.DEFAULT, false).y;
+		int minHeight = trace.getHeight();
 		int newHeight = Math.max(height, minHeight);
 		setHeight(newHeight);
+		
+		// relayout and update vertical scrollbar, and left scroll setting
+		sectionViewer.layout();
 		return (height >= minHeight);
 	}	
 	
@@ -185,19 +194,32 @@ public class TraceLineViewer implements ISashClient {
 			
 		GridData traceGridData = (GridData) trace.getLayoutData();
 		traceGridData.heightHint = height;
-			
-		// relayout and update vertical scrollbar, and left scroll setting
-		sectionViewer.layout();
 	}
 	
 	/**
 	 * This method will decide whether to show or hide a line.
 	 */
 	public void updateAutoHide() {
-		boolean hasSamples = line.hasSamples(zoom.getStartTime(), zoom
-				.getEndTime());
-		setVisible(hasSamples);
-		traceLineSeparator.setVisible(hasSamples);
+		if (getAutoHidePreference()) {
+			boolean hasSamples = line.hasSamples(zoom.getStartTime(), zoom.getEndTime());
+			setVisible(hasSamples);
+		} else if (getHideEmptyLinePreference()) {
+			setVisible(line.getCount() > 2);
+		} else {
+			setVisible(true);
+		}
+	}
+	
+	private boolean getAutoHidePreference() {
+		return preferenceStore.getBoolean(TracePluginActivator.AUTO_HIDE_PREFERENCE);
+	}
+	
+	private boolean getHideEmptyLinePreference() {
+		return preferenceStore.getBoolean(TracePluginActivator.HIDE_EMPTY_LINE_PREFERENCE);
+	}
+	
+	public void updateVisibility() {
+		setVisible(line.isVisible());
 	}
 	
 	/**
@@ -207,9 +229,9 @@ public class TraceLineViewer implements ISashClient {
 	 * 			Boolean value which specifies whether the line should be hidden or not
 	 */
 	public void setVisible(final boolean visible) {
-		traceLineSeparator.setVisible(visible);
-		
 		if (isVisible != visible) {
+			traceLineSeparator.setVisible(visible);
+			
 			GridData traceGridData = (GridData) trace.getLayoutData();
 			traceGridData.exclude = !visible;
 			trace.setVisible(visible);
@@ -219,6 +241,11 @@ public class TraceLineViewer implements ISashClient {
 			label.setVisible(visible);
 
 			isVisible = visible;
+			line.setVisible(visible);
+		}
+		
+		if (visible) {
+			setHeight(trace.getHeight());
 		}
 	}
 

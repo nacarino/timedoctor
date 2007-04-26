@@ -10,6 +10,7 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.trace.canvases;
 
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Composite;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -41,4 +42,10 @@ public class EventCanvas extends TraceCanvas {
 				Colors.getColorRegistry().get(Colors.LIGHT_PINK), line, zoom));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
+	public void propertyChange(PropertyChangeEvent event) {
+		//Do nothing
+	}
 }

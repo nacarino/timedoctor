@@ -15,6 +15,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -108,6 +111,9 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 	
 	private SampleLine currentSelectedLine = null;
 	
+	private IPreferenceStore preferenceStore;
+	private IPropertyChangeListener propertyListener;
+	
 	/**
 	 * Constructs the MainViewer in the given parent, setting up vertical
 	 * scrolling and creating the contents.
@@ -127,10 +133,30 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 		this.traceModel = traceModel;
 		this.zoomModel = zoomModel;
 		
-		zoomModel.setTimes(0, traceModel.getEndTime() / 2);
 		zoomModel.addObserver(this);
+		traceModel.addObserver(this);
 
 		createContents(leftPane, rightPane, traceCursorFactory);
+		
+		propertyListener = new IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				updateAutoHide();
+				traceModel.setChanged();
+			}
+		};
+		
+		preferenceStore = TracePluginActivator.getDefault().getPreferenceStore();		
+		preferenceStore.addPropertyChangeListener(propertyListener);
+		
+		zoomModel.setTimes(0, traceModel.getEndTime() / 2);
+	}
+	
+	public void dispose() {
+		traceModel.deleteObserver(this);
+		zoomModel.deleteObserver(this);
+		selectionChangedListeners.clear();
+		
+		preferenceStore.removePropertyChangeListener(propertyListener);
 	}
 
 	/**
@@ -288,9 +314,14 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 	 *            has no effect
 	 */
 	public final void update(final Observable o, final Object data) {
-		setHorizontalScroll();
-		updateAutoHide();
-		updateSelection(zoomModel.getSelectedLine());
+		if (o instanceof TraceModel) {
+			updateVisibility();
+		} else {
+			setHorizontalScroll();
+			updateAutoHide();
+			updateSelection(zoomModel.getSelectedLine());
+			traceModel.setChanged();
+		}
 	}
 	
 	private void updateSelection(final SampleLine newSelectionLine) {
@@ -304,6 +335,13 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 		}
 		
 		fireSelectionChanged(newSelectionLine);
+	}
+	
+	private void updateVisibility() {
+		for (SectionViewer currentSection : sectionViewerMap.values()) {
+			currentSection.updateVisibility();
+		}
+		layout();
 	}
 
 	private void updateAutoHide() {
@@ -394,7 +432,7 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
 	 */
 	public void setSelection(final ISelection selection) {
-		if (selection.isEmpty() || !(selection instanceof TraceSelection)) 
+		if (!(selection instanceof TraceSelection) || selection.isEmpty()) 
 			return;
 		
 		updateSelection(((TraceSelection)selection).getLine());
