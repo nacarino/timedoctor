@@ -16,9 +16,20 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            class="com.nxp.timedoctor.internal.ui.preferences.TimeDoctorPreferences"
+            id="com.nxp.timedoctor.ui.preferences.TimeDoctor"
+            name="TimeDoctor"/>
+      <page
+            category="com.nxp.timedoctor.ui.preferences.TimeDoctor"
+            class="com.nxp.timedoctor.internal.ui.preferences.OptionsPreferencePage"
+            id="com.nxp.timedoctor.ui.preferences.TimeDoctor.optionPreferences"
+            name="Display Options">
+      </page>   
+      <page
+            category="com.nxp.timedoctor.ui.preferences.TimeDoctor"
             name="Keys"
             class="org.eclipse.ui.ExtensionFactory:keysPreferencePage"
-            id="com.nxp.timedoctor.ui.preferences.keys">
+            id="com.nxp.timedoctor.ui.preferences.TimeDoctor.keys">
       </page>
    </extension>
    

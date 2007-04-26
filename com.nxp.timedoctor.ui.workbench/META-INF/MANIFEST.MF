@@ -9,6 +9,7 @@ Export-Package: com.nxp.timedoctor.internal.ui,
  com.nxp.timedoctor.internal.ui.actions,
  com.nxp.timedoctor.ui
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.views,
  org.eclipse.core.runtime,
  com.nxp.timedoctor.core.model,
  com.nxp.timedoctor.core.parser,
