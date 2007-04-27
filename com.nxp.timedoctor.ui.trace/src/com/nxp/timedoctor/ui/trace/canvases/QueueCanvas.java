@@ -71,6 +71,7 @@ public class QueueCanvas extends TraceCanvas {
 	@Override
 	public void setMinHeight(int height) {
 		super.setMinHeight(height);
+		queuePaintListener.setTraceHeight(height);
 		updateHeight();
 	}
 

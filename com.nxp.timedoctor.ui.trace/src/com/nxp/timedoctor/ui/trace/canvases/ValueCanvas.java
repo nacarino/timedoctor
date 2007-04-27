@@ -67,6 +67,7 @@ public class ValueCanvas extends TraceCanvas {
 	@Override
 	public void setMinHeight(int height) {
 		super.setMinHeight(height);
+		counterPaintListener.setTraceHeight(height);
 		updateHeight();
 	}
 
