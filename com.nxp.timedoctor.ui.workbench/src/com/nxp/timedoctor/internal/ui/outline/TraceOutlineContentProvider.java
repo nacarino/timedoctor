@@ -42,7 +42,7 @@ public class TraceOutlineContentProvider implements ITreeContentProvider {
 			Section section;
 			
 			for ( LineType type : LineType.values() ) {
-				if ( (section = list.getSection(type)) != null ) {
+				if ( ((section = list.getSection(type)) != null) && (type != LineType.PORTS)) {
 					sectionArray.add(section);
 				}
 			}
