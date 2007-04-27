@@ -135,15 +135,19 @@ public class EventPaintListener extends TracePaintListener implements PaintListe
 				}
 				xOld = xEnd;
 
-				if (line.getSample(index).type == SampleType.START) {
-					sampleFlag.draw(e, color, color, xStart, VERTICAL_PADDING, traceHeight);
+				if ((line.getSample(index).type == SampleType.START) ||
+						(( line.getType() == SampleLine.LineType.SEMAPHORES) && (line.getSample(index).val > 0)) ) {
 					e.gc.setBackground(fillColor);
 					e.gc.fillRectangle(xStart, canvasHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
 							EVENT_BAR_HEIGHT);
 					e.gc.drawRectangle(xStart, canvasHeight - EVENT_BAR_HEIGHT, xEnd - xStart,
 							EVENT_BAR_HEIGHT);
-				} else if (line.getSample(index).type == SampleType.STOP) {
+				}
+				
+				if (line.getSample(index).type == SampleType.STOP) {
 					sampleFlag.draw(e, color, fillColor, xStart, VERTICAL_PADDING, traceHeight);
+				} else {
+					sampleFlag.draw(e, color, color, xStart, VERTICAL_PADDING, traceHeight);
 				}
 			}
 		}
