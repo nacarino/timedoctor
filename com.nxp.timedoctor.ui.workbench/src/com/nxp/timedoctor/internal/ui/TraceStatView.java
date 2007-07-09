@@ -11,7 +11,7 @@
 package com.nxp.timedoctor.internal.ui;
 
 import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
-import com.nxp.timedoctor.ui.statistics.TraceStatViewer;
+import com.nxp.timedoctor.ui.statistics.TraceStatisticsPage;
 
 public class TraceStatView extends StatisticsView {
 	public static final String ID = "com.nxp.timedoctor.ui.workbench.TraceStatView";
@@ -24,7 +24,7 @@ public class TraceStatView extends StatisticsView {
 
 	@Override
 	protected IStatisticsViewPage getPage(final TraceEditor editor) {
-		TraceStatViewer viewer = new TraceStatViewer();
+		TraceStatisticsPage viewer = new TraceStatisticsPage();
 		viewer.setModels(editor.getZoomModel(), editor.getTraceModel());
 		
 		return viewer;
