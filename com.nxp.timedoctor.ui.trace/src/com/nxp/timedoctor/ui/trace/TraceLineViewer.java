@@ -20,6 +20,7 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -246,6 +247,8 @@ public class TraceLineViewer implements ISashClient {
 		
 		if (visible) {
 			setHeight(trace.getHeight());
+		} else {
+			selectLine(false);
 		}
 	}
 
@@ -288,8 +291,10 @@ public class TraceLineViewer implements ISashClient {
 	 * Selects or deselects this {@link TraceLineViewer}
 	 *  
 	 * @param select true, to select; false, to deselect
+	 * 
+	 * @return The selected {@link Control} or null, if unable to select
 	 */
-	public void selectLine(boolean select) {
+	public Control selectLine(boolean select) {
 		if (select){
 			label.setBackground(label.getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
 			label.setForeground(label.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -297,5 +302,7 @@ public class TraceLineViewer implements ISashClient {
 			label.setBackground(label.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 			label.setForeground(label.getParent().getForeground());
 		}
+		
+		return isVisible ? trace : null;
 	}
 }

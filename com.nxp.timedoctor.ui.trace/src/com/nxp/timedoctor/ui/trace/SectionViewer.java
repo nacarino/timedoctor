@@ -16,6 +16,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.Section;
@@ -203,9 +204,12 @@ public class SectionViewer implements IExpandClient{
 	 * 
 	 * @param line The {@link SampleLine} to select or deselect
 	 * @param select true to select, false to deselect
+	 * 
+	 * @return The selected {@link Control} or null, if unable to select
 	 */
-	public void selectLine(final SampleLine line, boolean select) {
-		traceLineViewerMap.get(line).selectLine(select);
+	public Control selectLine(final SampleLine line, boolean select) {
+		TraceLineViewer traceLineViewer = traceLineViewerMap.get(line);
+		return traceLineViewer.selectLine(select);
 	}
 
 	/**

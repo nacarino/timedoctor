@@ -22,15 +22,19 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Slider;
 
@@ -319,22 +323,54 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 		} else {
 			setHorizontalScroll();
 			updateAutoHide();
-			updateSelection(zoomModel.getSelectedLine());
 			traceModel.setChanged();
+			
+			updateSelection(zoomModel.getSelectedLine(), false);
 		}
 	}
 	
-	private void updateSelection(final SampleLine newSelectionLine) {
-		if (currentSelectedLine != newSelectionLine) {
-			if (currentSelectedLine != null) {
-				sectionViewerMap.get(currentSelectedLine.getSection()).selectLine(currentSelectedLine, false);
+	private void updateSelection(final SampleLine newSelectionLine, boolean updateView) {
+		if (currentSelectedLine != null) {
+			sectionViewerMap.get(currentSelectedLine.getSection()).selectLine(currentSelectedLine, false);
+		}
+
+		if (newSelectionLine != null && newSelectionLine.isVisible()) {
+			SectionViewer sectionViewer = sectionViewerMap.get(newSelectionLine.getSection());
+			Control control = sectionViewer.selectLine(newSelectionLine, true);
+
+			if (control != null && updateView) {
+				updateView(control);
 			}
 			
-			sectionViewerMap.get(newSelectionLine.getSection()).selectLine(newSelectionLine, true);			
 			currentSelectedLine = newSelectionLine;
+			fireSelectionChanged();
 		}
-		
-		fireSelectionChanged(newSelectionLine);
+	}
+
+	private void updateView(Control control) {
+		ScrollBar bar = verticalScroll.getVerticalBar();
+
+		int location       = control.getLocation().y;
+		int halfViewHeight = bar.getSize().y / 2; // Half of the current visible portion
+		int fullHeight     = rightContent.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+
+		int selection;
+
+		if (location < halfViewHeight) {
+			selection = 0;
+		} else if (location > (fullHeight - halfViewHeight)) {
+			selection = fullHeight - (halfViewHeight * 2);
+		} else {
+			selection = location - halfViewHeight; // So that the selected line is in middle of the visible view
+		}
+
+		setScroll(selection); // Updates the leftContent
+
+		Point p = rightContent.getLocation();
+		p.y = -selection;
+		rightContent.setLocation(p); // Updates the rightContent
+
+		bar.setSelection(selection); // Updates the scroll bar
 	}
 	
 	private void updateVisibility() {
@@ -420,26 +456,31 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 	public void removeSelectionChangedListener(ISelectionChangedListener listener) {
 		selectionChangedListeners.remove(listener);
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
 	 */
 	public ISelection getSelection() {
-		return new TraceSelection(currentSelectedLine);
+		if (currentSelectedLine == null) {
+			return StructuredSelection.EMPTY;
+		}
+		
+		return new StructuredSelection(currentSelectedLine);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
 	 */
 	public void setSelection(final ISelection selection) {
-		if (!(selection instanceof TraceSelection) || selection.isEmpty()) 
+		if (!(selection instanceof IStructuredSelection) || selection.isEmpty()) 
 			return;
 		
-		updateSelection(((TraceSelection)selection).getLine());
+		IStructuredSelection sel = (IStructuredSelection) selection;
+		updateSelection((SampleLine) sel.getFirstElement(), true);
 	}
 	
-	private void fireSelectionChanged(final SampleLine selectedLine) {
-		final SelectionChangedEvent event = new SelectionChangedEvent(this, new TraceSelection(selectedLine));
+	private void fireSelectionChanged() {
+		final SelectionChangedEvent event = new SelectionChangedEvent(this, getSelection());
 		
         Object[] listeners = selectionChangedListeners.getListeners();
         for (int i = 0; i < listeners.length; ++i) {
