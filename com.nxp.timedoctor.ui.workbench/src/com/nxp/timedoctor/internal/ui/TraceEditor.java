@@ -12,31 +12,26 @@ package com.nxp.timedoctor.internal.ui;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPathEditorInput;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
-import org.eclipse.ui.part.IPage;
-import org.eclipse.ui.part.PageBookView;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.parser.Parser;
 import com.nxp.timedoctor.internal.ui.outline.TraceOutlinePage;
-import com.nxp.timedoctor.ui.trace.TraceSelection;
 import com.nxp.timedoctor.ui.trace.TraceViewer;
 
 /**
@@ -44,9 +39,10 @@ import com.nxp.timedoctor.ui.trace.TraceViewer;
  * the file and creates a traceModel, then creates and populates all subelements
  * necessary to display and manipulate the data.
  */
-public class TraceEditor extends EditorPart implements ISelectionListener {
+public class TraceEditor extends EditorPart implements ISelectionChangedListener {
 	public final static String ID = "com.nxp.timedoctor.ui.workbench.TraceEditor";
-	private ArrayList<IPage> pageList = new ArrayList<IPage>(); 
+
+	private IContentOutlinePage fOutlinePage = null;
 
 	/**
 	 * The view that holds all actual GUI elements.
@@ -140,7 +136,10 @@ public class TraceEditor extends EditorPart implements ISelectionListener {
 	@Override
 	public Object getAdapter(final Class key) {
 		if (key.equals(IContentOutlinePage.class)) {
-			return createOutlinePage();
+			if (fOutlinePage == null) {
+				fOutlinePage = createOutlinePage();
+			}
+			return fOutlinePage;
 		}
 
 		return super.getAdapter(key);
@@ -148,7 +147,6 @@ public class TraceEditor extends EditorPart implements ISelectionListener {
 
 	private TraceOutlinePage createOutlinePage() {
 		TraceOutlinePage traceOutlinePage = new TraceOutlinePage(this);
-		pageList.add(traceOutlinePage);
 		return traceOutlinePage;
 	}
 	
@@ -184,7 +182,7 @@ public class TraceEditor extends EditorPart implements ISelectionListener {
 		traceViewer = new TraceViewer(parent, traceModel, zoomModel);
 		
 		getSite().setSelectionProvider(getSelectionProvider());
-		getSite().getPage().addSelectionListener(this);
+		getSelectionProvider().addSelectionChangedListener(this);
 	}
 
 	/**
@@ -223,10 +221,9 @@ public class TraceEditor extends EditorPart implements ISelectionListener {
 		zoomModel.deleteObservers();
 		traceModel.deleteObservers();
 		
-		getSite().getPage().removeSelectionListener(this);
-		pageList.clear();
-		
+		fOutlinePage = null;
 		traceModel = null;
+		
 		zoomModel = null;
 
 		super.dispose();
@@ -241,21 +238,20 @@ public class TraceEditor extends EditorPart implements ISelectionListener {
 		return traceViewer.getSelectionProvider();
 	}
 
-		/* (non-Javadoc)
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if (!(selection instanceof TraceSelection)
-				|| part instanceof TraceEditor)
-			return;
-
-		if (part instanceof PageBookView) {
-			IPage p = ((PageBookView) part).getCurrentPage();
-
-			if (!pageList.contains(p))
-				return;
-		}
-
-		getSelectionProvider().setSelection(selection);
+	public void selectionChanged(SelectionChangedEvent event) {
+		if (event.getSource().equals(getSelectionProvider())) {
+			if (fOutlinePage != null) {
+				fOutlinePage.removeSelectionChangedListener(this);
+				fOutlinePage.setSelection(event.getSelection());
+				fOutlinePage.addSelectionChangedListener(this);
+			}
+		} else {
+			getSelectionProvider().removeSelectionChangedListener(this);
+			getSelectionProvider().setSelection(event.getSelection());
+			getSelectionProvider().addSelectionChangedListener(this);
+		}	
 	}
 }

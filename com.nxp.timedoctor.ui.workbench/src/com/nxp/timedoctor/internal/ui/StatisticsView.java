@@ -11,6 +11,7 @@
 package com.nxp.timedoctor.internal.ui;
 
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
@@ -22,8 +23,8 @@ import org.eclipse.ui.part.MessagePage;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.PageBookView;
 
+import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
-import com.nxp.timedoctor.ui.trace.TraceSelection;
 
 public abstract class StatisticsView extends PageBookView implements ISelectionListener {
 	
@@ -48,13 +49,15 @@ public abstract class StatisticsView extends PageBookView implements ISelectionL
 	}
 
 	public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-		if (part == this || selection == null || selection.isEmpty() || !(selection instanceof TraceSelection)) {
+		if (part == this || !(selection instanceof IStructuredSelection) || selection.isEmpty()) {
 			return;
 		}
 		
+		IStructuredSelection sel = (IStructuredSelection) selection;		
 		IStatisticsViewPage page = (IStatisticsViewPage) getCurrentPage();
+		
 		if (page != null) {
-			page.selectLine(((TraceSelection)selection).getLine());
+			page.selectLine((SampleLine) sel.getFirstElement());
 		}
 	}
 

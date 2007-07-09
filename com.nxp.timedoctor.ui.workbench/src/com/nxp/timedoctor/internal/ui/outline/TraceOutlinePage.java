@@ -13,8 +13,11 @@ package com.nxp.timedoctor.internal.ui.outline;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.util.SafeRunnable;
@@ -23,23 +26,19 @@ import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
@@ -49,7 +48,6 @@ import com.nxp.timedoctor.core.model.SectionList;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
 import com.nxp.timedoctor.internal.ui.TraceEditor;
-import com.nxp.timedoctor.ui.trace.TraceSelection;
 
 /**
  * An OutLine view provider for the <code>TraceEditor</code>. It extends the {@link ContentOutlinePage}
@@ -57,13 +55,12 @@ import com.nxp.timedoctor.ui.trace.TraceSelection;
  *
  */
 public class TraceOutlinePage extends Page implements IContentOutlinePage,
-		ISelectionChangedListener, ISelectionListener, Observer {
+		ISelectionChangedListener, Observer {
 	private TraceModel traceModel;
-	private CheckboxTreeViewer treeTraceViewer;
+	private CheckboxTreeViewer fTreeViewer;
 	private ListenerList selectionListenerList = new ListenerList();
-	private ISelectionProvider editorSelectionProvider;
-	
-	private boolean fLinkWithEditor = true;
+	private TraceEditor fTraceEditor;
+	private boolean fLinkWithEditor = false;
 	
 	/**
 	 * Constructor for the {@link TraceOutlinePage}
@@ -72,12 +69,12 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 	public TraceOutlinePage(final TraceEditor traceEditor) {
 		super();
 		
+		fTraceEditor = traceEditor;
 		this.traceModel = traceEditor.getTraceModel();
-		this.editorSelectionProvider = traceEditor.getSelectionProvider();
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#init(org.eclipse.ui.part.IPageSite)
+	 * @see org.eclipse.ui.part.Page#init(org.eclipse.ui.part.IPageSite)
 	 */
 	@Override
 	public void init(IPageSite pageSite) {
@@ -85,47 +82,42 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#createControl(org.eclipse.swt.widgets.Composite)
+	 * @see org.eclipse.ui.part.Page#createControl(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public void createControl(Composite parent) {
 		installLinkWithEditorButton();
 		
-		treeTraceViewer = new ContainerCheckedTreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-		treeTraceViewer.setAutoExpandLevel(CheckboxTreeViewer.ALL_LEVELS);
-		treeTraceViewer.setUseHashlookup(true);
+		fTreeViewer = new ContainerCheckedTreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+		fTreeViewer.setAutoExpandLevel(CheckboxTreeViewer.ALL_LEVELS);
+		fTreeViewer.setUseHashlookup(true);
 		
-		treeTraceViewer.setContentProvider(new TraceOutlineContentProvider());
-		treeTraceViewer.setLabelProvider(new TraceOutlineLabelProvider());
+		fTreeViewer.setContentProvider(new TraceOutlineContentProvider());
+		fTreeViewer.setLabelProvider(new TraceOutlineLabelProvider());
 		
-		treeTraceViewer.setInput(traceModel);
-		treeTraceViewer.expandAll();
+		fTreeViewer.setInput(traceModel);
 		
-		treeTraceViewer.addSelectionChangedListener(this);
-		
-		treeTraceViewer.addCheckStateListener(new ICheckStateListener(){
+		fTreeViewer.addCheckStateListener(new ICheckStateListener(){
 			public void checkStateChanged(CheckStateChangedEvent event) {
-				if (!fLinkWithEditor)
-					return;
-				
 				final Object source = event.getElement();
+				final boolean checked = event.getChecked();
 				
 				if ( source instanceof Section ) {
 					Section section = (Section)source;
 					
 					for (final SampleLine line:section.getLines()) {
-						line.setVisible(event.getChecked());
+						line.setVisible(checked);
 					}
 				} else {
 					SampleLine line = (SampleLine)source;
-					line.setVisible(event.getChecked());
+					line.setVisible(checked);
 				}
 				
 				traceModel.setChanged();
 			}
 		});
 		
-		treeTraceViewer.addTreeListener(new ITreeViewerListener(){
+		fTreeViewer.addTreeListener(new ITreeViewerListener(){
 			public void treeCollapsed(TreeExpansionEvent event) {}
 
 			public void treeExpanded(TreeExpansionEvent event) {
@@ -134,11 +126,15 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 		});
 				
 		updateCheckState();
-		setSelection(editorSelectionProvider.getSelection());
+		
+		if (fLinkWithEditor) {
+			setSelection(fTraceEditor.getSelectionProvider().getSelection());
+		}
 		
 		traceModel.addObserver(this);
 		getSite().setSelectionProvider(this);
-		getSite().getPage().addSelectionListener(this);
+		addSelectionChangedListener(fTraceEditor);
+		fTreeViewer.addSelectionChangedListener(this);
 	}
 	
 	private void updateCheckState() {
@@ -154,47 +150,52 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 
 	private void updateCheckState(final Section section) {
 		for (final SampleLine line : section.getLines()) {
-			treeTraceViewer.setChecked(line, line.isVisible());
+			fTreeViewer.setChecked(line, line.isVisible());
 		}
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener#selectionChanged(org.eclipse.jface.viewers.SelectionChangedEvent)
 	 */
 	public void selectionChanged(final SelectionChangedEvent event) {
-		//Selection changes in TreeViewer 
 		setFocus();
-		final TraceSelection formTraceSelection = formTraceSelection(event.getSelection());
-		
-		if (formTraceSelection.isEmpty()) {
-			setEmptySelection();
-		} else {
-			if (fLinkWithEditor)
-				fireSelectionChanged(formTraceSelection);
+
+		IStructuredSelection selection = (IStructuredSelection)event.getSelection();
+		Object selected = selection.getFirstElement();
+		if (selected instanceof SampleLine) {
+			fireSelectionChanged(selection);
 		}
 	}
 
-	private void setEmptySelection() {
-		treeTraceViewer.removeSelectionChangedListener(this);
-		treeTraceViewer.setSelection(TreeSelection.EMPTY);
-		treeTraceViewer.addSelectionChangedListener(this);
+	private ISelection getVisibleSampleLineAsSelection(final ISelection sel){
+		if (sel instanceof IStructuredSelection) {
+			final Object selected = ((IStructuredSelection) sel).getFirstElement();			
+			if (selected instanceof SampleLine && ((SampleLine)selected).isVisible()) {
+				return new StructuredSelection(selected);
+			}
+		}		
+		return StructuredSelection.EMPTY;
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#getSelection()
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
 	 */
 	public ISelection getSelection() {
-		return formTraceSelection(treeTraceViewer.getSelection());
+		return getVisibleSampleLineAsSelection(fTreeViewer.getSelection());
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#setSelection(org.eclipse.jface.viewers.ISelection)
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
 	 */
 	public void setSelection(ISelection selection) {
-		if (selection instanceof TraceSelection) {
-			treeTraceViewer.removeSelectionChangedListener(this);
-			treeTraceViewer.setSelection(formTreeSelection(selection), true);
-			treeTraceViewer.addSelectionChangedListener(this);
+		if (fTreeViewer != null && fLinkWithEditor) {
+			ISelection sel = getVisibleSampleLineAsSelection(selection);
+			
+			if (!sel.isEmpty()) {
+				fTreeViewer.removeSelectionChangedListener(this);
+				fTreeViewer.setSelection(sel, true);
+				fTreeViewer.addSelectionChangedListener(this);
+			}
 		}
 	}
 	
@@ -229,47 +230,20 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.ISelectionListener#selectionChanged(org.eclipse.ui.IWorkbenchPart, org.eclipse.jface.viewers.ISelection)
-	 */
-	public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-		if (part instanceof TraceEditor) {
-			if (fLinkWithEditor)
-				setSelection(selection);
-		} else {
-			setSelection(selection);
-		}
-	}
-
-	private ITreeSelection formTreeSelection(final ISelection selection) {
-		if (selection.isEmpty()) {
-			return TreeSelection.EMPTY;
-		}
-		
-		TraceSelection sel = (TraceSelection)selection;
-		
-		TreePath treePath = new TreePath(new Object[] { sel.getLine() });
-		TreeSelection treeSelection = new TreeSelection(treePath);
-		
-		return treeSelection;
-	}
-
-	private TraceSelection formTraceSelection(final ISelection selection) {
-		final Object selected = ((IStructuredSelection) selection).getFirstElement();
-		
-		if (selected instanceof SampleLine) {
-			return new TraceSelection((SampleLine)selected);
-		} else {
-			return new TraceSelection();
-		}
-	}
-
-	/* (non-Javadoc)
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
 	public void update(Observable o, Object arg) {
-		if (o instanceof TraceModel && fLinkWithEditor) {
-			treeTraceViewer.refresh();
-			updateCheckState();
+		if (o instanceof TraceModel) {
+			fTreeViewer.refresh();
+			
+			UIJob job = new UIJob("Update tree") {
+				@Override
+				public IStatus runInUIThread(IProgressMonitor monitor) {
+					updateCheckState(); //Can take long if the tree is big
+					return Status.OK_STATUS;
+				}
+			};
+			job.schedule();
 		}
 	}
 
@@ -278,29 +252,36 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 	 */
 	@Override
 	public void dispose() {
-		super.dispose();
-		treeTraceViewer = null;
-		getSite().getPage().removeSelectionListener(this);
+		if (fTraceEditor != null) {
+			removeSelectionChangedListener(fTraceEditor);
+		}
+		
+		if (fTreeViewer != null) {
+			fTreeViewer.removeSelectionChangedListener(this);
+			fTreeViewer.getControl().dispose();
+			fTreeViewer = null;
+		}
+		
 		traceModel.deleteObserver(this);
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#setFocus()
+	 * @see org.eclipse.ui.part.Page#setFocus()
 	 */
 	@Override
 	public void setFocus() {
-		if ( treeTraceViewer != null ) {
-			treeTraceViewer.getControl().setFocus();
+		if ( fTreeViewer != null ) {
+			fTreeViewer.getControl().setFocus();
 		}
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.ui.views.contentoutline.ContentOutlinePage#getControl()
+	 * @see org.eclipse.ui.part.Page#getControl()
 	 */
 	@Override
 	public Control getControl() {
-		if ( treeTraceViewer != null )
-			return treeTraceViewer.getControl();
+		if ( fTreeViewer != null )
+			return fTreeViewer.getControl();
 		return null;
 	}
 	
@@ -323,8 +304,6 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 	}
 	
 	private void updateLink() {
-		treeTraceViewer.refresh();
-		updateCheckState();
-		setSelection(editorSelectionProvider.getSelection());
+		setSelection(fTraceEditor.getSelectionProvider().getSelection());
 	}
 }
