@@ -13,20 +13,24 @@ package com.nxp.timedoctor.ui.statistics;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.actions.ActionFactory;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
 import com.nxp.timedoctor.core.model.statistics.TraceStatistic;
+import com.nxp.timedoctor.ui.statistics.actions.CopyAction;
+import com.nxp.timedoctor.ui.statistics.actions.PrintAction;
 
-public class TraceStatViewer implements Observer, IStatisticsViewPage {
+public class TraceStatisticsPage implements Observer, IStatisticsViewPage {
 	private ZoomModel zoomModel;
 	private StatisticsTimeModel timeModel;
 	
@@ -34,11 +38,15 @@ public class TraceStatViewer implements Observer, IStatisticsViewPage {
 	private TraceStatistic traceStat;
 	
 	private Composite topComposite;
+	private IAction copyAction;
+	private IAction printAction;
 	
 	/**
 	 * The constructor.
 	 */
-	public TraceStatViewer() {		
+	public TraceStatisticsPage() {
+		copyAction = new CopyAction(this);
+		printAction = new PrintAction(this);
 	}
 
 	/* (non-Javadoc)
@@ -108,6 +116,13 @@ public class TraceStatViewer implements Observer, IStatisticsViewPage {
 	 */
 	public void setActionBars(IActionBars actionBars) {
 		//TODO: button to select between seconds, cycles, or %
+		actionBars.getToolBarManager().add(copyAction);
+		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), copyAction);
+		
+		actionBars.getToolBarManager().add(printAction);
+		actionBars.setGlobalActionHandler(ActionFactory.PRINT.getId(), printAction);
+		
+		actionBars.updateActionBars();
 	}
 
 	/* (non-Javadoc)
@@ -123,5 +138,13 @@ public class TraceStatViewer implements Observer, IStatisticsViewPage {
 	public void dispose() {
 		zoomModel.deleteObserver(this);
 		timeModel.deleteObserver(this);
+	}
+
+	public void copyToClipboard() {
+		tableViewer.copy();
+	}
+
+	public void print() {
+		tableViewer.print();
 	}
 }

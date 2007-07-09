@@ -10,26 +10,32 @@
  *******************************************************************************/
 package com.nxp.timedoctor.ui.statistics;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 
 import com.nxp.timedoctor.core.model.statistics.Statistic;
 
-public class LineStatTreeViewer {
-	private final String ITEM_HEADING 	= "Statistic";
-	private final String TOTAL_HEADING 	= "Total";
-	private final String LOAD_HEADING 	= "Load";
-	private final String MIN_HEADING 	= "Minimum/Execution";
-	private final String AVG_HEADING 	= "Average/Execution";
-	private final String MAX_HEADING 	= "Maximum/Execution";
+public class LineStatTreeViewer extends StatisticsViewer {
+	private final static String ITEM_HEADING 	= "Statistic";
+	private final static String TOTAL_HEADING 	= "Total";
+	private final static String LOAD_HEADING 	= "Load";
+	private final static String MIN_HEADING 	= "Minimum/Execution";
+	private final static String AVG_HEADING 	= "Average/Execution";
+	private final static String MAX_HEADING 	= "Maximum/Execution";
 
 	private TreeViewer viewer;
 	
-	private final String[] columnNames = new String[] { 
+	private final static String[] columnNames = new String[] { 
 			ITEM_HEADING, 
 			TOTAL_HEADING,
 			LOAD_HEADING,
@@ -38,11 +44,18 @@ public class LineStatTreeViewer {
 			MAX_HEADING
 	};
 	
-	public LineStatTreeViewer(final Composite parent) {
-		createTreeViewer(createTree(parent));
-		updateColumnSize();
+	public LineStatTreeViewer(final Composite topComposite) {
+		super(topComposite);
 	}
 	
+	@Override
+	protected Control getControl(Composite parentComposite) {
+		Tree tree = createTree(parentComposite);
+		createTreeViewer(tree);
+		updateColumnSize();		
+		return tree;
+	}
+
 	private Tree createTree(final Composite parent) {
 		Tree tree = new Tree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		tree.setHeaderVisible(true);
@@ -67,13 +80,10 @@ public class LineStatTreeViewer {
 		}
 	}
 
-	public void setLayoutData(final Object layoutData) {
-		viewer.getTree().setLayoutData(layoutData);
-	}
-	
 	public void setInput(final Statistic input) {
 		viewer.setInput(input);
 		viewer.getTree().setEnabled(input != null);
+		updateRequired();
 		refresh();
 	}
 
@@ -85,6 +95,72 @@ public class LineStatTreeViewer {
 	private void updateColumnSize() {
 		for (TreeColumn column : viewer.getTree().getColumns()) {
 			column.pack();
+		}
+	}
+
+	@Override
+	protected void populateStyledText() {
+		styledText.setText(""); //Clear the text
+		
+		final Tree tree = viewer.getTree();
+		
+		StyleRange boldStyle = new StyleRange();
+		boldStyle.fontStyle = SWT.BOLD;
+		
+		StyleRange normalStyle = new StyleRange();
+		normalStyle.fontStyle = SWT.NORMAL;
+		
+		//Copy column text
+		TreeColumn[] columns = tree.getColumns();
+		
+		List<TreeItem> treeItemsList = getTreeItemsAsList(tree);
+		ArrayList<ColumnFormatter> columnFormatterArray = new ArrayList<ColumnFormatter>(columns.length);
+		
+		for (int col = 0; col < columns.length; col++) {
+			ColumnFormatter columnFormatter = new ColumnFormatter();
+			columnFormatter.addString(tree.getColumn(col).getText());
+			
+			for (TreeItem item: treeItemsList) {
+				columnFormatter.addString(item.getText(col));
+			}
+			
+			columnFormatterArray.add(columnFormatter);
+		}
+		
+		for (int row = 0; row < treeItemsList.size() + 1; row++) {
+			for (int col = 0; col < columns.length; col++) {
+				final int currentOffset = styledText.getText().length();
+				
+				ColumnFormatter columnFormatter = columnFormatterArray.get(col);
+				final String formattedString = columnFormatter.getFormattedString(row);
+				
+				styledText.append(formattedString);
+				styledText.append("\t");
+				
+				if (row == 0 || col == 0) {
+					boldStyle.start = currentOffset;
+					boldStyle.length = formattedString.length() + 1;
+					styledText.setStyleRange(boldStyle);
+				} else {
+					normalStyle.start = currentOffset;
+					normalStyle.length = formattedString.length() + 1;
+					styledText.setStyleRange(normalStyle);
+				}
+			}
+			styledText.append("\n");
+		}
+	}
+
+	private List<TreeItem> getTreeItemsAsList(final Tree tree) {
+		List<TreeItem> list = new ArrayList<TreeItem>(tree.getItemCount() * 2);
+		appendAllTreeItems(tree.getItems(), list);
+		return list;
+	}
+
+	private void appendAllTreeItems(TreeItem[] items, List<TreeItem> list) {
+		for (TreeItem subItem : items) {
+			list.add(subItem);
+			appendAllTreeItems(subItem.getItems(), list);
 		}
 	}
 }

@@ -13,6 +13,7 @@ package com.nxp.timedoctor.ui.statistics;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.jface.action.IAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.GridData;
@@ -20,6 +21,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.actions.ActionFactory;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
@@ -27,8 +29,10 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
 import com.nxp.timedoctor.core.model.statistics.StatisticsTimeModel;
 import com.nxp.timedoctor.core.model.statistics.TaskStatistic;
+import com.nxp.timedoctor.ui.statistics.actions.CopyAction;
+import com.nxp.timedoctor.ui.statistics.actions.PrintAction;
 
-public class LineStatViewer implements IStatisticsViewPage, Observer {
+public class LineStatisticsPage implements IStatisticsViewPage, Observer {
 	private static final String DEFAULT_LABEL = "Select a TASK/ISR/AGENT trace-line";
 	
 	private TraceModel          traceModel;
@@ -43,10 +47,15 @@ public class LineStatViewer implements IStatisticsViewPage, Observer {
 
 	private TaskStatistic taskStat;
 	
+	private IAction copyAction;
+	private IAction printAction;
+	
 	/**
 	 * The constructor.
 	 */
-	public LineStatViewer() {
+	public LineStatisticsPage() {
+		copyAction = new CopyAction(this);
+		printAction = new PrintAction(this);
 	}
 
 	/* (non-Javadoc)
@@ -131,6 +140,13 @@ public class LineStatViewer implements IStatisticsViewPage, Observer {
 		} else {
 			taskLabel.setText("Statistics for " + line.getName());
 		}
+		
+		enableActions(line != null);
+	}
+	
+	private void enableActions(boolean enable) {
+		copyAction.setEnabled(enable);
+		printAction.setEnabled(enable);
 	}
 
 	/* (non-Javadoc)
@@ -152,6 +168,13 @@ public class LineStatViewer implements IStatisticsViewPage, Observer {
 	 */
 	public void setActionBars(IActionBars actionBars) {
 		// TODO: button to select between seconds, cycles, or %
+		actionBars.getToolBarManager().add(copyAction);
+		actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(), copyAction);
+		
+		actionBars.getToolBarManager().add(printAction);
+		actionBars.setGlobalActionHandler(ActionFactory.PRINT.getId(), printAction);
+		
+		actionBars.updateActionBars();
 	}
 
 	/* (non-Javadoc)
@@ -159,5 +182,13 @@ public class LineStatViewer implements IStatisticsViewPage, Observer {
 	 */
 	public void setFocus() {
 		// Do nothing
+	}
+
+	public void copyToClipboard() {
+		treeViewer.copy();
+	}
+
+	public void print() {
+		treeViewer.print();
 	}
 }

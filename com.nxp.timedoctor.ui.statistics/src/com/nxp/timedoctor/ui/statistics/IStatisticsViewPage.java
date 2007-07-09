@@ -27,4 +27,8 @@ public interface IStatisticsViewPage extends IPage {
 	 * @param line
 	 */
 	public void selectLine(SampleLine line);
+	
+	public void copyToClipboard();
+	
+	public void print();
 }
