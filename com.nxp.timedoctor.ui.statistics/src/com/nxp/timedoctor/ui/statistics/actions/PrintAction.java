@@ -21,7 +21,7 @@ public class PrintAction extends Action {
 	public PrintAction(final IStatisticsViewPage statisticsViewPage) {
 		this.statisticsViewPage = statisticsViewPage;
 		
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/print.gif"));
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/elcl16/print.gif"));
 		setToolTipText("Print");
 	}
 

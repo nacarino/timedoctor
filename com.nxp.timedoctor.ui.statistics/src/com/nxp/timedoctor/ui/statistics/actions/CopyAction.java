@@ -21,7 +21,7 @@ public class CopyAction extends Action {
 	public CopyAction(final IStatisticsViewPage statisticsPage) {
 		this.statisticsPage = statisticsPage;
 		
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/copy.gif"));
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/elcl16/copy.gif"));
 		setToolTipText("Copy to clipboard");
 	}
 
