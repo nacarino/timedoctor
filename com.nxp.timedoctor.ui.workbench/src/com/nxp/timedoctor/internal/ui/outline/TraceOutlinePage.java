@@ -298,7 +298,7 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 		
 		linkWithEditorAction.setChecked(fLinkWithEditor);
 
-		linkWithEditorAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/link_with_editor.gif"));
+		linkWithEditorAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/elcl16/link_with_editor.gif"));
 		linkWithEditorAction.setToolTipText("Link with Editor");
 		getSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
 	}
