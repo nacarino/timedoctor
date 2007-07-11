@@ -5,4 +5,5 @@ Bundle-SymbolicName: com.nxp.timedoctor.ui;singleton:=true
 Bundle-Version: 1.4.0
 Bundle-Vendor: Royal Philips Electronics NV.
 Bundle-Localization: plugin
-Eclipse-LazyStart: false
+Eclipse-LazyStart: true
+Export-Package: com.nxp.timedoctor.ui
