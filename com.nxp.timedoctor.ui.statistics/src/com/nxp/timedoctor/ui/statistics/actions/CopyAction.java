@@ -13,6 +13,7 @@ package com.nxp.timedoctor.ui.statistics.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
 
 
@@ -21,7 +22,8 @@ public class CopyAction extends Action {
 	public CopyAction(final IStatisticsViewPage statisticsPage) {
 		this.statisticsPage = statisticsPage;
 		
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/elcl16/copy.gif"));
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+									ITimeDoctorUIConstants.LOCAL_TOOLBAR_ENABLED_IMG_PATH + "copy.gif"));
 		setToolTipText("Copy to clipboard");
 	}
 

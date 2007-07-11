@@ -13,6 +13,7 @@ package com.nxp.timedoctor.ui.statistics.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
 
 public class PrintAction extends Action {
@@ -21,7 +22,8 @@ public class PrintAction extends Action {
 	public PrintAction(final IStatisticsViewPage statisticsViewPage) {
 		this.statisticsViewPage = statisticsViewPage;
 		
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/elcl16/print.gif"));
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+				ITimeDoctorUIConstants.LOCAL_TOOLBAR_ENABLED_IMG_PATH + "print.gif"));
 		setToolTipText("Print");
 	}
 
