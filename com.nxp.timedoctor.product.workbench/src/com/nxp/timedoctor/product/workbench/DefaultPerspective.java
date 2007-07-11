@@ -13,12 +13,12 @@ package com.nxp.timedoctor.product.workbench;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 
-import com.nxp.timedoctor.ui.ITimeDoctorWorkbenchConstants;
+import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 
 public class DefaultPerspective implements IPerspectiveFactory {
 
 	public void createInitialLayout(final IPageLayout layout) {
-		layout.addShowViewShortcut(ITimeDoctorWorkbenchConstants.TASK_STATISTICS_VIEW);
-		layout.addShowViewShortcut(ITimeDoctorWorkbenchConstants.ALL_TASK_STATISTICS_VIEW);
+		layout.addShowViewShortcut(ITimeDoctorUIConstants.TASK_STATISTICS_VIEW);
+		layout.addShowViewShortcut(ITimeDoctorUIConstants.ALL_TASK_STATISTICS_VIEW);
 	}
 }
