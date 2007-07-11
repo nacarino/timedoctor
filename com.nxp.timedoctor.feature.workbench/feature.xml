@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.workbench"
       label="%featureName"
-      version="1.3.0"
+      version="1.4.0"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.workbench">
 
@@ -113,5 +113,19 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.update.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.update.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
