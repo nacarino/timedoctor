@@ -23,6 +23,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import com.nxp.timedoctor.internal.ui.TraceEditor;
 import com.nxp.timedoctor.internal.ui.TraceEditorInput;
+import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 
 public class OpenAction extends Action implements IWorkbenchAction {
 	
@@ -35,7 +36,8 @@ public class OpenAction extends Action implements IWorkbenchAction {
 		setId(ID);
 		setText("&Open Trace...");
 		setToolTipText("Open a TimeDoctor trace file.");
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/etool16/open.gif"));
+		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+				ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "open.gif"));
 	}
 
 	@Override

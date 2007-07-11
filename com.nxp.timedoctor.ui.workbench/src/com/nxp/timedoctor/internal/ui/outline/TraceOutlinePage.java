@@ -48,6 +48,7 @@ import com.nxp.timedoctor.core.model.SectionList;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
 import com.nxp.timedoctor.internal.ui.TraceEditor;
+import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 
 /**
  * An OutLine view provider for the <code>TraceEditor</code>. It extends the {@link ContentOutlinePage}
@@ -298,7 +299,8 @@ public class TraceOutlinePage extends Page implements IContentOutlinePage,
 		
 		linkWithEditorAction.setChecked(fLinkWithEditor);
 
-		linkWithEditorAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin("com.nxp.timedoctor.ui", "icons/elcl16/link_with_editor.gif"));
+		linkWithEditorAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN,
+													ITimeDoctorUIConstants.LOCAL_TOOLBAR_ENABLED_IMG_PATH + "link_with_editor.gif"));
 		linkWithEditorAction.setToolTipText("Link with Editor");
 		getSite().getActionBars().getToolBarManager().add(linkWithEditorAction);
 	}

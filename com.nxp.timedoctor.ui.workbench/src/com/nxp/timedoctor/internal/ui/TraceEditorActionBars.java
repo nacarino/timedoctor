@@ -29,6 +29,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
+import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 import com.nxp.timedoctor.ui.trace.actions.GoToTimeAction;
 import com.nxp.timedoctor.ui.trace.actions.NextAction;
 import com.nxp.timedoctor.ui.trace.actions.PreviousAction;
@@ -42,9 +43,6 @@ import com.nxp.timedoctor.ui.trace.actions.ZoomOutAction;
  * This class performs retargetable actions for menu items.
  */
 public class TraceEditorActionBars extends EditorActionBarContributor implements Observer {
-	private static final String UI_PLUGIN = "com.nxp.timedoctor.ui";
-	private static final String IMAGE_FOLDER = "icons/etool16/";
-
 	private final static String PLUGIN_COMMAND_ID = "com.nxp.timedoctor.ui.commands";
 
 	private ZoomInAction zoomInAction;
@@ -78,38 +76,45 @@ public class TraceEditorActionBars extends EditorActionBarContributor implements
 		// must be updated to Eclipse 3.2 new command handler way of working
 		zoomInAction = new ZoomInAction("Zoom In");		
 		zoomInAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomIn");
-		zoomInAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "zoom_in.gif"));
+		zoomInAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "zoom_in.gif"));
 		zoomInCommandHandler = new ActionHandler(zoomInAction);
 		
 		zoomOutAction = new ZoomOutAction("Zoom Out");		
 		zoomOutAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomOut");
-		zoomOutAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "zoom_out.gif"));
+		zoomOutAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "zoom_out.gif"));
 		zoomOutCommandHandler = new ActionHandler(zoomOutAction);
 		
 		zoomBackAction = new ZoomBackAction("Zoom Back");
 		zoomBackAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomBack");
-		zoomBackAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "zoom_back.gif"));
+		zoomBackAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "zoom_back.gif"));
 		zoomBackCommandHandler = new ActionHandler(zoomBackAction);
 		
 		zoomFitAction = new ZoomFitAction("Zoom Fit");
 		zoomFitAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".ZoomFit");
-		zoomFitAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "zoom_fit.gif"));
+		zoomFitAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "zoom_fit.gif"));
 		zoomFitCommandHandler = new ActionHandler(zoomFitAction);
 		
 		nextAction = new NextAction("Next Event");		
 		nextAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Next");
-		nextAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "next.gif"));
+		nextAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "next.gif"));
 		nextCommandHandler = new ActionHandler(nextAction);
 		
 		previousAction = new PreviousAction("Previous Event");
 		previousAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".Previous");
-		previousAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "previous.gif"));
+		previousAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "previous.gif"));
 		previousCommandHandler = new ActionHandler(previousAction);
 		
 		// Editor actions
 		goToTimeAction = new GoToTimeAction("Goto Time");		
 		goToTimeAction.setActionDefinitionId(PLUGIN_COMMAND_ID + ".GoToTime");
-		goToTimeAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(UI_PLUGIN, IMAGE_FOLDER + "goto.gif"));
+		goToTimeAction.setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
+													ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "goto.gif"));
 		goToTimeCommandHandler = new ActionHandler(goToTimeAction);
 	}
 
