@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.nxp.timedoctor.feature.base"
-      label="TimeDoctor Base Feature"
-      version="1.4.0"
+      label="%featureName"
+      version="1.4.0.qualifier"
       provider-name="Royal Philips Electronics NV."
       image="timedoctor_update_120.gif">
 
@@ -17,6 +17,10 @@
    <license url="%licenseURL">
       %license
    </license>
+
+   <includes
+         id="com.nxp.timedoctor.feature.base.source"
+         version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
