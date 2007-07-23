@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.workbench"
       label="%featureName"
-      version="1.4.0"
+      version="1.4.0.qualifier"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.workbench"
       image="timedoctor_update_120.gif">
@@ -25,6 +25,10 @@
 
    <includes
          id="org.eclipse.rcp"
+         version="0.0.0"/>
+
+   <includes
+         id="com.nxp.timedoctor.feature.workbench.source"
          version="0.0.0"/>
 
    <requires>
