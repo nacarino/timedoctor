@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.ide"
       label="%featureName"
-      version="1.4.0"
+      version="1.4.0.qualifier"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.ide"
       image="timedoctor_update_120.gif">
@@ -22,6 +22,10 @@
    <includes
          id="com.nxp.timedoctor.feature.base"
          version="0.0.0"/>
+
+   <includes
+         id="com.nxp.timedoctor.feature.ide.source"
+         version="0.0.0"/>         
 
    <requires>
       <import plugin="org.eclipse.ui"/>
