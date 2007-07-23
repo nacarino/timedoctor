@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Timedoctor File Format Help Plug-in
 Bundle-SymbolicName: com.nxp.timedoctor.help;singleton:=true
-Bundle-Version: 1.3.0
+Bundle-Version: 1.4.0.qualifier
 Bundle-Vendor: NXP Semiconductors B.V.
 Bundle-Localization: plugin
 Require-Bundle: org.apache.lucene,
