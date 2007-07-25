@@ -1,4 +1,4 @@
-This directory contains files for building TimeDoctor IDE and Workbench from commandline.
+This directory contains files for building TimeDoctor IDE and Workbench from command line.
 
 Contents:
 ide/
@@ -17,6 +17,8 @@ masterBuild.cmd
 	windows script that calls run.cmd in each of the above directories to initiate the build
 	
 For fine-tuning, please modify run.cmd in each of the above directories	
+
+NOTE: Be sure to have the RCP-delta-pack installed in the base Eclipse used to build.
 
 NOTE: currently, the build is based on copying plugins manually. However, this can be further 
 automated using automatic fetch from CVS using map files 
