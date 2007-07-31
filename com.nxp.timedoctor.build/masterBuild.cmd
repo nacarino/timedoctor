@@ -1,5 +1,6 @@
 @echo off
-set ECLIPSE_BASE_LOCATION=f:/Tools/eclipse-SDK-3.2/eclipse
+set ECLIPSE_BASE_LOCATION=f:\Tools\eclipse-SDK-3.2\eclipse
+set BUILD_LAUNCH_CMD=java -jar %ECLIPSE_BASE_LOCATION%\startup.jar
 
 set ROOTDIR=%CD%
 set SOURCEDIR=%ROOTDIR%\sources
@@ -71,3 +72,4 @@ if %ERRORLEVEL% NEQ 0 (
     echo Build failed for %WORKBENCHFEATURE%. Please refer %WORKBENCHFEATURE%\buildOutput.log for details >> %ROOTDIR%\FAILED.LOG
 )
 echo #########################################################################################################
+cd %ROOTDIR%

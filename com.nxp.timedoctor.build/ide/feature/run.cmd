@@ -1,5 +1,6 @@
 @echo off
 rem set ECLIPSE_BASE_LOCATION=
+rem set BUILD_LAUNCH_CMD=
 set BUILDTYPE=I
 set BUILDID=TestBuild
 set SKIPFETCH=true
@@ -15,4 +16,4 @@ set BUILDER=%CD%/configuration
 
 set BUILDFILE=%CD%/build.xml
 
-java -jar %ECLIPSE_BASE_LOCATION%/startup.jar -application org.eclipse.ant.core.antRunner -DbaseLocation=%ECLIPSE_BASE_LOCATION% -DbuildDirectory=%BUILD_DIRECTORY% -Dconfigs=%CONFIGS% -DarchivePrefix=%ARCHIVEPREFIX% -DjavacSource=%JAVACSOURCE% -DjavacTarget=%JAVACTARGET% -DbuildId=%BUILDID% -DbuildType=%BUILDTYPE% -DskipFetch=%SKIPFETCH% -DgenerateFeatureVersionSuffix=true -Dbuilder=%BUILDER% -DoutputUpdateJars=false -buildfile %BUILDFILE% > buildOutput.log 2>&1
+%BUILD_LAUNCH_CMD% -application org.eclipse.ant.core.antRunner -DbaseLocation=%ECLIPSE_BASE_LOCATION% -DbuildDirectory=%BUILD_DIRECTORY% -Dconfigs=%CONFIGS% -DarchivePrefix=%ARCHIVEPREFIX% -DjavacSource=%JAVACSOURCE% -DjavacTarget=%JAVACTARGET% -DbuildId=%BUILDID% -DbuildType=%BUILDTYPE% -DskipFetch=%SKIPFETCH% -DgenerateFeatureVersionSuffix=true -Dbuilder=%BUILDER% -DoutputUpdateJars=false -buildfile %BUILDFILE% > buildOutput.log 2>&1
