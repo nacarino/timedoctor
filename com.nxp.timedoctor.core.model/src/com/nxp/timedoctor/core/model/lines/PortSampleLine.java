@@ -56,9 +56,9 @@ public class PortSampleLine extends SampleLine {
 		setType(LineType.PORTS);
 		prodLine = prod;
 		consLine = cons;
-		if (prodLine.getType() == LineType.QUEUES) {
+		if (prodLine != null && prodLine.getType() == LineType.QUEUES) {
 			channelLine = prodLine;
-		} else if (consLine.getType() == LineType.QUEUES) {
+		} else if (consLine != null && consLine.getType() == LineType.QUEUES) {
 			channelLine = consLine;
 		} else {
 			channelLine = null;
