@@ -22,7 +22,7 @@ public final class Times {
 	/**
 	 * Constant representing the precision value for time = 0.
 	 */
-	private static final double PREC_0 = 0.000000001;
+	private static final double PREC_0 = 1.0E-12;
 
 	/**
 	 * Constant representing the precision value for seconds.
@@ -32,17 +32,27 @@ public final class Times {
 	/**
 	 * Constant representing the precision value for milliseconds.
 	 */
-	private static final double PREC_MS = 0.0001;
+	private static final double PREC_MS = 1.0E-4;
+	
+	/**
+	 * Constant representing the precision value for microseconds.
+	 */
+	private static final double PREC_US = 1.0E-7;
 
 	/**
 	 * Constant representing the multiplier value for milliseconds.
 	 */
-	private static final double MULT_MS = 1000;
+	private static final double MULT_MS = 1.0E3;
 
 	/**
 	 * Constant representing the multiplier value for microseconds.
 	 */
-	private static final double MULT_US = 1000000;
+	private static final double MULT_US = 1.0E6;
+	
+	/**
+	 * Constant representing the multiplier value for nanoseconds.
+	 */
+	private static final double MULT_NS = 1.0E9;
 
 	/**
 	 * Private constructor to prevent class instantiation.
@@ -85,9 +95,12 @@ public final class Times {
 		} else if (precision >= PREC_MS) {
 			NumberFormat timeFormat = new DecimalFormat("0.###ms");
 			s = timeFormat.format(time * MULT_MS);
-		} else {
+		} else if(precision >= PREC_US) {
 			NumberFormat timeFormat = new DecimalFormat("0.###us");
 			s = timeFormat.format(time * MULT_US);
+		} else {
+			NumberFormat timeFormat = new DecimalFormat("0.###ns");
+			s = timeFormat.format(time * MULT_NS);
 		}
 		return s;
 	}

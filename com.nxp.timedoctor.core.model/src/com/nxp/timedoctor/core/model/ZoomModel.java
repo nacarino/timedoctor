@@ -29,7 +29,11 @@ public class ZoomModel extends Observable {
      */
     // MR improve name, relate to a stack of zoom items
     private static final int INIT_STACK_SIZE = 50;
-
+    
+    private static final int INITIAL_INTERVAL = 1000;
+    
+    private static final int DEFAULT_TICKS_PER_UNIT = 10;
+    
     /**
      * The start time of the data currently displayed onscreen.
      */
@@ -66,8 +70,12 @@ public class ZoomModel extends Observable {
 	 * Accuracy of the time to be displayed.
 	 */
 	private double timeDisplayAccuracy = 0.0;
+	
+	private int intervalCount = -1;
 
     private SampleLine selectedLine =  null;
+
+	private int pixeslsWidth = -1;
     
     /**
      * Sets the zoom and updates all observers with the new value.
@@ -78,6 +86,7 @@ public class ZoomModel extends Observable {
     public final void setStartTime(final double time) {
     	if (time != startTime) {
     		this.startTime = time;
+    		updateTimeDisplayAccuracy();
     		setChanged();
     		notifyObservers();
     	}
@@ -92,6 +101,7 @@ public class ZoomModel extends Observable {
     public final void setEndTime(final double time) {
         if (time != endTime) {
         	this.endTime = time;
+        	updateTimeDisplayAccuracy();
         	setChanged();
         	notifyObservers();
         }
@@ -123,6 +133,7 @@ public class ZoomModel extends Observable {
     	if ((start != end) && ((start != startTime) || (end != endTime))) {
 			this.startTime = start;
 			this.endTime = end;
+			updateTimeDisplayAccuracy();
 			setChanged();
 			notifyObservers();
 		}
@@ -188,14 +199,14 @@ public class ZoomModel extends Observable {
     }
     
     /**
-	 * Sets the accuracy value of the ruler
-	 * 
-	 * @param accuracy
-	 *            the new accuracy value
-	 */
-	public final void setTimeDisplayAccuracy(double accuracy) {
-		this.timeDisplayAccuracy = accuracy;
-	}
+     * Returns whether the zoom stack is empty
+     * 
+     * @return
+     * 		true, if empty; false otherwise
+     */
+    public final boolean isZoomStackEmpty() {
+    	return (stackCount == 0);
+    }
 	
 	/**
 	 * Returns the current accuracy value
@@ -204,6 +215,27 @@ public class ZoomModel extends Observable {
 	 */
 	public final double getTimeDisplayAccuracy() {
 		return timeDisplayAccuracy;
+	}
+	
+	/**
+	 * The number of intervals, best suited for the current time display accuracy
+	 * as returned by {@link #getTimeDisplayAccuracy()}
+	 * 
+	 * @return
+	 * 		The number of intervals
+	 */
+	public final int getIntevalCount() {
+		return intervalCount;
+	}
+	
+	/**
+	 * Returns the TimeDisplay interval
+	 * 
+	 * @return
+	 * 		The time display interval
+	 */
+	public final double getTimeDisplayInterval() {
+		return timeDisplayAccuracy / intervalCount;
 	}
 
 	/**
@@ -239,5 +271,45 @@ public class ZoomModel extends Observable {
 	
 	public SampleLine getSelectedLine() {
 		return selectedLine;
+	}
+	
+	/**
+	 * The width of the display
+	 * 
+	 * @param width
+	 * 			The width in integer
+	 */
+	public void setWidth(final int width) {
+		this.pixeslsWidth = width;
+		updateTimeDisplayAccuracy();
+	}
+
+	private void updateTimeDisplayAccuracy() {
+		if (pixeslsWidth != -1) {
+			int count = DEFAULT_TICKS_PER_UNIT;
+			
+			double pixelsPerTime = this.pixeslsWidth / (endTime - startTime);
+			double interval = INITIAL_INTERVAL;
+			double width = INITIAL_INTERVAL * pixelsPerTime;
+			
+			// Find 10-power that ensures 75 pixel spacing (max number is xxxx.xxus)
+			int cursorWidth = 75;
+			while (width > 10 * cursorWidth) {
+				interval /= 10;
+				width /= 10;
+			}
+			if (width > 5 * cursorWidth) {
+				interval /= 5;
+				width /= 5;
+				count = 2;
+			} else if (width > 2 * cursorWidth) {
+				interval /= 2;
+				width /= 2;
+				count = 5;
+			}
+			
+			this.timeDisplayAccuracy = interval;
+			this.intervalCount = count;
+		}
 	}
 }

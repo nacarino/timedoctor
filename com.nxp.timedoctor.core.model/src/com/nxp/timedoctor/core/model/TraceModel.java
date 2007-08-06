@@ -48,6 +48,9 @@ public class TraceModel extends Observable {
 	 * Hash table of description names keyed by description id.
 	 */
  	private HashMap < Integer, String > descrNames = new HashMap < Integer, String > ();
+ 	
+ 	private double maxClockSpeed = 1;
+ 	private double minRoundedResolution = 1;
 
 	// MR improve comment
 	/**
@@ -173,9 +176,24 @@ public class TraceModel extends Observable {
 	 * Computes and sets the max value for each LineType
 	 */
 	public final void computeMaxValues() {
-		for(LineType type:LineType.values()) {
+		for (LineType type:LineType.values()) {
 			computeMaxSample(type);
 		}
+		
+		computeMaxClockSpeed();
+	}
+
+	private void computeMaxClockSpeed() {
+		for (SampleCPU cpu: cpus) {
+			maxClockSpeed = Math.max(maxClockSpeed, cpu.getClocksPerSec());
+		}
+		
+		final double timePeriod = 1.0 / maxClockSpeed;
+		final String tpStr = Double.toString(timePeriod);
+		final int index = tpStr.indexOf("E");
+		
+		String exponent = (index == -1)?"0":tpStr.substring(index + 1);
+		minRoundedResolution = Math.pow(10.0, Double.parseDouble(exponent));
 	}
 	
 	private void computeMaxSample(final LineType type) {
@@ -202,5 +220,29 @@ public class TraceModel extends Observable {
 	public synchronized void setChanged() {
 		super.setChanged();
 		super.notifyObservers();
+	}
+	
+	/**
+	 * Returns the maximum clock speed of all the CPUs in this trace
+	 * 
+	 * @return
+	 * 			The maximum clock speed
+	 */
+	public final double getMaxClockSpeed() {
+		return maxClockSpeed;
+	}
+	
+	/**
+	 * Returns the minimum rounded time-resolution of all the CPUs in this trace
+	 * The rounding is done towards the lesser power of ten.
+	 * <p>
+	 * Eg., if the max frequency in the trace is 200 Hz, then the time period is
+	 * 1/200 = 0.005 or 5e-3. Because of the rounding, the value returned in 1.0e-3 
+	 *  
+	 * @return
+	 * 		The rounded minimum time-resolution
+	 */
+	public final double getMinTimeResolution() {
+		return minRoundedResolution;
 	}
 }
