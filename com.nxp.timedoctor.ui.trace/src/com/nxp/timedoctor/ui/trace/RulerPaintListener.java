@@ -28,12 +28,6 @@ import com.nxp.timedoctor.core.model.ZoomModel;
 public class RulerPaintListener implements PaintListener {
 
 	/**
-	 * Sets the initial number of ticks per unit (in this case a second) to be
-	 * ten.
-	 */
-	private static final int DEFAULT_TICKS_PER_UNIT = 10;
-
-	/**
 	 * Sets the main tick height to eight pixels.
 	 */
 	private static final int MAIN_TICK_HEIGHT = 6;
@@ -48,11 +42,6 @@ public class RulerPaintListener implements PaintListener {
 	 * pixels.
 	 */
 	private static final int LABEL_OFFSET = 7;
-
-	/**
-	 * Sets the initial time interval size.
-	 */
-	private static final int INITIAL_INTERVAL = 1000;
 
 	/**
 	 * The default end time used if the time interval to be visualized is zero
@@ -108,32 +97,10 @@ public class RulerPaintListener implements PaintListener {
 
 		double drawStartTime = startTime + (e.x / pixelsPerTime);
 		double drawEndTime = drawStartTime + (e.width / pixelsPerTime);
-
-		double interval = INITIAL_INTERVAL;
-		double width = INITIAL_INTERVAL * pixelsPerTime;
-		int count = DEFAULT_TICKS_PER_UNIT;
 		
-		// Find 10-power that ensures 75 pixel spacing (max number is xxxx.xxus)
-		int cursorWidth = 75;
-		while (width > 10 * cursorWidth) {
-			interval /= 10;
-			width /= 10;
-		}
-		if (width > 5 * cursorWidth) {
-			interval /= 5;
-			width /= 5;
-			count = 2;
-		} else if (width > 2 * cursorWidth) {
-			interval /= 2;
-			width /= 2;
-			count = 5;
-		}
-		double accuracy = interval;
-		interval /= count;
-
-		// MR Ugly: the model should not be updated by a viewer like this
-		// Problems can occur if other viewers depend on this update
-		zoomModel.setTimeDisplayAccuracy(accuracy);
+		double accuracy = zoomModel.getTimeDisplayAccuracy();		
+		double interval = zoomModel.getTimeDisplayInterval();
+		int count = zoomModel.getIntevalCount();
 
 		double time = accuracy * Math.floor(drawStartTime / accuracy);
 		int pos;

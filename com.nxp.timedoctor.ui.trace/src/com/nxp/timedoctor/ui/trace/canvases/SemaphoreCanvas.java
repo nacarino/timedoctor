@@ -45,7 +45,7 @@ public class SemaphoreCanvas extends TraceCanvas {
      */
     public SemaphoreCanvas(final Composite parent, final SampleLine line,
 			final ZoomModel zoom, final TraceModel traceModel) {
-		super(parent, zoom, new SemaphoreSampleInfo(line));
+		super(parent, zoom, new SemaphoreSampleInfo(line, zoom));
 		
 		this.model = traceModel;
 		this.line  = line;

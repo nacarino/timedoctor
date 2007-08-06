@@ -13,7 +13,6 @@ package com.nxp.timedoctor.ui.trace.actions;
 /**
  * This class fits the trace models window with in the trace editor.
  */
-// TODO handle enable/disable depending on zoom out/in/back
 public class ZoomFitAction extends TraceAction {
 	public static final String ID = "com.nxp.timedoctor.ui.actions.ZoomFit";
 

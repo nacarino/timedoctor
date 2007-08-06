@@ -11,6 +11,8 @@
 package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -19,6 +21,7 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.canvases.TraceCanvas;
 
@@ -30,6 +33,7 @@ public class TraceZoomListener implements MouseListener, MouseMoveListener {
 	private double drawStartTime = 0.0;
 	private double drawEndTime = 0.0;
 	private ZoomModel zoom;
+	private TraceModel traceModel;
 	private int mouseButton = 0;
 	private Cursor zoomCursor = null;
 
@@ -38,9 +42,12 @@ public class TraceZoomListener implements MouseListener, MouseMoveListener {
 	 * 
 	 * @param zoomData
 	 *            the observable model part containing zoom/scroll data
+	 * @param traceModel
+	 * 			  the {@link TraceModel} object	
 	 */
-	public TraceZoomListener(final ZoomModel zoomData) {
-		this.zoom = zoomData;		
+	public TraceZoomListener(final ZoomModel zoomData, final TraceModel traceModel) {
+		this.zoom = zoomData;
+		this.traceModel = traceModel;
 	}
 
 	public void mouseDoubleClick(final MouseEvent e) {
@@ -64,8 +71,15 @@ public class TraceZoomListener implements MouseListener, MouseMoveListener {
 	public void mouseMove(final MouseEvent e) {
 		if (mouseButton == 1) {
 			if (zoomCursor == null) {
-				// TODO cusor must be disposed explicitly
 				zoomCursor = new Cursor(e.display, SWT.CURSOR_SIZEE);
+				e.widget.addDisposeListener(new DisposeListener(){
+					public void widgetDisposed(DisposeEvent e) {
+						if (!zoomCursor.isDisposed()) {
+							zoomCursor.dispose();
+							zoomCursor = null;
+						}
+					}
+				});
 			}
 			((Control) e.widget).setCursor(zoomCursor);
 		}		
@@ -80,7 +94,7 @@ public class TraceZoomListener implements MouseListener, MouseMoveListener {
 	 * @see org.eclipse.swt.events.MouseTrackListener#mouseHover(org.eclipse.swt.events.MouseEvent)
 	 */
 	public void mouseUp(final MouseEvent e) {
-		if (mouseButton == 1) {
+		if ((mouseButton == 1) && (zoom.getTimeDisplayAccuracy() > traceModel.getMinTimeResolution())) {
 			drawEndTime = zoom.getTimeAtPosition(e.x, getWidth(e));
 
 			if (drawStartTime > drawEndTime) {

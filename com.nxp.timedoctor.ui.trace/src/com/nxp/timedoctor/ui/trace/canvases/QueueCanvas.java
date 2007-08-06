@@ -47,7 +47,7 @@ public class QueueCanvas extends TraceCanvas {
 			final SampleLine line,
 			final ZoomModel zoom, 
 			final TraceModel model) {
-		super(parent, zoom, new QueueSampleInfo(line));
+		super(parent, zoom, new QueueSampleInfo(line, zoom));
 		
 		this.model = model;
 		this.line  = line;

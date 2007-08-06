@@ -13,7 +13,6 @@ package com.nxp.timedoctor.ui.trace.actions;
 /**
  * This class performs the zoom out operation.
  */
-// TODO handle enable/disable depending on zoom back/out/fit
 public class ZoomOutAction extends TraceAction {
 	public static final String ID = "com.nxp.timedoctor.ui.actions.ZoomOut";
 	

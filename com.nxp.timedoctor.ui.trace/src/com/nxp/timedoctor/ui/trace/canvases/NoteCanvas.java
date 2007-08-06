@@ -36,7 +36,7 @@ public class NoteCanvas extends TraceCanvas {
 	public NoteCanvas(final Composite parent, 
 			final SampleLine line,
 			final ZoomModel zoom) {
-		super(parent, zoom, new NoteSampleInfo(line));
+		super(parent, zoom, new NoteSampleInfo(line, zoom));
 		addPaintListener(new NotePaintListener(Colors.getColorRegistry().get(Colors.DARK_GOLDENROD), line, zoom));
 		
 	}

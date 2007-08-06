@@ -13,18 +13,18 @@ package com.nxp.timedoctor.ui.trace.descriptions;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
 
-public class ValueSampleInfo extends SampleInfo {
+public class ValueSampleInfo extends AbstractSampleInfo {
 	private SampleLine line;
 	private ZoomModel zoom;
 	
 	public ValueSampleInfo(final SampleLine line, final ZoomModel zoom) {
-		super(line);
+		super(line, zoom);
 		this.zoom = zoom;
 		this.line = line;	
 	}
 	
 	@Override
-	public String getInfoStr(final int index) {
+	protected void fillInfoString(StringBuilder sb, int index) {
 		double startTime = line.getSample(index).time;
 		double endTime = line.getSample(index + 1).time;
 		double valueDifference = line.getSample(index + 1).val
@@ -36,18 +36,16 @@ public class ValueSampleInfo extends SampleInfo {
 		double overallTimeInterval = result[0];
 		double avgValueDifference = result[1];
 		
-		String text = timeBoundsToStr(startTime, endTime);
-		text += " (" + timeIntervalToStr(startTime, endTime) + ")\n";
-		text += doubleToIntStr(valueDifference);
-		text += "\nAvg: " + doubleToIntStr(avgValueDifference)  + " #";
-		text += " / ";
-		text += doubleToIntStr(avgValueDifference/overallTimeInterval) + " #/s";
+		sb.append(timeBoundsToStr(startTime, endTime));
+		sb.append(" (" + timeIntervalToStr(startTime, endTime) + ")\n");
+		sb.append(doubleToIntStr(valueDifference));
+		sb.append("\nAvg: " + doubleToIntStr(avgValueDifference)  + " #");
+		sb.append(" / ");
+		sb.append(doubleToIntStr(avgValueDifference/overallTimeInterval) + " #/s");
 				
 		String description = line.descrString(startTime);
 		if (description != null) {
-			text += description;
+			sb.append(description);
 		}
-		
-		return text;
 	}
 }

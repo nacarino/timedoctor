@@ -13,18 +13,18 @@ package com.nxp.timedoctor.ui.trace.descriptions;
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.ZoomModel;
 
-public class CycleSampleInfo extends SampleInfo {
+public class CycleSampleInfo extends AbstractSampleInfo {
 	private SampleLine line;
 	private ZoomModel zoom;
 	
 	public CycleSampleInfo(final SampleLine line, final ZoomModel zoom) {
-		super(line);
+		super(line, zoom);
 		this.zoom = zoom;
 		this.line = line;	
 	}
 	
 	@Override
-	public String getInfoStr(final int index) {
+	protected void fillInfoString(StringBuilder sb, int index) {
 		double startTime = line.getSample(index).time;
 		double endTime = line.getSample(index + 1).time;
 		double timeInterval = endTime - startTime; // based on sample times
@@ -38,24 +38,22 @@ public class CycleSampleInfo extends SampleInfo {
 		double overallTimeInterval = result[0];
 		double avgValueDifference = result[1];
 		
-		String text = timeBoundsToStr(startTime, endTime);
-		text += " (" + timeIntervalToStr(startTime, endTime) + ")\n";
-		text += doubleToIntStr(valueDifference) + " cycles";
-		text += " / ";
-		text += cyclesToPercentageStr(valueDifference, timeInterval);
-		text += " / ";
-		text += cyclesToFrequencyStr(valueDifference, timeInterval);
-		text += "\nAvg: " + doubleToIntStr(avgValueDifference) + " cycles";
-		text += " / ";
-		text += cyclesToPercentageStr(avgValueDifference, overallTimeInterval);
-		text += " / ";
-		text += cyclesToFrequencyStr(avgValueDifference, overallTimeInterval);
+		sb.append(timeBoundsToStr(startTime, endTime));
+		sb.append(" (" + timeIntervalToStr(startTime, endTime) + ")\n");
+		sb.append(doubleToIntStr(valueDifference) + " cycles");
+		sb.append(" / ");
+		sb.append(cyclesToPercentageStr(valueDifference, timeInterval));
+		sb.append(" / ");
+		sb.append(cyclesToFrequencyStr(valueDifference, timeInterval));
+		sb.append("\nAvg: " + doubleToIntStr(avgValueDifference) + " cycles");
+		sb.append(" / ");
+		sb.append(cyclesToPercentageStr(avgValueDifference, overallTimeInterval));
+		sb.append(" / ");
+		sb.append(cyclesToFrequencyStr(avgValueDifference, overallTimeInterval));
 				
 		String description = line.descrString(startTime);
 		if (description != null) {
-			text += description;
+			sb.append(description);
 		}
-		
-		return text;
 	}
 }

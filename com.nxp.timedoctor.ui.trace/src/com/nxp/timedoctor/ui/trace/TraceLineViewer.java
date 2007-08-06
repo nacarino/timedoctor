@@ -148,7 +148,7 @@ public class TraceLineViewer implements ISashClient {
 		trace.addMouseTrackListener(traceCursorListener);
 		trace.addMouseListener(traceCursorListener);
 		
-		TraceZoomListener zoomListener = new TraceZoomListener(zoom);
+		TraceZoomListener zoomListener = new TraceZoomListener(zoom, model);
 		trace.addMouseListener(zoomListener);
 		trace.addMouseMoveListener(zoomListener);
 				

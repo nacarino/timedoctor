@@ -14,6 +14,9 @@ import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -117,6 +120,17 @@ public class HeaderViewer implements Observer {
 		rulerFormData.bottom = new FormAttachment(FORMLAYOUT_FULL);
 		ruler.setLayoutData(rulerFormData);
 
+		ruler.addControlListener(new ControlListener(){
+
+			public void controlMoved(ControlEvent e) {
+			}
+
+			public void controlResized(ControlEvent e) {
+				Rectangle bounds = ((Canvas) e.widget).getClientArea();
+				zoom.setWidth(bounds.width);
+			}
+		});
+		
 		// Paint ruler
 		RulerPaintListener rulerPaintListener =
 			new RulerPaintListener(zoom);

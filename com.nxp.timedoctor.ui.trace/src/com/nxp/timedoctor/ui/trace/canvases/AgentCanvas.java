@@ -44,7 +44,7 @@ public class AgentCanvas extends TraceCanvas {
 			final SampleLine line,
 			final ZoomModel zoom, 
 			final TraceModel model) {
-		super(parent, zoom, new TaskSampleInfo(line));
+		super(parent, zoom, new TaskSampleInfo(line, zoom));
 
 		addPaintListener(new TaskPaintListener(Colors.getColorRegistry().get(Colors.SEA_GREEN), line, zoom, model));
 	}

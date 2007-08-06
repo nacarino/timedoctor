@@ -11,6 +11,8 @@
 package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseMoveListener;
@@ -61,8 +63,15 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	public final void mouseMove(final MouseEvent e) {
 		if (mouseButton == 3) {
 			if (scrollCursor == null) {
-				// TODO cusor must be disposed explicitly
 				scrollCursor = new Cursor(e.display, SWT.CURSOR_HAND);
+				e.widget.addDisposeListener(new DisposeListener() {
+					public void widgetDisposed(DisposeEvent e) {
+						if (!scrollCursor.isDisposed()) {
+							scrollCursor.dispose();
+							scrollCursor = null;
+						}
+					}
+				});
 			}
 			((Control) e.widget).setCursor(scrollCursor);
 			

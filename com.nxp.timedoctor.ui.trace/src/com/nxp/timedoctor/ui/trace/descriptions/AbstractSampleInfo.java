@@ -12,36 +12,45 @@ package com.nxp.timedoctor.ui.trace.descriptions;
 
 import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.Times;
+import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
 
-public class SampleInfo {
-	protected static final double ACCURACY = 0.001d;
-	
+public abstract class AbstractSampleInfo {
+	private ZoomModel zoomModel;
 	private double clockFrequency;
 	
-	protected SampleInfo(final SampleLine line) {
+	protected AbstractSampleInfo(final SampleLine line, final ZoomModel zoomModel) {
 		if (line.getType() == LineType.MEM_CYCLES) {
 			this.clockFrequency = line.getCPU().getMemClocksPerSec();
 		}
 		else {
 			this.clockFrequency = line.getCPU().getClocksPerSec();
 		}
+		this.zoomModel = zoomModel;
 	}
 	
-	public String getInfoStr(final int index) {
-		return null;
+	public final String getInfoStr(final int index) {
+		StringBuilder sb = new StringBuilder();
+		fillInfoString(sb, index);
+		return sb.toString();
+	}
+	
+	protected abstract void fillInfoString(StringBuilder sb, int index);
+
+	protected String timeToStr(final double time) {
+		return Times.timeToString(time, zoomModel.getTimeDisplayAccuracy());
 	}
 	
 	protected String timeBoundsToStr(final double startTime, final double endTime) {
-		String text = Times.timeToString(startTime, ACCURACY);
+		String text = Times.timeToString(startTime, zoomModel.getTimeDisplayAccuracy());
 		text += " - ";
-		text += Times.timeToString(endTime, ACCURACY);
+		text += Times.timeToString(endTime, zoomModel.getTimeDisplayAccuracy());
 		return text;
 	}
 	
 	protected String timeIntervalToStr(final double startTime, final double endTime) {
 		double timeInterval = endTime - startTime;
-		return Times.timeToString(timeInterval, ACCURACY);		
+		return Times.timeToString(timeInterval, zoomModel.getTimeDisplayAccuracy());		
 	}
 	
 	protected String timeIntervalToCyclesStr(final double startTime, final double endTime) {

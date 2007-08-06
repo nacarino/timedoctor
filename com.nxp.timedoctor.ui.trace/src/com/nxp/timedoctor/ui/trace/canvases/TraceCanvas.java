@@ -26,7 +26,7 @@ import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.SampleLine.LineType;
 import com.nxp.timedoctor.ui.trace.TracePluginActivator;
-import com.nxp.timedoctor.ui.trace.descriptions.SampleInfo;
+import com.nxp.timedoctor.ui.trace.descriptions.AbstractSampleInfo;
 
 /**
  * Abstract parent class for trace canvases. Contains a factory method to return
@@ -37,7 +37,7 @@ import com.nxp.timedoctor.ui.trace.descriptions.SampleInfo;
 public abstract class TraceCanvas extends Canvas implements Observer, IPropertyChangeListener {
 	protected static final int MAXIMUM_ROW_HEIGHT = 70;
 	
-	private SampleInfo sampleInfo;
+	private AbstractSampleInfo sampleInfo;
 	protected IPreferenceStore preferenceStore;
 	
 	protected int minHeight;
@@ -54,7 +54,7 @@ public abstract class TraceCanvas extends Canvas implements Observer, IPropertyC
 	 */
 	protected TraceCanvas(final Composite parent, 
 			final ZoomModel zoom,
-			final SampleInfo sampleInfo) {
+			final AbstractSampleInfo sampleInfo) {
 		super(parent, SWT.DOUBLE_BUFFERED);
 		
 		this.sampleInfo = sampleInfo;

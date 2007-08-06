@@ -11,28 +11,26 @@
 package com.nxp.timedoctor.ui.trace.descriptions;
 
 import com.nxp.timedoctor.core.model.SampleLine;
-import com.nxp.timedoctor.core.model.Times;
+import com.nxp.timedoctor.core.model.ZoomModel;
 
-public class NoteSampleInfo extends SampleInfo {
+public class NoteSampleInfo extends AbstractSampleInfo {
 	private SampleLine line;
 	
-	public NoteSampleInfo(final SampleLine line) {
-		super(line);
+	public NoteSampleInfo(final SampleLine line, final ZoomModel zoom) {
+		super(line, zoom);
 		this.line = line;	
 	}
 	
 	@Override
-	public String getInfoStr(final int index) {
+	protected void fillInfoString(StringBuilder sb, int index) {
 		double startTime = line.getSample(index).time;
 		
-		String text = "Note @ ";
-		text += Times.timeToString(startTime, ACCURACY);
+		sb.append("Note @ ");
+		sb.append(timeToStr(startTime));
 		
 		String description = line.descrString(startTime);
 		if (description != null) {
-			text += description;
+			sb.append(description);
 		}
-
-		return text;
 	}
 }

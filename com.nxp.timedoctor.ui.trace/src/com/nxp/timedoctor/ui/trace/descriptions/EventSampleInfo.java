@@ -11,33 +11,31 @@
 package com.nxp.timedoctor.ui.trace.descriptions;
 
 import com.nxp.timedoctor.core.model.SampleLine;
-import com.nxp.timedoctor.core.model.Times;
+import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.Sample.SampleType;
 
-public class EventSampleInfo extends SampleInfo {
+public class EventSampleInfo extends AbstractSampleInfo {
 	private SampleLine line;
 	
-	public EventSampleInfo(final SampleLine line) {
-		super(line);
+	public EventSampleInfo(final SampleLine line, final ZoomModel zoom) {
+		super(line, zoom);
 		this.line = line;	
 	}
 	
 	@Override
-	public String getInfoStr(final int index) {
+	protected void fillInfoString(StringBuilder sb, int index) {
 		double startTime = line.getSample(index).time;
 		double value = line.getSample(index).val;
 		
-		String text = line.getSample(index).type == SampleType.START ? "Send @ "
-				: "Receive @ ";
-		text += Times.timeToString(startTime, ACCURACY);
-		text += "\nSeq. Number = ";
-		text += doubleToIntStr(value);
+		sb.append(line.getSample(index).type == SampleType.START ? "Send @ "
+				: "Receive @ ");
+		sb.append(timeToStr(startTime));
+		sb.append("\nSeq. Number = ");
+		sb.append(doubleToIntStr(value));
 		
 		String description = line.descrString(startTime);
 		if (description != null) {
-			text += description;
+			sb.append(description);
 		}
-
-		return text;
 	}
 }

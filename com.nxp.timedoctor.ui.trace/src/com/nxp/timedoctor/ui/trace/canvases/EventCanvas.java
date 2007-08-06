@@ -37,7 +37,7 @@ public class EventCanvas extends TraceCanvas {
 	public EventCanvas(final Composite parent, 
 			final SampleLine line,
 			final ZoomModel zoom) {
-		super(parent, zoom, new EventSampleInfo(line));
+		super(parent, zoom, new EventSampleInfo(line, zoom));
 		addPaintListener(new EventPaintListener(Colors.getColorRegistry().get(Colors.DARK_MAGENTA),
 				Colors.getColorRegistry().get(Colors.LIGHT_PINK), line, zoom));
 	}

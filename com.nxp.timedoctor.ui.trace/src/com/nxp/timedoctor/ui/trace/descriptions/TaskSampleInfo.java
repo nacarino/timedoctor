@@ -11,31 +11,30 @@
 package com.nxp.timedoctor.ui.trace.descriptions;
 
 import com.nxp.timedoctor.core.model.SampleLine;
+import com.nxp.timedoctor.core.model.ZoomModel;
 
-public class TaskSampleInfo extends SampleInfo {
+public class TaskSampleInfo extends AbstractSampleInfo {
 	private SampleLine line;
 	
-	public TaskSampleInfo(final SampleLine line) {
-		super(line);
+	public TaskSampleInfo(final SampleLine line, final ZoomModel zoom) {
+		super(line, zoom);
 		this.line = line;	
 	}
 	
 	@Override
-	public String getInfoStr(final int index) {
+	protected void fillInfoString(StringBuilder sb, int index) {
 		double startTime = line.getSample(index).time;
 		double endTime = line.getSample(index + 1).time;
 
-		String text = timeBoundsToStr(startTime, endTime) + "\n";
-		text += timeIntervalToStr(startTime, endTime);
-		text += " / ";
-		text += timeIntervalToCyclesStr(startTime, endTime);
+		sb.append(timeBoundsToStr(startTime, endTime) + "\n");
+		sb.append(timeIntervalToStr(startTime, endTime));
+		sb.append(" / ");
+		sb.append(timeIntervalToCyclesStr(startTime, endTime));
 		
 		String description = line.descrString(startTime);
 		description += line.descrString(endTime);
 		if (description != null) {
-			text += description;
+			sb.append(description);
 		}
-		
-		return text;
 	}
 }
