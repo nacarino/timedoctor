@@ -67,6 +67,8 @@ public class TraceEditorActionBars extends EditorActionBarContributor implements
 	private ActionHandler goToTimeCommandHandler;
 
 	private ZoomModel zoomModel;
+
+	private TraceModel traceModel;
 	
 	/**
 	 * Constructor for TraceEditorActionBars.
@@ -169,7 +171,7 @@ public class TraceEditorActionBars extends EditorActionBarContributor implements
 		TraceEditor traceEditor = (TraceEditor) editor;
 		
 		zoomModel = traceEditor.getZoomModel();
-		TraceModel traceModel = traceEditor.getTraceModel();
+		traceModel = traceEditor.getTraceModel();
 		
 		zoomInAction.updateModel(traceModel, zoomModel);
 		zoomOutAction.updateModel(traceModel, zoomModel);
@@ -210,6 +212,12 @@ public class TraceEditorActionBars extends EditorActionBarContributor implements
 	}
 
 	private void updateActionState() {
+		final double timeDisplayAccuracy = zoomModel.getTimeDisplayAccuracy();
+		
+		zoomInAction.setEnabled(timeDisplayAccuracy > traceModel.getMinTimeResolution());
+		zoomOutAction.setEnabled(timeDisplayAccuracy < traceModel.getEndTime());
+		zoomBackAction.setEnabled(!zoomModel.isZoomStackEmpty());
+		
 		final SampleLine selectedLine = zoomModel.getSelectedLine();
 		
 		if (selectedLine != null) {
