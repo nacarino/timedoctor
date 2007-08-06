@@ -11,9 +11,9 @@
 package com.nxp.timedoctor.ui.statistics.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 
-import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 import com.nxp.timedoctor.ui.statistics.IStatisticsViewPage;
 
 
@@ -21,9 +21,10 @@ public class CopyAction extends Action {
 	private IStatisticsViewPage statisticsPage;
 	public CopyAction(final IStatisticsViewPage statisticsPage) {
 		this.statisticsPage = statisticsPage;
-		
-		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
-									ITimeDoctorUIConstants.LOCAL_TOOLBAR_ENABLED_IMG_PATH + "copy.gif"));
+				
+		ISharedImages sharedImages = PlatformUI.getWorkbench().getSharedImages();
+		setImageDescriptor(sharedImages.getImageDescriptor(ISharedImages.IMG_TOOL_COPY));
+		setDisabledImageDescriptor(sharedImages.getImageDescriptor(ISharedImages.IMG_TOOL_COPY_DISABLED));
 		setToolTipText("Copy to clipboard");
 	}
 
