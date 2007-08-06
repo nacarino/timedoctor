@@ -83,7 +83,7 @@ public class ZoomModel extends Observable {
      * @param time
      *            the new start time
      */
-    public final void setStartTime(final double time) {
+    protected final void setStartTime(final double time) {
     	if (time != startTime) {
     		this.startTime = time;
     		updateTimeDisplayAccuracy();
@@ -98,7 +98,7 @@ public class ZoomModel extends Observable {
      * @param time
      *            the new offset value
      */
-    public final void setEndTime(final double time) {
+    protected final void setEndTime(final double time) {
         if (time != endTime) {
         	this.endTime = time;
         	updateTimeDisplayAccuracy();
