@@ -31,6 +31,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction openAction;
     private IWorkbenchAction closeAction;
     private IWorkbenchAction exitAction;
+    private IWorkbenchAction copyAction;
     private IWorkbenchAction preferenceAction;
     private IWorkbenchAction aboutAction;
     private IWorkbenchAction updateAction;
@@ -52,6 +53,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         exitAction = ActionFactory.QUIT.create(window);
         register(exitAction);
  
+        copyAction = ActionFactory.COPY.create(window);
+        register(copyAction);
+        
         preferenceAction = ActionFactory.PREFERENCES.create(window);
         register(preferenceAction);
 
@@ -73,10 +77,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     	IWorkbenchWindow window = getActionBarConfigurer().getWindowConfigurer().getWindow();
     	
         MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
+        MenuManager editMenu = new MenuManager("&Edit", IWorkbenchActionConstants.M_EDIT);
         MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
         MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
         
         menuBar.add(fileMenu);
+        menuBar.add(editMenu);
         // Add a group marker indicating where action set menus will appear.
         menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
         menuBar.add(windowMenu);
@@ -89,6 +95,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         fileMenu.add(recentFileList);
         fileMenu.add(new Separator());
         fileMenu.add(exitAction);
+        
+        //Edit
+        editMenu.add(copyAction);
         
         // Window
         MenuManager viewMenu = new MenuManager("Show View");
