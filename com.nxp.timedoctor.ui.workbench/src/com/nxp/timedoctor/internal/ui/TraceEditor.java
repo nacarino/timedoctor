@@ -19,18 +19,21 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.parser.Parser;
+import com.nxp.timedoctor.internal.ui.actions.CopyAction;
 import com.nxp.timedoctor.internal.ui.outline.TraceOutlinePage;
 import com.nxp.timedoctor.ui.trace.TraceViewer;
 
@@ -123,7 +126,10 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 		} catch (InterruptedException e) {
 			// User pressed cancel
 			super.getSite().getPage().closeEditor(this, false);
+			return;
 		}
+		
+		site.getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), new CopyAction(this));
 	}
 
 	/**
@@ -253,5 +259,16 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 			getSelectionProvider().setSelection(event.getSelection());
 			getSelectionProvider().addSelectionChangedListener(this);
 		}	
+	}
+	
+	/**
+	 * Returns an {@link Image} containing the screenshot of the current visible
+	 * portion
+	 * 
+	 * @return
+	 * 			The {@link Image} screenshot. The image resource must be disposed by the caller.
+	 */
+	public Image getScreenShot() {
+		return traceViewer.getScreenShot(); //Should be disposed by the caller
 	}
 }
