@@ -12,6 +12,9 @@ package com.nxp.timedoctor.ui.trace;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +42,8 @@ public class TraceViewer implements ISashClient {
 	
 	private MainViewer mainViewer;
 
+	private HeaderViewer headerViewer;
+	
 	/**
 	 * Creates the <code>TraceViewer</code> contents in the parent composite,
 	 * using the traceModel for data. So far, just uses dummy data, and traceModel isn't
@@ -105,7 +110,7 @@ public class TraceViewer implements ISashClient {
 
 		TraceCursorFactory traceCursorFactory = new TraceCursorFactory(zoomModel);
 
-		new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomModel);
+		headerViewer = new HeaderViewer(leftPane, rightPane, traceCursorFactory, zoomModel);
 		mainViewer = new MainViewer(leftPane, rightPane, traceCursorFactory, traceModel, zoomModel);
 		
 		SashListener sashListener = new SashListener(this, SWT.VERTICAL);
@@ -150,5 +155,34 @@ public class TraceViewer implements ISashClient {
 	 */
 	public ISelectionProvider getSelectionProvider() {
 		return mainViewer;
+	}
+
+	/**
+	 * Returns an {@link Image} containing the screenshot of the current visible
+	 * portion
+	 * 
+	 * @return
+	 * 			The {@link Image} screenshot. The image resource must be disposed by the caller.
+	 */
+	public Image getScreenShot() {
+		final Image topImage = headerViewer.getScreenShot();
+		final Image bottomImage = mainViewer.getScreenShot();
+		
+		// Merge the two
+		final Rectangle topRect = topImage.getBounds();
+		final Rectangle bottomRect = bottomImage.getBounds();
+		
+	    final Image mergedImage = new Image(leftPane.getDisplay(), Math.min(topRect.width, bottomRect.width), topRect.height + bottomRect.height);
+	    
+	    final GC mergedGc = new GC(mergedImage);
+	    mergedGc.drawImage(topImage, 0, 0);
+	    mergedGc.drawImage(bottomImage, 0, topRect.height);
+	    
+	    topImage.dispose();
+	    bottomImage.dispose();
+	    
+	    mergedGc.dispose();
+	    
+		return mergedImage; //Should be disposed by the caller
 	}
 }

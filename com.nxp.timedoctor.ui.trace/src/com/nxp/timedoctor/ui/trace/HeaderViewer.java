@@ -16,6 +16,9 @@ import java.util.Observer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -61,6 +64,8 @@ public class HeaderViewer implements Observer {
 
 	private SampleLine selectedLine = null;
 	
+	private Composite rulerPane;
+	
 	/**
 	 * Constructs a header view in the given parent, and creates the contents of
 	 * the header.
@@ -102,7 +107,7 @@ public class HeaderViewer implements Observer {
 		logo.setFont(Fonts.getFontRegistry().get(Fonts.HEADER_LOGO_FONT));
 				
 		// Ruler pane
-		Composite rulerPane = new Composite(rightPane, SWT.NONE);
+		rulerPane = new Composite(rightPane, SWT.NONE);
 		rulerPane.setLayout(new FormLayout());
 
 		GridData rulerPaneGridData = new GridData(SWT.FILL, SWT.FILL, true, false, 1, 1);
@@ -163,5 +168,46 @@ public class HeaderViewer implements Observer {
 			
 			selectedLine = line;
 		}
+	}
+	
+	/**
+	 * Returns an {@link Image} containing the screenshot of the current visible
+	 * portion
+	 * 
+	 * @return
+	 * 			The {@link Image} screenshot. The image resource must be disposed by the caller.
+	 */
+	public Image getScreenShot() {
+		//Capture logo
+		final Point logoSize = logo.getSize();
+		final GC logoGc = new GC(logo);
+		final Image logoImage = new Image(logo.getDisplay(), logoSize.x, logoSize.y);
+		logoGc.copyArea(logoImage, 0, 0);
+
+		//Capture ruler
+		final Point rulerSize = rulerPane.getSize();
+		final GC rulerGc = new GC(rulerPane);
+		final Image rulerImage = new Image(rulerPane.getDisplay(), rulerSize.x, rulerSize.y);
+		rulerGc.copyArea(rulerImage, 0, 0);
+
+		//Merge the both
+		final Rectangle logoRect = logoImage.getBounds();
+		final Rectangle rulerRect = rulerImage.getBounds();
+
+		final Image mergedImage = new Image(rulerPane.getDisplay(), logoRect.width + rulerRect.width, Math.min(logoRect.height, rulerRect.height));
+		final GC mergedGc = new GC(mergedImage);
+		mergedGc.drawImage(logoImage, 0, 0);
+		mergedGc.drawImage(rulerImage, logoRect.width, 0);
+
+		// Dispose resources
+		logoGc.dispose();
+		logoImage.dispose();
+
+		rulerGc.dispose();
+		rulerImage.dispose();
+
+		mergedGc.dispose();
+
+		return mergedImage; //Should be disposed by the caller
 	}
 }

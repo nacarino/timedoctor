@@ -30,7 +30,10 @@ import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -492,4 +495,50 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
             });
         }
     }
+	
+	/**
+	 * Returns an {@link Image} containing the screenshot of the current visible
+	 * portion
+	 * 
+	 * @return
+	 * 			The {@link Image} screenshot. The image resource must be disposed by the caller.
+	 */
+	public Image getScreenShot() {
+		// Capture left
+		final GC leftGc = new GC(leftContent);
+		final Point leftSize = leftContent.getSize();
+		final Image leftImage = new Image(leftContent.getDisplay(), leftSize.x, leftSize.y);
+		leftGc.copyArea(leftImage, 0, 0);
+		
+		//Capture right
+		final GC rightGc = new GC(verticalScroll);
+		final Point rightSize = verticalScroll.getSize();
+		
+		final ScrollBar bar = verticalScroll.getVerticalBar();
+		if (bar.isVisible()) {
+			rightSize.x -= bar.getSize().x;
+		}
+		final Image rightImage = new Image(verticalScroll.getDisplay(), rightSize.x, rightSize.y);
+		rightGc.copyArea(rightImage, 0, 0);
+		
+		//Merge the both
+		final Rectangle leftRect = leftImage.getBounds();
+		final Rectangle rightRect = rightImage.getBounds();
+		
+		final Image mergedImage = new Image(verticalScroll.getDisplay(), leftRect.width + rightRect.width, Math.min(leftRect.height, rightRect.height));
+		final GC mergedGc = new GC(mergedImage);
+		mergedGc.drawImage(leftImage, 0, 0);
+		mergedGc.drawImage(rightImage, leftRect.width, 0);
+		
+		//Dispose resources
+		leftGc.dispose();
+		leftImage.dispose();
+		
+		rightGc.dispose();
+		rightImage.dispose();
+		
+		mergedGc.dispose();
+		
+		return mergedImage; //Should be disposed by the caller
+	}
 }
