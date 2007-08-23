@@ -4,7 +4,7 @@ rem set BUILD_LAUNCH_CMD=
 set BUILDTYPE=I
 set BUILDID=TestBuild
 set SKIPFETCH=true
-set CONFIG="win32, win32, x86"
+set CONFIG="win32, win32, x86 & linux, gtk, x86"
 rem set ARCHIVESFORMAT="win32, win32, x86 - Folder"
 
 rem YOU MAY NOT NEED TO EDIT ANYTHING BELOW THIS
