@@ -49,18 +49,18 @@ public abstract class StatisticsView extends PageBookView implements ISelectionL
 	}
 
 	public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-		final IPage page = getCurrentPage();
-		
-		if (!(page instanceof IStatisticsViewPage) 
-				|| part == this 
-				|| !(selection instanceof IStructuredSelection) 
-				|| selection.isEmpty()) {
+		if (part == this || !(selection instanceof IStructuredSelection) || selection.isEmpty()) {
 			return;
 		}
 		
-		IStructuredSelection sel = (IStructuredSelection) selection;
+		final IPage page = getCurrentPage();
+		final Object selectedElement = ((IStructuredSelection) selection).getFirstElement();
+		
+		if (!(page instanceof IStatisticsViewPage) || !(selectedElement instanceof SampleLine))
+			return;
+		
 		IStatisticsViewPage statisticsPage = (IStatisticsViewPage) page;
-		statisticsPage.selectLine((SampleLine) sel.getFirstElement());
+		statisticsPage.selectLine((SampleLine) selectedElement);
 	}
 
 	@Override
