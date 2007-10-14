@@ -10,28 +10,42 @@
  *******************************************************************************/
 package com.nxp.timedoctor.product.workbench;
 
-import org.eclipse.core.runtime.IPlatformRunnable;
+import org.eclipse.equinox.app.IApplication;
+import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * This class controls all aspects of the application's execution
  */
-public class Application implements IPlatformRunnable {
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.core.runtime.IPlatformRunnable#run(java.lang.Object)
-	 */
-	public Object run(final Object args) throws Exception {
-		Display display = PlatformUI.createDisplay();
+public class Application implements IApplication {
+	public Object start(IApplicationContext context) throws Exception {
+		final Display display = PlatformUI.createDisplay();
 		try {
-			int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
-			if (returnCode == PlatformUI.RETURN_RESTART) {
-				return IPlatformRunnable.EXIT_RESTART;
-			}
-			return IPlatformRunnable.EXIT_OK;
+			int code = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
+			
+			// exit the application with an appropriate return code
+			return code == PlatformUI.RETURN_RESTART ? EXIT_RESTART : EXIT_OK;
 		} finally {
-			display.dispose();
+			if (display != null)
+				display.dispose();
 		}
+	}
+
+	public void stop() {
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+
+		if (workbench == null)
+			return;
+		
+		final Display display = workbench.getDisplay();
+		
+		display.syncExec(new Runnable() {
+			public void run() {
+				if (!display.isDisposed())
+					workbench.close();
+			}
+		});
 	}
 }
