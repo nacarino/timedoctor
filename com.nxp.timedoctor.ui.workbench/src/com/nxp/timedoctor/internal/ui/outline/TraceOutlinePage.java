@@ -39,7 +39,6 @@ import org.eclipse.ui.part.IPageSite;
 import org.eclipse.ui.part.Page;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.progress.UIJob;
-import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 
 import com.nxp.timedoctor.core.model.SampleLine;
@@ -51,8 +50,7 @@ import com.nxp.timedoctor.internal.ui.TraceEditor;
 import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 
 /**
- * An OutLine view provider for the <code>TraceEditor</code>. It extends the {@link ContentOutlinePage}
- * and implements {@link ITraceVisibleListener}. 
+ * An OutLine view provider for the <code>TraceEditor</code>
  *
  */
 public class TraceOutlinePage extends Page implements IContentOutlinePage,
