@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.workbench"
       label="%featureName"
-      version="1.4.0.qualifier"
+      version="1.4.1.qualifier"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.workbench"
       image="timedoctor_update_120.gif">
@@ -34,23 +34,99 @@
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="com.nxp.timedoctor.ui"/>
+      <import plugin="org.eclipse.ui.views"/>
       <import plugin="com.nxp.timedoctor.core.model"/>
       <import plugin="com.nxp.timedoctor.core.parser"/>
       <import plugin="com.nxp.timedoctor.ui.trace"/>
+      <import plugin="com.nxp.timedoctor.ui.statistics"/>
       <import plugin="org.eclipse.core.expressions"/>
-      <import plugin="org.eclipse.core.runtime" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.help" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.core.runtime" version="3.1.0" match="compatible"/>
-      <import plugin="org.apache.lucene" version="1.4.3" match="compatible"/>
-      <import plugin="org.eclipse.help" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.help.appserver" version="3.1.0" match="compatible"/>
-      <import plugin="com.ibm.icu"/>
       <import plugin="org.eclipse.help.base" version="3.1.0" match="compatible"/>
-      <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.1.0" match="compatible"/>
+      <import plugin="org.apache.jasper" version="5.5.17" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.jsp.jasper.registry" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.equinox.http.registry" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="javax.servlet"/>
+      <import plugin="org.eclipse.osgi.services"/>
       <import plugin="org.eclipse.jface" version="3.2.0" match="compatible"/>
-      <import plugin="org.eclipse.tomcat"/>
+      <import plugin="com.ibm.icu"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.help.appserver" version="3.1.0" match="compatible"/>
+      <import plugin="org.apache.commons.logging"/>
+      <import plugin="org.apache.lucene" version="1.9.1" match="compatible"/>
+      <import plugin="org.apache.lucene.analysis" version="1.9.1" match="compatible"/>
+      <import plugin="org.eclipse.core.runtime" version="3.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.equinox.http.jetty"/>
+      <import plugin="org.eclipse.help.base" version="3.3.0" match="compatible"/>
+      <import plugin="org.eclipse.ui" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>
+      <import plugin="org.eclipse.update.core" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.update.configurator" version="3.1.0" match="compatible"/>
+      <import plugin="org.eclipse.core.net" version="1.0.0" match="compatible"/>
    </requires>
+
+   <plugin
+         id="org.eclipse.help.webapp"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.help.appserver"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.forms"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.tomcat"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.apache.lucene"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.help.base"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.help.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.update.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.update.core"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
          id="com.nxp.timedoctor.product.workbench"
@@ -74,60 +150,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.help.appserver"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.help.base"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.help.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.help.webapp"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.ui.forms"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.lucene"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.tomcat"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
-
-   <plugin
-         id="org.eclipse.update.core"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.update.ui"
+         id="org.eclipse.core.net"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -135,6 +158,13 @@
 
    <plugin
          id="org.eclipse.update.scheduler"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.ui.net"
          download-size="0"
          install-size="0"
          version="0.0.0"
