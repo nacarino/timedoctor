@@ -95,7 +95,15 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 	 */
 	@Override
 	public final void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
-		if ( !(input instanceof IPathEditorInput)) {
+		IPathEditorInput iPath;
+		
+		if (input instanceof IPathEditorInput) {
+			iPath = (IPathEditorInput)input;
+		} else {
+			iPath = (IPathEditorInput)input.getAdapter(IPathEditorInput.class);
+		}
+		
+		if (iPath == null) {
 			throw new PartInitException("Invalid Input: Must have implemented IPathEditorInput");
 		}
 		
@@ -107,7 +115,6 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 		traceModel = new TraceModel();
 		zoomModel = new ZoomModel();
 		
-		IPathEditorInput iPath = (IPathEditorInput)input;
 		File ioFile = iPath.getPath().toFile();
 		
 		final Parser parser = new Parser("Opening trace", traceModel, ioFile);
@@ -222,14 +229,18 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 	 */
 	@Override
 	public void dispose() {		
-		traceViewer.dispose();
+		if (traceViewer != null)
+				traceViewer.dispose();
 		
-		zoomModel.deleteObservers();
-		traceModel.deleteObservers();
+		if (zoomModel != null)
+			zoomModel.deleteObservers();
+		
+		if (traceModel != null)
+			traceModel.deleteObservers();
 		
 		fOutlinePage = null;
-		traceModel = null;
 		
+		traceModel = null;		
 		zoomModel = null;
 
 		super.dispose();
