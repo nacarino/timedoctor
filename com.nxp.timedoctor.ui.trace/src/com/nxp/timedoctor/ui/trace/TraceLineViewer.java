@@ -110,7 +110,7 @@ public class TraceLineViewer implements ISashClient {
 		
 		setupReordering();
 				
-		setDefaultSashOffset();
+		setMinHeight();
 		preferenceStore = TracePluginActivator.getDefault().getPreferenceStore(); 
 	}
 
@@ -171,11 +171,14 @@ public class TraceLineViewer implements ISashClient {
 	}
 	
 	public final void setDefaultSashOffset() {
-		int minHeight = trace.getHeight();
-		setHeight(minHeight);
+		setMinHeight();
 		
 		// relayout and update vertical scrollbar, and left scroll setting
 		sectionViewer.layout();
+	}
+
+	private void setMinHeight() {
+		setHeight(trace.getHeight());
 	}
 
 	public final boolean setSashOffset(final int offset) {

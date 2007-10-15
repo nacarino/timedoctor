@@ -243,6 +243,8 @@ public class MainViewer implements IScrollClient, Observer, ISelectionProvider {
 		traceBottomGridData.heightHint = 1;		
 		traceBottom.setLayoutData(traceBottomGridData);
 		traceBottom.setBackground(rightContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+		
+		layout();
 	}
 
 	private SectionViewer createSectionViewer(final LineType type, final Section section) {
