@@ -83,6 +83,7 @@ public class TraceStatTableViewer extends StatisticsViewer {
 	public void refresh() {
 		viewer.refresh(true);
 		updateColumnSize();
+		updateRequired();
 	}
 	
 	private void updateColumnSize() {
