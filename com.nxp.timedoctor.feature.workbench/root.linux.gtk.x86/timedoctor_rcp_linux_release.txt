@@ -1,5 +1,5 @@
-TimeDoctor version 1.4.0 is available, both as a stand-alone tool and as Eclipse 
-plug-in. 
+TimeDoctor version 1.4.1 is available, both as a stand-alone tool and as 
+Eclipse plug-in. 
 
 This release has been tested on this configuration:
     - SUN JRE 1.5.0
@@ -8,41 +8,10 @@ This release has been tested on this configuration:
     - RHEL 3 (Update 7) (For other versions please see howto.txt)
 Note that both Windows and Linux platforms are x86 (32-bit)
 
-1.4.0 is a major milestone as this release now includes these features:
+1.4.1 is a minor release made mainly to support Eclipse 3.3
 
-Copy/Print support
-	- Copy/Print support added for the statistics view
-	- Copy support added for the visible trace lines in the Trace Editor
-
-Nano-second resolution
-	- Support added for nano-second resolution
-
-Interactive enable/disable of actions
-	- The zoom actions are now automtically enabled/disabled based on whether
-	  such an operation is to be allowed (eg., Zoom back disabled when zoom
-	  stack empty)
-
-Selection updates
-	 - Code cleanup has been done for the selection link between the 
-	   TraceEditor and the OutlineView
-	 - The selected SampleLine in the OutlineView is now automatically brought
-	   to focus in the TraceEditor.
-	  
-Toolbar with icons
-	- Toolbar for zoom and goto	actions added with icons
-
-Update/Configuration actions
-	- Support for Update (site.xml) has been added to the RCP version
-	- Support for 'Manage Configuration' has been added to the RCP version
-
-Automated build support
-	- Support to build TimeDoctor using the Eclipse PDE build has been added.
-	  The necessary instructions and scripts can be located in the 
-	  com.nxp.timedoctor.build module in CVS.
-	  
 The following bugs have been fixed. For description and resolution, go to
-http://sourceforge.net/tracker/index.php
+http://sourceforge.net/tracker/?group_id=174793
 
-1665117  Key-binding is not displayed in IDE version
-1665105  Continuous ZOOM-IN fails
-1665130  File Drag & Drop fails on Linux
+Bug# 1813614  Copy works only for the first time
+Bug# 1813666  Display problem for file with large number of sample lines

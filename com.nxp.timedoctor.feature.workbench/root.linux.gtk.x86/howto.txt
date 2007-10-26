@@ -2,7 +2,7 @@ To build TimeDoctor for your Linux distro/version/platform, please follow these
 steps:
 
 Downloads:
-1) If not present, please download Eclipse SDK 3.2 from 
+1) If not present, please download Eclipse SDK 3.3 from 
    http://download.eclipse.org/eclipse/downloads/
    for your relevant Linux distro/version/platform
 2) If not present, please download Java 1.5 (JRE or JDK) from 
