@@ -5,11 +5,4 @@ Bundle-SymbolicName: com.nxp.timedoctor.help;singleton:=true
 Bundle-Version: 1.4.1.qualifier
 Bundle-Vendor: NXP Semiconductors B.V.
 Bundle-Localization: plugin
-Require-Bundle: org.apache.lucene,
- org.eclipse.help.appserver,
- org.eclipse.help.base,
- org.eclipse.help.ui,
- org.eclipse.help.webapp,
- org.eclipse.tomcat,
- org.eclipse.ui.forms
 Bundle-ClassPath: html/
