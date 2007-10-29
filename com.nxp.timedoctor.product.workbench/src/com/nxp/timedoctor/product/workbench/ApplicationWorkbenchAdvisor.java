@@ -17,10 +17,15 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
 	private static final String PERSPECTIVE_ID = "com.nxp.timedoctor.product.workbench.perspective";
+	private String[] arguments;
 
-    @Override
+    public ApplicationWorkbenchAdvisor(String[] arguments) {
+		this.arguments = arguments;
+	}
+
+	@Override
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
-        return new ApplicationWorkbenchWindowAdvisor(configurer);
+        return new ApplicationWorkbenchWindowAdvisor(configurer, arguments);
     }
 
 	@Override

@@ -23,7 +23,9 @@ public class Application implements IApplication {
 	public Object start(IApplicationContext context) throws Exception {
 		final Display display = PlatformUI.createDisplay();
 		try {
-			int code = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
+			String[] arguments = (String[]) context.getArguments().get(IApplicationContext.APPLICATION_ARGS);
+			
+			int code = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor(arguments));
 			
 			// exit the application with an appropriate return code
 			return code == PlatformUI.RETURN_RESTART ? EXIT_RESTART : EXIT_OK;

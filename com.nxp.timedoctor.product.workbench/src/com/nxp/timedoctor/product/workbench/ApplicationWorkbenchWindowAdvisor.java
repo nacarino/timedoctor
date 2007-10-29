@@ -25,6 +25,7 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 import com.nxp.timedoctor.internal.ui.FileDropListener;
+import com.nxp.timedoctor.internal.ui.actions.FileOpener;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private Control page;
@@ -32,9 +33,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private Control coolBar;
 
 	private ApplicationActionBarAdvisor actionBars;
-
-    public ApplicationWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer) {
+	private String[] arguments;
+	
+	public ApplicationWorkbenchWindowAdvisor(final IWorkbenchWindowConfigurer configurer, String[] arguments) {
         super(configurer);
+        this.arguments = arguments;
     }
 
     @Override
@@ -153,4 +156,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.addEditorAreaTransfer(FileTransfer.getInstance());
         configurer.configureEditorAreaDropListener(new FileDropListener(configurer.getWindow()));        
     }
+
+	@Override
+	public void postWindowOpen() {
+		if (arguments != null && arguments.length > 0) {
+			FileOpener opener = new FileOpener(getWindowConfigurer().getWindow());
+			opener.openFiles(arguments);
+		}
+	}
 }
