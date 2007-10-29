@@ -1,6 +1,6 @@
 @echo off
-set ECLIPSE_BASE_LOCATION=f:\Tools\eclipse-SDK-3.2\eclipse
-set BUILD_LAUNCH_CMD=java -jar %ECLIPSE_BASE_LOCATION%\startup.jar
+set ECLIPSE_BASE_LOCATION=F:\Tools\EKC\Experiments\TimeDoctor-3.3.1.1\eclipse
+set BUILD_LAUNCH_CMD=%ECLIPSE_BASE_LOCATION%\eclipse.exe -nosplash
 
 set ROOTDIR=%CD%
 set SOURCEDIR=%ROOTDIR%\sources
