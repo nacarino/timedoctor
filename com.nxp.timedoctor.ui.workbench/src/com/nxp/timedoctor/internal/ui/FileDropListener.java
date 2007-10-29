@@ -10,23 +10,20 @@
  *******************************************************************************/
 package com.nxp.timedoctor.internal.ui;
 
-import java.io.File;
-
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 
-// TODO lots of duplicate code with the OpenAction class, refactor?
+import com.nxp.timedoctor.internal.ui.actions.FileOpener;
+
 public class FileDropListener extends DropTargetAdapter {
 
-	private IWorkbenchWindow window;
+	private FileOpener fileOpener;
 
 	public FileDropListener(final IWorkbenchWindow window) {
-		this.window = window;
+		fileOpener = new FileOpener(window);
 	}
 	
 	@Override
@@ -48,41 +45,7 @@ public class FileDropListener extends DropTargetAdapter {
 		Object object = fileTransfer.nativeToJava(event.currentDataType);
 		if (object instanceof String[]) {
 			String[] fileStrings = (String[]) object;
-			openFiles(fileStrings);
-		}
-	}
-
-	private void openFiles(final String[] fileStrings) {
-		if ((fileStrings != null) && (fileStrings.length > 0)) {
-			int numberOfFilesNotFound = 0;
-			StringBuffer notFound = new StringBuffer();
-
-			for (String path : fileStrings) {
-				File file = new File(path);
-				TraceEditorInput input = new TraceEditorInput(file);
-				if (file.exists() && !file.isDirectory()) {
-					openFile(input);
-				} else {
-					if (++numberOfFilesNotFound > 1) {
-						notFound.append('\n');
-					}
-					notFound.append(file.getAbsolutePath());
-				}
-			}
-			if (numberOfFilesNotFound > 0) {
-				MessageDialog.openError(window.getShell(),
-						"Error", "The file(s) " + notFound.toString()
-								+ " could not be found");
-			}
-		}
-	}
-
-	private void openFile(final TraceEditorInput input) {
-		try {
-			window.getActivePage().openEditor(input, TraceEditor.ID);
-		} catch (PartInitException e) {
-			MessageDialog.openError(window.getShell(),
-					"Error", e.getMessage());
+			fileOpener.openFiles(fileStrings);
 		}
 	}
 }

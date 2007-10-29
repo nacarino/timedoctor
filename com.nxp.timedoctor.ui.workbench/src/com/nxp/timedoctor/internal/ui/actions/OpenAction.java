@@ -13,22 +13,19 @@ package com.nxp.timedoctor.internal.ui.actions;
 import java.io.File;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
-import com.nxp.timedoctor.internal.ui.TraceEditor;
-import com.nxp.timedoctor.internal.ui.TraceEditorInput;
 import com.nxp.timedoctor.ui.ITimeDoctorUIConstants;
 
 public class OpenAction extends Action implements IWorkbenchAction {
 	
 	public final static String ID = "com.nxp.timedoctor.ui.trace";
 	
+	private FileOpener fileOpener;
 	private final IWorkbenchWindow window;
 
 	public OpenAction(final IWorkbenchWindow window) {
@@ -38,6 +35,7 @@ public class OpenAction extends Action implements IWorkbenchAction {
 		setToolTipText("Open a TimeDoctor trace file.");
 		setImageDescriptor(AbstractUIPlugin.imageDescriptorFromPlugin(ITimeDoctorUIConstants.TD_UI_PLUGIN, 
 				ITimeDoctorUIConstants.TOOLBAR_ENABLED_IMG_PATH + "open.gif"));
+		fileOpener = new FileOpener(window);
 	}
 
 	@Override
@@ -51,40 +49,15 @@ public class OpenAction extends Action implements IWorkbenchAction {
 		fileDialog.open();
 		
 		String[] fileNames = fileDialog.getFileNames();
-		String filePath = fileDialog.getFilterPath();
-		openFiles(filePath, fileNames);
-	}
-
-	private void openFiles(final String filePath, final String[] fileNames) {
-		if ( (fileNames != null) && (fileNames.length > 0)) {
-			int numberOfFilesNotFound = 0;
-			StringBuffer notFound = new StringBuffer();
+		
+		if (fileNames != null && fileNames.length > 0) {
+			final String filePath = fileDialog.getFilterPath();
 			
-			for (String fileName : fileNames) {
-				TraceEditorInput input = new TraceEditorInput(fileName, filePath);
-				File file = input.getPath().toFile();
-				
-				if (file.exists() && !file.isDirectory()) {
-					openFile(input);
-				} else {
-					if (++numberOfFilesNotFound > 1) {
-						notFound.append('\n');
-					}
-					notFound.append(file.getAbsolutePath());
-				}
-				
-				if (numberOfFilesNotFound > 0) {
-					MessageDialog.openError(window.getShell(), "Error", "The file(s) " + notFound.toString() + " could not be found");
-				}
+			for (int i=0; i < fileNames.length; i++) {
+				fileNames[i] = filePath + File.separator + fileNames[i];
 			}
-		}
-	}
-
-	private void openFile(final TraceEditorInput input) {
-		try {
-			window.getActivePage().openEditor(input, TraceEditor.ID);
-		} catch (PartInitException e) {
-			MessageDialog.openError(window.getShell(), "Error", e.getMessage());
+			
+			fileOpener.openFiles(fileNames);
 		}
 	}
 

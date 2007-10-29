@@ -22,11 +22,13 @@ public class TraceEditorInput implements IPathEditorInput {
 	private File file;
 
 	public TraceEditorInput(final File file) {
+		if (file == null)
+			throw new IllegalArgumentException("Input is null");
 		this.file = file;
 	}
 	
-	public TraceEditorInput(final String name, final String path) {
-		this.file = new File(path + File.separator + name);
+	public boolean canRead() {
+		return !file.isDirectory() && file.canRead();
 	}
 
 	public boolean exists() {
