@@ -60,6 +60,8 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 
 	private ZoomModel zoomModel;
 
+	private boolean cancelled;
+
 	/**
 	 * *.tdi files cannot be saved. Throws an UnsupportedOperationException if
 	 * called.
@@ -95,6 +97,7 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 	 */
 	@Override
 	public final void init(final IEditorSite site, final IEditorInput input) throws PartInitException {
+		this.cancelled = false;
 		IPathEditorInput iPath;
 		
 		if (input instanceof IPathEditorInput) {
@@ -131,8 +134,8 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 			MessageDialog.openError(this.getSite().getShell(), "Error", "Parse failed, reason: " + e.getCause().getMessage());
 			throw new PartInitException(e.getCause().getMessage(), e.getCause());
 		} catch (InterruptedException e) {
-			// User pressed cancel
-			super.getSite().getPage().closeEditor(this, false);
+			// User pressed cancel, set the flag to true
+			this.cancelled = true;
 			return;
 		}
 		
@@ -192,6 +195,17 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 	 */
 	@Override
 	public final void createPartControl(final Composite parent) {
+		if (cancelled) {
+			// User has pressed cancel during init(). Call the close editor in asyncExec,
+			// so that it gets called after createPartControl() processing is complete.
+			parent.getDisplay().asyncExec(new Runnable() {
+				public void run() {
+					TraceEditor.this.getSite().getPage().closeEditor(TraceEditor.this, false);
+				}
+			});
+			return;
+		}
+		
 		traceViewer = new TraceViewer(parent, traceModel, zoomModel);
 		
 		getSite().setSelectionProvider(getSelectionProvider());
