@@ -14,6 +14,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -81,6 +83,10 @@ public class Parser {
 	// MR move to argument of methods
 	private int tokenLength;
 	
+	private List<String> unParsedLinesList = new ArrayList<String>(10);
+
+	private int lineCount = 0;
+	
 	/**
 	 * Initializes the model and input variables, and passes the name to the
 	 * <code>Job</code> constructor.
@@ -101,6 +107,8 @@ public class Parser {
 	/**
 	 * Run method for multithreading. Contains all parser functionality.
 	 * 
+	 * @return true, if all the lines in the file were parsed, false otherwise
+	 * 
 	 * @param monitor
 	 *            the progress monitor to update while running
 	 * @throws InterruptedException 
@@ -108,7 +116,7 @@ public class Parser {
 	 * @throws InvocationTargetException
 	 * 			  throws <code>InvocationTargetException</code> which embeds within it, an actual <code>Exception</code> thrown
 	 */
-	public final void doParse(final IProgressMonitor monitor) throws InterruptedException, InvocationTargetException {
+	public final boolean doParse(final IProgressMonitor monitor) throws InterruptedException, InvocationTargetException {
 		monitor.beginTask("Parsing trace...", IProgressMonitor.UNKNOWN);
 
 		try {
@@ -117,6 +125,10 @@ public class Parser {
 			model.setEndTime();
 			closeLines();
 			model.computeMaxValues();
+			
+			if (model.getEndTime() <= 0.0d || (unParsedLinesList.size() > lineCount/2)) {
+				throw new TraceParseException("Parse failed, because of a corrupt trace file");
+			}
 		} catch (InterruptedException e) {
 			//User pressed cancel
 			throw e;
@@ -126,6 +138,18 @@ public class Parser {
 		} finally {
 			monitor.done(); //to stop the monitor
 		}
+		
+		return (unParsedLinesList.size() == 0);
+	}
+	
+	public String getUnparsedLines() {
+		StringBuilder sb = new StringBuilder("<Line #>: <Parsed Line> (Because of <reason>)\n");
+		
+		for (String unparsedLine:unParsedLinesList) {
+			sb.append("\n" + unparsedLine);
+		}
+		
+		return sb.toString();
 	}
 
 	/**
@@ -147,7 +171,9 @@ public class Parser {
 			if (monitor.isCanceled()) {
 				throw new InterruptedException("User interrupted");
 			}
-
+			
+			lineCount++;
+	
 			// Although it is deprecated, use a StringTokenizer
 			// instead of String.split(), for increased performance
 			// in simple splitting of strings separated by whitespaces
@@ -158,7 +184,13 @@ public class Parser {
 			}
 
 			if (tokenLength > 0) {
-				parseLine(tokens);
+				try {
+					parseLine(tokens);
+				} catch (Exception e) {
+					unParsedLinesList.add(lineCount + ": " + parseLine + " (Because of " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+				}
+			} else {
+				unParsedLinesList.add(lineCount + ": (Because of blank line)");
 			}
 		}
 	}
@@ -168,6 +200,7 @@ public class Parser {
 
 		if (command.compareTo("CPU") == 0) { // CPU <id> <name>
 			parseCpuCommand(tokens);
+			return;
 		} else if ((currentCPU == null) && (command.compareTo("TIME") != 0)) {
 			// Single-cpu file with no cpu tag
 			currentCPU = new SampleCPU(model, 0, null, 1);
@@ -207,6 +240,9 @@ public class Parser {
 			// the end-of-file
 			// command is found
 			return;
+		} else {
+			//Unknown command
+			throw new IllegalArgumentException("Unknown command \"" + command + "\"");
 		}
 	}
 
