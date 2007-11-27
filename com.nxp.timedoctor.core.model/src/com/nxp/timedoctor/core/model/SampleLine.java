@@ -163,7 +163,7 @@ public abstract class SampleLine {
 			case PORT_INT_VALUE:
 				return PORTS;
 			default:
-				throw new IllegalArgumentException();
+				throw new IllegalArgumentException("Incorrect type " + type);
 			}
 		};
 	}
