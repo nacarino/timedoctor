@@ -14,7 +14,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -61,6 +60,8 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 	private ZoomModel zoomModel;
 
 	private boolean cancelled;
+
+	private String unParsedLines = null;
 
 	/**
 	 * *.tdi files cannot be saved. Throws an UnsupportedOperationException if
@@ -126,20 +127,19 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 		try {
 			window.run(true, true, new IRunnableWithProgress() {
 				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-					parser.doParse(monitor);
+					boolean success = parser.doParse(monitor);
+					if (!success)
+						unParsedLines = parser.getUnparsedLines();
 				}
 			});
 		} catch (InvocationTargetException e) {
 			// A parse exception
-			MessageDialog.openError(this.getSite().getShell(), "Error", "Parse failed, reason: " + e.getCause().getMessage());
 			throw new PartInitException(e.getCause().getMessage(), e.getCause());
 		} catch (InterruptedException e) {
 			// User pressed cancel, set the flag to true
 			this.cancelled = true;
 			return;
 		}
-		
-		site.getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), new CopyAction(this));
 	}
 
 	/**
@@ -210,6 +210,10 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 		
 		getSite().setSelectionProvider(getSelectionProvider());
 		getSelectionProvider().addSelectionChangedListener(this);
+		getEditorSite().getActionBars().setGlobalActionHandler(ActionFactory.COPY.getId(), new CopyAction(this));
+		
+		if (unParsedLines != null)
+			UnparsedMessageDialog.displayMessage(parent.getShell(), unParsedLines);
 	}
 
 	/**
