@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.workbench"
       label="%featureName"
-      version="1.4.1.qualifier"
+      version="1.4.2.qualifier"
       provider-name="%providerName"
       plugin="com.nxp.timedoctor.product.workbench"
       image="timedoctor_update_120.gif">
