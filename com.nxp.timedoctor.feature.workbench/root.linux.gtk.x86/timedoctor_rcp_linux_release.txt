@@ -1,17 +1,18 @@
-TimeDoctor version 1.4.1 is available, both as a stand-alone tool and as 
+TimeDoctor version 1.4.2 is available, both as a stand-alone tool and as 
 Eclipse plug-in. 
 
 This release has been tested on this configuration:
     - SUN JRE 1.5.0
-    - Eclipse SDK 3.2
+    - Eclipse SDK 3.3
     - Windows 2000 and XP
     - RHEL 3 (Update 7) (For other versions please see howto.txt)
 Note that both Windows and Linux platforms are x86 (32-bit)
 
-1.4.1 is a minor release made mainly to support Eclipse 3.3
+1.4.2 is a minor release with these bugs fixed:
+
+Bug#1835637  TimeDoctor hangs for a empty file
+Bug#1835100  Tasks not rendered properly
+Bug#1835080  Cancelling TimeDoctor parse raises exceptions
 
 The following bugs have been fixed. For description and resolution, go to
 http://sourceforge.net/tracker/?group_id=174793
-
-Bug# 1813614  Copy works only for the first time
-Bug# 1813666  Display problem for file with large number of sample lines
