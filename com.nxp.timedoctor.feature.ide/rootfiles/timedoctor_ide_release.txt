@@ -1,4 +1,4 @@
-TimeDoctor version 1.4.1 is available, both as a stand-alone tool and as 
+TimeDoctor version 1.4.2 is available, both as a stand-alone tool and as 
 Eclipse plug-in.
 
 INSTALLATION
@@ -16,31 +16,31 @@ INSTALLATION
    - Select "Add an extension location" and browse to the directory where 
      you extracted timedoctor (C:/timedoctor);
    - Select the top-level "eclipse" directory (C:/timedoctor/eclipse);
-   - Click Ok to restart Eclipse.
+   - Click OK to restart Eclipse.
 
 5) Open a sample trace file (eclipse/sample.tdi) via File->Open
 
 See for more information on the extension location:
 	http://www-128.ibm.com/developerworks/library/os-ecl-manage/
-As an alternative to step 4) yoou can copy the folders
+As an alternative to step 4) you can copy the folders
 	eclipse/plugins
 	eclipse/features
 to your Eclipse install directory and start Eclipse with eclipse.exe -clean
 
 This release has been tested on this configuration:
     - SUN JRE 1.5.0
-    - Eclipse SDK 3.2
+    - Eclipse SDK 3.3
     - Windows 2000 and XP
     - RHEL 3 (Update 7)
 Note that both Windows and Linux platforms are x86 (32-bit)
 
 OVERVIEW
 
-1.4.1 is a minor release made mainly to support Eclipse 3.3
+1.4.2 is a minor release with these bugs fixed:
+
+Bug#1835637  TimeDoctor hangs for a empty file
+Bug#1835100  Tasks not rendered properly
+Bug#1835080  Cancelling TimeDoctor parse raises exceptions
 
 The following bugs have been fixed. For description and resolution, go to
 http://sourceforge.net/tracker/?group_id=174793
-
-Bug# 1813614  Copy works only for the first time
-Bug# 1813666  Display problem for file with large number of sample lines
-
