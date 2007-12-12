@@ -2,7 +2,7 @@
 <feature
       id="com.nxp.timedoctor.feature.base"
       label="%featureName"
-      version="1.4.1.qualifier"
+      version="1.4.2.qualifier"
       provider-name="Royal Philips Electronics NV."
       image="timedoctor_update_120.gif">
 
