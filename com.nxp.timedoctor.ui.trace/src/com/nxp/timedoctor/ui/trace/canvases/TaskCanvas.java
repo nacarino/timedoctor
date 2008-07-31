@@ -17,12 +17,15 @@ import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.ui.trace.Colors;
+import com.nxp.timedoctor.ui.trace.TracePluginActivator;
 import com.nxp.timedoctor.ui.trace.descriptions.TaskSampleInfo;
 
 /**
  * Canvas to draw tasks.
  */
 public class TaskCanvas extends TraceCanvas {
+
+	private TaskPaintListener fTaskPaintListener;
 
 	/**
 	 * Constructs a new TaskCanvas in the given composite. TaskCanvases
@@ -44,13 +47,24 @@ public class TaskCanvas extends TraceCanvas {
 			final TraceModel model) {
 		super(parent, zoom, new TaskSampleInfo(line, zoom));
 		
-		addPaintListener(new TaskPaintListener(Colors.getColorRegistry().get(Colors.DARK_BLUE), line, zoom, model));
+		fTaskPaintListener = new TaskPaintListener(Colors.getColorRegistry().get(Colors.DARK_BLUE), line, zoom, model);
+		updateSubPixelPreference();
+		
+		addPaintListener(fTaskPaintListener);
+	}
+
+	private void updateSubPixelPreference() {
+		final boolean enable = preferenceStore.getBoolean(TracePluginActivator.SUB_PIXEL_LOAD);
+		fTaskPaintListener.enableSubPixel(enable);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
 	public void propertyChange(PropertyChangeEvent event) {
-		//Do nothing
+		if (event.getProperty().equals(TracePluginActivator.SUB_PIXEL_LOAD)) {
+			updateSubPixelPreference();
+			redraw();
+		}
 	}
 }

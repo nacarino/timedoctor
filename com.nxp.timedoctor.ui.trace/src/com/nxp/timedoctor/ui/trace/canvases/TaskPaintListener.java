@@ -21,6 +21,7 @@ import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.model.Sample.SampleType;
+import com.nxp.timedoctor.core.model.SampleLine.LineType;
 import com.nxp.timedoctor.ui.trace.Colors;
 
 /**
@@ -80,6 +81,8 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 	 */
 	private int colorIndex;
 
+	private boolean fSubPixelOn;
+
 	/**
 	 * Constructs a new <code>TaskPaintListener</code> with the given color,
 	 * sample line, and source of zoom/scroll data.
@@ -124,11 +127,18 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 			// scrollbar.
 			int fullWidth = scroll.getBounds().width;
 			int canvasHeight = canvas.getBounds().height;
-			int traceHeight = canvasHeight - VERTICAL_PADDING;
-			double zoom = fullWidth / (data.getEndTime() - data.getStartTime());
+			int traceHeight = canvasHeight - VERTICAL_PADDING; //height of the trace-blocks
+			
+			//for subpixel calculation
+			double totalTimeIn1Pixel = 0;
+			int subPixelTraceHeight = 0;
+			
+			double zoom = fullWidth / (data.getEndTime() - data.getStartTime()); //zoom = pixels / time
 
 			final double drawStartTime = timeOffset + (e.x / zoom);
 			final double drawEndTime = drawStartTime + (e.width / zoom);
+			
+			//search for the first sample before drawStartTime
 			int index = line.binarySearch(drawStartTime);
 
 			e.gc.setBackground(e.display.getSystemColor(SWT.COLOR_WHITE));
@@ -139,7 +149,7 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 				active = true;
 			}
 			
-			for (int xOld = -1; index < line.getCount(); index++) {
+			for (int xEndOld = -1; index < line.getCount(); index++) { //for loop over all the samples starting from 'index'
 				if (line.getSample(index).time > drawEndTime) {
 					break;
 				}
@@ -154,11 +164,12 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 								* zoom);
 						final int xEnd = boundedInt((line.getSample(index + 1).time - timeOffset)
 								* zoom);
-						if (xEnd <= xOld) {
+
+						if (!fSubPixelOn && (xEnd <= xEndOld)) {
 							continue;
 						}
-						xOld = xEnd;
-						e.gc.setForeground(color);
+
+						e.gc.setForeground(color); 
 
 						if (line.getSample(index).type == SampleType.RESUME) {
 							colorIndex = (int) line.getSample(index).val;
@@ -166,6 +177,7 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 							colorIndex = (int) line.getSample((int) line
 									.getSample(index).val).val;
 						}
+
 						if (colorIndex < 0) {
 							e.gc.setBackground(canvas.getDisplay()
                                     .getSystemColor(SWT.COLOR_WHITE));
@@ -173,15 +185,59 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 							final String colorType = colorList[colorIndex % MAX_COLORS];
 							e.gc.setBackground(Colors.getColorRegistry().get(colorType));
 						}
+						
+						/*
+						 * For sub-pixel visualization, the calculation of traceHeight is explained as follows.
+						 * 
+						 * timeIn1Pixel = 1 pixel / zoom, The time being drawn in 1 pixel
+						 *  
+						 * totalTimeIn1Pixel, stores the total time the CPU was occupied in 1 pixel. If more than one sample 
+						 *                    is being painted on the same pixel-column, then the time they occupy are summed up.
+						 * 
+						 * load = totalTimeIn1Pixel/timeIn1Pixel, Load is the time the CPU is active, in the pixel column.
+						 * 
+						 * subPixelTraceHeight = load * traceHeight
+						 * =>
+						 * subPixelTraceHeight = totalTimeIn1Pixel * zoom * traceHeight  
+						 *  
+						 */
+						if (fSubPixelOn && (xStart == xEnd)) {
+							if (xEndOld == xStart) {
+								//We have already calculated a totalTimeIn1Pixel for this pixel
+								totalTimeIn1Pixel += (line.getSample(index+1).time - line.getSample(index).time);								
+							} else {
+								//First sample in this pixel
+								totalTimeIn1Pixel = (line.getSample(index+1).time - line.getSample(index).time);								
+							}	
 
-						if (xStart == xEnd) {
+							subPixelTraceHeight = (int)Math.ceil(totalTimeIn1Pixel * zoom * traceHeight);
+							e.gc.drawLine(xStart, canvasHeight, xStart, canvasHeight - subPixelTraceHeight); //draw this pixel
+							
+						} else if (fSubPixelOn && (xStart == (xEnd - 1))) {
+							//The sample spans two pixels, so we need to redraw both pixels							
+							if (xEndOld == xStart) {
+								//We have already calculated a totalTimeIn1Pixel for the first pixel
+								totalTimeIn1Pixel += ((xStart + 1)/zoom + timeOffset - line.getSample(index).time);								
+							} else {
+								//First sample in the first pixel
+								totalTimeIn1Pixel = ((xStart + 1)/zoom + timeOffset - line.getSample(index).time);								
+							}
+							
+							subPixelTraceHeight = (int)Math.ceil(totalTimeIn1Pixel * zoom * traceHeight);
+							e.gc.drawLine(xStart, canvasHeight, xStart, canvasHeight - subPixelTraceHeight); //draw this pixel
+							
+							totalTimeIn1Pixel = (line.getSample(index + 1).time - ((xStart + 1)/zoom + timeOffset));
+							subPixelTraceHeight = (int)Math.ceil(totalTimeIn1Pixel * zoom * traceHeight);
+							e.gc.drawLine(xEnd, canvasHeight, xEnd, canvasHeight - subPixelTraceHeight); //draw next pixel
+							
+						} else if (xStart == xEnd) {
 							e.gc.drawLine(xStart, canvasHeight, xEnd, VERTICAL_PADDING);
 						} else {
-							e.gc.fillRectangle(xStart, VERTICAL_PADDING,
-									xEnd - xStart, traceHeight);
-							e.gc.drawRectangle(xStart, VERTICAL_PADDING, xEnd - xStart,
-									traceHeight);
+							e.gc.fillRectangle(xStart, VERTICAL_PADDING, xEnd - xStart, traceHeight);
+							e.gc.drawRectangle(xStart, VERTICAL_PADDING, xEnd - xStart, traceHeight);
+							totalTimeIn1Pixel = 0;
 						}
+						xEndOld = xEnd;
 					} else if (line.getSample(index).type == SampleType.SUSPEND) {
 						// Handle preemption by another task or ISR
 						
@@ -195,7 +251,7 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 						final int xEnd = Math.max(xStart + 1, boundedInt((line
 								.getSample(j).time - timeOffset)
 								* zoom));
-                        xOld = xEnd;
+						xEndOld = xEnd;
 						index = j - 1;
 						
 						e.gc.setBackground(e.display
@@ -218,5 +274,9 @@ public class TaskPaintListener extends TracePaintListener implements PaintListen
 				}
 			}
 		}
+	}
+	
+	public void enableSubPixel(boolean enable) {
+		fSubPixelOn = enable && (line.getType() == LineType.TASKS);
 	}
 }

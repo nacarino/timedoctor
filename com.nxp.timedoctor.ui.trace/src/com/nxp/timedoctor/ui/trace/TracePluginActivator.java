@@ -49,6 +49,11 @@ public class TracePluginActivator extends AbstractUIPlugin {
 	 */
 	public static final String PROPORTIONAL_COUNTERS_PREFERENCE = "PROPORTIONAL_COUNTERS_PREFERENCE";
 	
+	/**
+	 * String constant used in preference page for Sub pixel load.
+	 */
+	public static final String SUB_PIXEL_LOAD = "SUB_PIXEL_LOAD";
+	
 	public TracePluginActivator() {
 		plugin = this;
 	}
