@@ -70,6 +70,10 @@ public class OptionsPreferencePage extends FieldEditorPreferencePage implements 
 				"Display Counters proportionally", getFieldEditorParent());
 		addField(proportionalCounters);
 		
+		BooleanFieldEditor subPixelLoad = new BooleanFieldEditor(TracePluginActivator.SUB_PIXEL_LOAD,
+				"Display task height proportionally to its CPU load", getFieldEditorParent());
+		addField(subPixelLoad);
+		
 		listener = new IPropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent event) {
 				if (event.getProperty().equals(TracePluginActivator.AUTO_HIDE_PREFERENCE)) {
