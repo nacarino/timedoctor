@@ -691,7 +691,12 @@ public abstract class SampleLine {
 	public boolean hasSamples(final double startTime, final double endTime) {
 		final int startIndex = binarySearch(startTime);
 	 	final int endIndex = binarySearch(endTime);
-	 	return (startIndex != endIndex);
+	 	
+	 	if ((startIndex == 0) && (endIndex == 0)) {
+	 		return (startTime <= samples[0].time) && (endTime >= samples[0].time);
+	 	} else {
+	 		return (startIndex != endIndex);
+	 	}
 	}
 	
 	/**
