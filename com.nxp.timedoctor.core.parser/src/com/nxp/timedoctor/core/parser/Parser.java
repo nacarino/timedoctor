@@ -160,37 +160,44 @@ public class Parser {
 	 *                  throws any reported <code>Exception</code>
 	 */
 	private void parseFile(final IProgressMonitor monitor) throws Exception {
-		BufferedReader file = null;
+		FileReader fileReader = null;
+		
+		try {
+			fileReader = new FileReader(ioFile);
+			final BufferedReader file = new BufferedReader(fileReader);
 
-		file = new BufferedReader(new FileReader(ioFile));
+			String parseLine;
+			String[] tokens = new String[MAX_TAG_ARGS];
 
-		String parseLine;
-		String[] tokens = new String[MAX_TAG_ARGS];
-
-		while ((parseLine = file.readLine()) != null) {
-			if (monitor.isCanceled()) {
-				throw new InterruptedException("User interrupted");
-			}
-			
-			lineCount++;
-	
-			// Although it is deprecated, use a StringTokenizer
-			// instead of String.split(), for increased performance
-			// in simple splitting of strings separated by whitespaces
-			StringTokenizer tokenizer = new StringTokenizer(parseLine);
-			
-			for (tokenLength = 0; tokenizer.hasMoreTokens(); tokenLength++) {
-				tokens[tokenLength] = tokenizer.nextToken();
-			}
-
-			if (tokenLength > 0) {
-				try {
-					parseLine(tokens);
-				} catch (Exception e) {
-					unParsedLinesList.add(lineCount + ": " + parseLine + " (Because of " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+			while ((parseLine = file.readLine()) != null) {
+				if (monitor.isCanceled()) {
+					throw new InterruptedException("User interrupted");
 				}
-			} else {
-				unParsedLinesList.add(lineCount + ": (Because of blank line)");
+				
+				lineCount++;
+		
+				// Although it is deprecated, use a StringTokenizer
+				// instead of String.split(), for increased performance
+				// in simple splitting of strings separated by whitespaces
+				StringTokenizer tokenizer = new StringTokenizer(parseLine);
+				
+				for (tokenLength = 0; tokenizer.hasMoreTokens(); tokenLength++) {
+					tokens[tokenLength] = tokenizer.nextToken();
+				}
+
+				if (tokenLength > 0) {
+					try {
+						parseLine(tokens);
+					} catch (Exception e) {
+						unParsedLinesList.add(lineCount + ": " + parseLine + " (Because of " + e.getClass().getSimpleName() + ": " + e.getMessage() + ")");
+					}
+				} else {
+					unParsedLinesList.add(lineCount + ": (Because of blank line)");
+				}
+			}
+		} finally {
+			if (fileReader != null) {
+				fileReader.close();
 			}
 		}
 	}
