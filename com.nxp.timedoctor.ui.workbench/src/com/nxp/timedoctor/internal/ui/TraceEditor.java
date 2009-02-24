@@ -28,12 +28,18 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.IPropertySourceProvider;
+import org.eclipse.ui.views.properties.PropertySheetPage;
 
+import com.nxp.timedoctor.core.model.SampleLine;
 import com.nxp.timedoctor.core.model.TraceModel;
 import com.nxp.timedoctor.core.model.ZoomModel;
 import com.nxp.timedoctor.core.parser.Parser;
 import com.nxp.timedoctor.internal.ui.actions.CopyAction;
 import com.nxp.timedoctor.internal.ui.outline.TraceOutlinePage;
+import com.nxp.timedoctor.internal.ui.properties.SampleLinePropertySource;
 import com.nxp.timedoctor.ui.trace.TraceViewer;
 
 /**
@@ -156,6 +162,19 @@ public class TraceEditor extends EditorPart implements ISelectionChangedListener
 				fOutlinePage = createOutlinePage();
 			}
 			return fOutlinePage;
+		} else if (key.equals(IPropertySheetPage.class)) {
+			final PropertySheetPage page = new PropertySheetPage();
+
+			page.setPropertySourceProvider(new IPropertySourceProvider() {
+				public IPropertySource getPropertySource(Object object) {
+					if (object instanceof SampleLine) {
+						final SampleLine sampleLine = (SampleLine) object;
+						return new SampleLinePropertySource(sampleLine);
+					}
+					return null;
+				}
+			});
+			return page;
 		}
 
 		return super.getAdapter(key);
