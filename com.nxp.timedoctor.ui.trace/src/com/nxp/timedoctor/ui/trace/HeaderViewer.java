@@ -117,7 +117,7 @@ public class HeaderViewer implements Observer {
 		traceCursorFactory.setRulerPane(rulerPane);
 
 		// ruler
-		ruler = new Canvas(rulerPane, SWT.DOUBLE_BUFFERED);
+		ruler = new Canvas(rulerPane, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 		FormData rulerFormData = new FormData();
 		rulerFormData.left = new FormAttachment(0);
 		rulerFormData.right = new FormAttachment(FORMLAYOUT_FULL);

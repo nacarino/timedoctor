@@ -177,8 +177,10 @@ public class TimeLine implements Observer {
 	
 	public void setCursor(final int x) {
 		int width = cursorLabel.getParent().getBounds().width;
-		setPosition(x, width);
-		cursorTime = zoom.getTimeAtPosition(x, width);
+		// Subtract a few pixels offset to the cursor to avoid an infinite loop in Linux GTK
+		// See https://bugs.eclipse.org/bugs/show_bug.cgi?id=218935
+		setPosition(x - 2, width);
+		cursorTime = zoom.getTimeAtPosition(x - 2, width);
 		setTimeLabel(cursorTime);
 	}
 

@@ -55,7 +55,7 @@ public abstract class TraceCanvas extends Canvas implements Observer, IPropertyC
 	protected TraceCanvas(final Composite parent, 
 			final ZoomModel zoom,
 			final AbstractSampleInfo sampleInfo) {
-		super(parent, SWT.DOUBLE_BUFFERED);
+		super(parent, SWT.NO_BACKGROUND | SWT.DOUBLE_BUFFERED);
 		
 		this.sampleInfo = sampleInfo;
 		zoom.addObserver(this);
