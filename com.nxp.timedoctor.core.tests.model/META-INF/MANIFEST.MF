@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TimeDoctor Model Tests Plug-in
-Bundle-SymbolicName: com.nxp.timedoctor.core.tests.model
+Bundle-SymbolicName: com.nxp.timedoctor.core.tests.model;singleton:=true
 Bundle-Version: 1.4.2.qualifier
 Bundle-Vendor: Royal Philips Electronics NV.
 Bundle-Localization: plugin
