@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+  <extension
+        point="org.eclipse.ui.commands">
+     <category
+           description="TimeDoctor Commands"
+           id="com.nxp.timedoctor.ui.commands"
+           name="TimeDoctor"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.ZoomFit"
+           name="Zoom to Fit"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.ZoomOut"
+           name="Zoom Out"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.ZoomIn"
+           name="Zoom In"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.ZoomBack"
+           name="Zoom Back"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.Next"
+           name="Next"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.Previous"
+           name="Previous"/>
+     <command
+           categoryId="com.nxp.timedoctor.ui.commands"
+           id="com.nxp.timedoctor.ui.commands.GoToTime"
+           name="Goto Time"/>
+  </extension>
+  <extension
+        point="org.eclipse.ui.bindings">
+        <scheme
+            name="TimeDoctor Key Configuration"
+            id="com.nxp.timedoctor.ui.keyConfiguration"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.ZoomBack"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F2"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.ZoomFit"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F5"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.ZoomOut"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F3"/>        
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.ZoomIn"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F4"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.GoToTime"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="CTRL+G"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.Next"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F10"/>
+     <key
+           commandId="com.nxp.timedoctor.ui.commands.Previous"
+           contextId="org.eclipse.ui.contexts.window"
+           schemeId="com.nxp.timedoctor.ui.keyConfiguration"
+           sequence="F9"/>
+  </extension>
+  
+</plugin>
