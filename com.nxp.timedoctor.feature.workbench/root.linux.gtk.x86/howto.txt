@@ -1,0 +1,27 @@
+To build TimeDoctor for your Linux distro/version/platform, please follow these 
+steps:
+
+Downloads:
+1) If not present, please download Eclipse SDK 3.3 from 
+   http://download.eclipse.org/eclipse/downloads/
+   for your relevant Linux distro/version/platform
+2) If not present, please download Java 1.5 (JRE or JDK) from 
+   http://java.sun.com/javase/downloads/index_jdk5.jsp
+
+Setup:
+1) Start Eclipse
+2) Import TimeDoctor projects from the TimeDoctor CVS. For information on TimeDoctor 
+   CVS access, please see http://sourceforge.net/cvs/?group_id=174793. For
+   information on Eclipse CVS, please see the online help documentation of Eclipse
+
+RCP export:
+1) Double-click the workbench.product file in the project
+   com.nxp.timedoctor.feature.workbench
+2) In the Overview sheet, click the "Eclipse Product export wizard" link and follow
+   the online instructions
+
+If you face problems, please raise a support request at     
+http://sourceforge.net/tracker/?func=add&group_id=174793&atid=870647
+
+Good Luck!
+
