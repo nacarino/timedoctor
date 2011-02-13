@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.nxp.timedoctor.feature.ide"
+      label="%featureName"
+      version="1.4.2.qualifier"
+      provider-name="%providerName"
+      plugin="com.nxp.timedoctor.product.ide"
+      image="timedoctor_update_120.gif">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      Copyright (c) 2006 Royal Philips Electronics NV. All rights reserved.
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <includes
+         id="com.nxp.timedoctor.feature.base"
+         version="0.0.0"/>
+
+   <includes
+         id="com.nxp.timedoctor.feature.ide.source"
+         version="0.0.0"/>
+
+   <requires>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="com.nxp.timedoctor.core.model"/>
+      <import plugin="com.nxp.timedoctor.core.parser"/>
+      <import plugin="com.nxp.timedoctor.ui.trace"/>
+   </requires>
+
+   <plugin
+         id="com.nxp.timedoctor.product.ide"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nxp.timedoctor.ui.workbench"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
