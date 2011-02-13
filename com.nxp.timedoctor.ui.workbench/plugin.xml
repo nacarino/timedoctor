@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+  <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="com.nxp.timedoctor.internal.ui.TraceEditor"
+            contributorClass="com.nxp.timedoctor.internal.ui.TraceEditorActionBars"
+            default="false"
+            extensions="tdi"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif"
+            id="com.nxp.timedoctor.ui.workbench.TraceEditor"
+            name="TimeDoctor Trace">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.nxp.timedoctor.internal.ui.preferences.TimeDoctorPreferences"
+            id="com.nxp.timedoctor.ui.preferences.TimeDoctor"
+            name="TimeDoctor"/>
+      <page
+            category="com.nxp.timedoctor.ui.preferences.TimeDoctor"
+            class="com.nxp.timedoctor.internal.ui.preferences.OptionsPreferencePage"
+            id="com.nxp.timedoctor.ui.preferences.TimeDoctor.optionPreferences"
+            name="Display Options">
+      </page>   
+      <page
+            category="com.nxp.timedoctor.ui.preferences.TimeDoctor"
+            name="Keys"
+            class="org.eclipse.ui.ExtensionFactory:keysPreferencePage"
+            id="com.nxp.timedoctor.ui.preferences.TimeDoctor.keys">
+      </page>
+   </extension>
+   
+   <extension
+        point="org.eclipse.ui.views">
+      <category
+            name="TimeDoctor"
+            id="com.nxp.timedoctor.ui.workbench.statistics">
+      </category>
+      <view
+            allowMultiple="false"
+            category="com.nxp.timedoctor.ui.workbench.statistics"
+            class="com.nxp.timedoctor.internal.ui.LineStatView"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/eview16/line_statistic_view.gif"
+            id="com.nxp.timedoctor.ui.workbench.LineStatView"
+            name="Trace Line Statistics">
+      </view>
+        <view
+            allowMultiple="false"
+            category="com.nxp.timedoctor.ui.workbench.statistics"
+            class="com.nxp.timedoctor.internal.ui.TraceStatView"
+            icon="platform:/plugin/com.nxp.timedoctor.ui/icons/eview16/trace_statistic_view.gif"
+            id="com.nxp.timedoctor.ui.workbench.TraceStatView"
+            name="Task Statistics">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               closeable="true"
+               id="com.nxp.timedoctor.ui.workbench.TraceStatView"
+               moveable="true"
+               ratio="0.5"
+               relationship="bottom"
+               showTitle="true"
+               standalone="true"
+               visible="false"/>
+         <view
+               closeable="true"
+               id="com.nxp.timedoctor.ui.workbench.LineStatView"
+               moveable="true"
+               ratio="0.5"
+               relationship="stack"
+               showTitle="true"
+               standalone="true"
+               visible="false"/>
+      </perspectiveExtension>
+   </extension>
+ </plugin>
