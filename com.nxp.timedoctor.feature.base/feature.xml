@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.nxp.timedoctor.feature.base"
+      label="%featureName"
+      version="1.4.2.qualifier"
+      provider-name="Royal Philips Electronics NV."
+      image="timedoctor_update_120.gif">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      Copyright (c) 2006 Royal Philips Electronics NV. All rights reserved.
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.apache.lucene"/>
+      <import plugin="org.eclipse.help.appserver"/>
+      <import plugin="org.eclipse.help.base"/>
+      <import plugin="org.eclipse.help.ui"/>
+      <import plugin="org.eclipse.help.webapp"/>
+      <import plugin="org.eclipse.tomcat"/>
+      <import plugin="org.eclipse.ui.forms"/>
+   </requires>
+
+   <plugin
+         id="com.nxp.timedoctor.core.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nxp.timedoctor.core.parser"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nxp.timedoctor.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nxp.timedoctor.ui.trace"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nxp.timedoctor.ui.statistics"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.nxp.timedoctor.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+</feature>
