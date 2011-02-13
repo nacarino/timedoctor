@@ -1,0 +1,256 @@
+<html>
+<head>
+<meta name="copyright" content="Copyright (c) 2006 NXP Semiconductors B.V.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License version 1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html">
+ <link rel="stylesheet" href="../../../style.css" charset="ISO-8859-1" type="text/css">
+<title>File Format Help  for  TimeDoctor</title>
+</head>
+<body>
+<a name="cpu"></a> 
+<h2>
+<code>CPU &lt;id&gt; [&lt;name&gt;]</code>
+</h2>
+<p>
+Used in multiple CPU sample files. Indicates name of CPU, and assumed all tags following until next CPU tag pertain to this CPU.  
+A multiple CPU file may use different values for SPEED and MEMSPEED, but must use a single time base (ie. TIME value and sample offset).
+Failing to do so will result in sample lines from different CPU's depicted with incorrectly correlated timing.
+In essence a multi-CPU TDI file is a concatenation of multiple single CPU TDI file each preceded by a CPU tag. 
+Id numbers of tasks, etc. only have to be uniqie within the range of a CPU tag, not accross CPUs.
+</p>
+<a name="speed"></a> 
+<h2>
+<code>SPEED &lt;clocks per sec&gt;</code>
+</h2>
+<p>
+Indicates the number of true clock cycles per second in the target system's time base.  This tag must appear once as the first or second line in the file and is mandatory.
+</p>
+<a name="memspeed"></a> 
+<h2>
+<code>MEMSPEED &lt;clocks per sec&gt;</code>
+</h2>
+<p>
+Indicates the number of true clock memory cycles per second on the target system's memory bus.  This tag must appear once as the third line in the file and is required only if "VAL 9" tags are used.
+</p>
+<a name="time"></a> 
+<h2>
+<code>TIME &lt;ticks per sec&gt;</code>
+</h2>
+<p>
+Indicates the number of ticks per second that the STA/STO samples use as a time base.
+This value may be different from the value indicated by SPEED, but does not need to be.
+ This tag must appear once as the first or second line in the file and is mandatory.
+</p>
+<a name="cre"></a> 
+<h2>
+<code>CRE &lt;type&gt; &lt;id&gt; &lt;time&gt; [&lt;prod_id&gt; &lt;cons_id&gt;] [&lt;prod_cpu_id&gt; &lt;cons_cpu_id&gt;]</code>
+</h2>
+<p>
+Represents a creation of a task, isr, queue, or connection. The type parameter indicates the type of event that the event pertains to. 
+Possible values for type are:
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>0</th><td>Task Created</td></tr>
+  <tr><th>1</th><td>Interrupt Service Routine Created</td></tr>
+  <tr><th>3</th><td>Queue Created</td></tr>
+  <tr><th>11</th><td>Port Created</td></tr>
+</table>
+<p>
+The id parameter is a 32-bit integer indicating the specific task/isr/queue/connection.  
+Id numbers do not need to be consecutive, but should be unique within the scope of successive CRE and DEL statements. 
+Id numbers must be unique across different types, e.g. there cannot be a task and a semaphore with the same id. 
+The time parameter is a double precision floating point value indicating the time of occurrence for this event, measured in ticks as specified by the TIME tag.
+</p>
+<p>
+The optional prod_id and cons_id parameters represent the producer and consumer tasks/isrs/queues on a connection. 
+The prod_cpu_id and cons_cpu_id are the idsof the respective CPUs on which the producer and consumer are created.
+ If either the producer or consumer id represents a queue, subsequent STA and STO events on the ports are visualized in the queue, not in the ports. 
+The following example sets up a buffered connected between two tasks A and B.
+</p>
+<code>
+CRE 0 &lt;task_a_id&gt; &lt;time&gt;<br>
+CRE 0 &lt;task_b_id&gt; &lt;time&gt;<br>
+CRE 3 &lt;queue_id&gt; &lt;time&gt;<br>
+CRE 11 &lt;a_port_id&gt; &lt;time&gt; &lt;task_a_id&gt; &lt;task_a_cpu_id&gt; &lt;queue_id&gt; &lt;queue_cpu_id&gt;<br>
+CRE 11 &lt;b_port_id&gt; &lt;time&gt; &lt;queue_id&gt; &lt;queue_cpu_id&gt; &lt;task_b_id&gt; &lt;task_b_cpu_id&gt;<br>
+STA 11 &lt;a_port_id&gt; &lt;time&gt; 10<br>
+STO 11 &lt;b_port_id&gt; &lt;time&gt; 5<br>
+</code>
+<p> 
+In the above example, task A writes 10 samples to the queue via its output port a_port_id, and task B consumes 5 samples from the queue via its input port b_port_id. 
+</p>
+<a name="del"></a> 
+<h2>
+<code> DEL &lt;type&gt; &lt;id&gt; &lt;time&gt; </code>
+</h2>
+<p> 
+Represents a destruction of a task, isr, queue, or connection. The type parameter indicates the type of event that the event pertains to. Possible values for type are:
+ </p>
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>0</th><td>Task Deleted</td></tr>
+  <tr><th>1</th><td>Interrupt Service Routine Deleted</td></tr>
+  <tr><th>3</th><td>Queue Deleted</td></tr>
+  <tr><th>11</th><td>Port Deleted</td></tr>
+</table>
+ 
+<p>
+The id parameter is a 32-bit integer indicating the specific task/isr/queue/connection. 
+ Id numbers do not need to be consecutive, but should be unique within the scope of successive CRE and DEL statements.
+ Id numbers must be unique across different types, e.g. there cannot be a task and a semaphore with the same id.
+ Finally the time parameter is a double precision floating point value indicating the time of occurrence for this event, measured in ticks as specified by the TIME tag.
+</p>
+<a name="sta"></a> 
+<h2>
+<code>STA &lt;type&gt; &lt;id&gt; &lt;time&gt; [&lt;size&gt;]</code>
+</h2>
+<p>
+Represents a start sample of a task, isr, etc. The type parameter indicates the type of event that the event pertains to. Possible values of for type are:
+</p>
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>0</th><td>Task Start</td></tr>
+  <tr><th>1</th><td>Interrupt Service Routine Start</td></tr>
+  <tr><th>2</th><td>Semaphore Acquire</td></tr>  
+  <tr><th>3</th><td>Queue Send/Write</td></tr>    
+  <tr><th>4</th><td>Event Send</td></tr>      
+  <tr><th>8</th><td>Agent Start</td></tr>        
+  <tr><th>11</th><td>Port Send/Write</td></tr>
+</table>
+
+<p>
+The id parameter is a 32-bit integer indicating the specific task/isr/semaphore etc for this sample. 
+ Id numbers do not need to be consecutive, but should be unique within the scope of successive CRE and DEL statements.
+ Id numbers must be unique across different types, e.g. there cannot be a task and a semaphore with the same id. 
+The time parameter is a double precision floating point value indicating the time of occurrence for this sample, measured in ticks as specified by the TIME tag.
+ The optional size parameter is only used for queues, queues, and ports.
+ The parameter represents the number of data elements/packets send. Default size is 1 data element/packet.
+</p>
+
+<a name="sto"></a> 
+<h2>
+<code>STO &lt;type&gt; &lt;id&gt; &lt;time&gt; [&lt;size&gt;]</code>
+</h2>
+<p>
+Represents a stop sample for a task, isr, etc. The type parameter indicates the type of event that the event pertains to. Possible values of for type are:
+</p>
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>0</th><td>Task Stop</td></tr>
+  <tr><th>1</th><td>Interrupt Service Routine Stop</td></tr>
+  <tr><th>2</th><td>Semaphore Release</td></tr>  
+  <tr><th>3</th><td>Queue Receive/Read</td></tr>    
+  <tr><th>4</th><td>Event Receive</td></tr>      
+  <tr><th>8</th><td>Agent Stop</td></tr>        
+  <tr><th>11</th><td>Port Receive/Read</td></tr>
+</table>
+
+<p>
+The id parameter is a 32-bit integer indicating the specific task/isr/semaphore etc for this sample.  
+Id numbers do not need to be consecutive, but should be unique within the scope of successive CRE and DEL statements.
+ Id numbers must be unique across different types, e.g. there cannot be a task and a semaphore with the same id.
+ The time parameter is a double precision floating point value indicating the time of occurrence for this sample, measured in ticks as specified by the TIME tag.
+ The optional size parameter is only used for queues (type 3), and represents the number of data elements/packets send. Default size is 1 data element/packet.
+</p>
+<a name="occ"></a> 
+<h2>
+<code>OCC &lt;type&gt; &lt;id&gt; &lt;time&gt;</code>
+</h2>
+<p>
+Represents an occurrence of a generic event. The type parameter indicates the type of event that the event pertains to. Possible values of for type are:
+<p>
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>7</th><td>Note</td><td>Indicates occurrence of a generic event (used in combination with DSC/DNM tags)</td></tr>
+</table>
+
+<p>
+The id parameter is a 32-bit integer indicating the specific task/isr/semaphore etc for this sample. 
+ Id numbers do not need to be consecutive, but should be unique across different types, e.g. there cannot be a task and a semaphore with the same id. 
+Finally the time parameter is a double precision floating point value indicating the time of occurrence for this sample, measured in ticks as specified by the TIME tag.
+</p>
+ 
+<a name="tim"></a> 
+<h2>
+<code>TIM &lt;time&gt;</code>
+</h2>
+<p>
+Specifies a time without adding a sample to any line. Used in combination with VAL tag for values not associated with any STA/STO/OCC events.
+</p>
+ <a name="val"></a> 
+<h2>
+<code>VAL &lt;type&gt; &lt;id&gt; &lt;value&gt;</code>
+</h2>
+<p>
+Represents a value sample for a counter that counts either clock cycles or generic quantities. The type parameter indicates the type of event that the event pertains to.
+Possible values of for type are:
+</p>
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>5</th><td>Value</td><td>Indicates generic quantity value (double precision float).</td></tr>
+  <tr><th>6</th><td>Cycles</td><td>Indicates value measured in clock cycles (as specified by SPEED tag).</td></tr>
+  <tr><th>9</th><td>Memory Cyles</td><td>Indicates value measured in memory clock cycles (as specified by MEMSPEED tag).</td></tr>
+</table>
+
+<p>
+The id parameter is a 32-bit integer indicating the specific task/isr/semaphore etc for this sample. 
+ Id numbers do not need to be consecutive, but should be unique across different types, e.g. there cannot be a task and a semaphore with the same id. 
+The value parameter is assumed to be a sampled counter, and thus should be increasing (display shows delta between subsequent samples).
+ Finally, the time for this sample is taken from the preceding STA/STO/OCC/TIM tag.
+</p>
+<a name="dsc"></a> 
+<h2>
+<code>DSC &lt;type&gt; &lt;id&gt; &lt;value&gt;</code>
+</h2>
+  <p>
+    Represents a description of a preceding sample (STA/STO/OCC). The type parameter indicates the type of description provided. Possible values of for type are:
+</p>
+<table cellspacing="0" cellpadding="5" border="0">
+  <tr><th>0</th><td>String</td><td>Indicates string value to be displayed when mouse hovers over the sample.</td></tr>
+  <tr><th>1</th><td>Number</td><td>Indicates numeric value to be displayed when mouse hovers over the sample.</td></tr>
+  <tr><th>2</th><td>Time</td><td>Indicates value in ticks (as specified by TIME tag) to be displayed when mouse hovers over the sample.</td></tr>
+  <tr><th>3</th><td>Color</td><td>Indicates color index for use in display.  Works only with Task/Isr <code>STA</code> samples.</td></tr>      
+</table>
+<p>
+The id parameter is a 32-bit integer indicating the specific variable described.  Id numbers do not need to be consecutive, and do not have to be unique across STA/STO etc sample types.
+</p>
+<a  name="dnm"></a> 
+<h2>
+<code>DNM &lt;type&gt; &lt;id&gt; &lt;name&gt;</code>
+</h2>
+<p>
+Specifies the display name for the given description id. The type parameter is ignored, so the id must be globally unique across all DSC types. 
+The value specified is used in the mouse hover event to specify what description was given. A "DNM 3 &lt;x&gt; &lt;y&gt;" tag will never be used.
+</p>
+ 
+<a name="nam"></a>
+<h2>
+<code>NAM &lt;type&gt; &lt;id&gt; &lt;name&gt;</code>
+</h2>
+<p>
+Specifies the display name for the given sample line. The id must be globally unique across all line types within the scope of successive CRE and DEL statements.
+</p>
+                              
+<a  name="end"></a>
+<h2>
+<code>END</code>
+</h2>
+<p>
+Optional tag. Indicates the end of the trace file. Has no parameters.
+</p>
+
+<br>
+ <br><div class="runningfooter">(C) Copyright NXP Semiconductors B.V., 2006. All Rights Reserved.</div>
+</body>
+</html>
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
