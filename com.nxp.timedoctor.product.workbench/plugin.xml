@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.nxp.timedoctor.product.workbench.DefaultPerspective"
+            id="com.nxp.timedoctor.product.workbench.perspective"
+            name="Default"/>
+     </extension>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="com.nxp.timedoctor.product.workbench.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="com.nxp.timedoctor.product.workbench.application"
+            name="TimeDoctor">
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini"/>
+         <property
+               name="aboutText"
+               value="%aboutText"/>
+         <property
+               name="aboutImage"
+               value="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_about.gif"/>
+         <property
+               name="windowImages"
+               value="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif,platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_32.gif"/>
+         <property
+               name="appName"
+               value="TimeDoctor">
+         </property>
+      </product>
+   </extension>
+
+</plugin>
