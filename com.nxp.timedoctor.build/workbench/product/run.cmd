@@ -12,7 +12,7 @@ set BUILD_DIRECTORY=%CD%/build
 set PLUGIN_PATH=%CD%/build
 set BUILDER=%CD%/configuration
 set BUILDFILE=%CD%/build.xml
-set PRODUCT_PATH=%PLUGIN_PATH%/features/com.nxp.timedoctor.feature.workbench/workbench.product
+set PRODUCT_PATH=%PLUGIN_PATH%/features/net.timedoctor.feature.workbench/workbench.product
 set JAVACSOURCE=1.5
 set JAVACTARGET=1.5
 

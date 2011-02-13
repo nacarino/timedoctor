@@ -14,7 +14,7 @@
  	<target name="allElementsDelegator">
  		<ant antfile="${genericTargets}" target="${target}">
 	 		<property name="type" value="feature" />
-	 		<property name="id" value="com.nxp.timedoctor.feature.workbench" />
+	 		<property name="id" value="net.timedoctor.feature.workbench" />
  		</ant>
  	</target>
  
@@ -25,7 +25,7 @@
  	<!-- Add one target for each root element and each configuration           -->
  	<!-- Replace element.id with the id of the top level element being built   -->
  	<!-- ===================================================================== -->
- 	<target name="assemble.com.nxp.timedoctor.feature.workbench">
+ 	<target name="assemble.net.timedoctor.feature.workbench">
  		<ant antfile="${assembleScriptName}" dir="${buildDirectory}"/>
  	</target>
 </project>

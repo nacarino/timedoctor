@@ -10,13 +10,14 @@ Downloads:
 
 Setup:
 1) Start Eclipse
-2) Import TimeDoctor projects from the TimeDoctor CVS. For information on TimeDoctor 
-   CVS access, please see http://sourceforge.net/cvs/?group_id=174793. For
-   information on Eclipse CVS, please see the online help documentation of Eclipse
+2) Import TimeDoctor projects from the TimeDoctor GIT repository. For information on TimeDoctor 
+   GIT access, please see http://sourceforge.net/git/?group_id=174793. For
+   information on using GIT with Eclipse, please see the eGit plugin documentation:
+   http://wiki.eclipse.org/EGit/User_Guide
 
 RCP export:
 1) Double-click the workbench.product file in the project
-   com.nxp.timedoctor.feature.workbench
+   net.timedoctor.feature.workbench
 2) In the Overview sheet, click the "Eclipse Product export wizard" link and follow
    the online instructions
 

@@ -1,19 +1,19 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TimeDoctor UI Workbench Plug-in
-Bundle-SymbolicName: com.nxp.timedoctor.ui.workbench;singleton:=true
+Bundle-SymbolicName: net.timedoctor.ui.workbench;singleton:=true
 Bundle-Version: 1.4.2.qualifier
 Bundle-Vendor: Royal Philips Electronics NV.
 Bundle-Localization: plugin
-Export-Package: com.nxp.timedoctor.internal.ui,
- com.nxp.timedoctor.internal.ui.actions
+Export-Package: net.timedoctor.internal.ui,
+ net.timedoctor.internal.ui.actions
 Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.views,
  org.eclipse.core.runtime,
- com.nxp.timedoctor.core.model,
- com.nxp.timedoctor.core.parser,
- com.nxp.timedoctor.ui.trace,
- com.nxp.timedoctor.ui.statistics,
+ net.timedoctor.core.model,
+ net.timedoctor.core.parser,
+ net.timedoctor.ui.trace,
+ net.timedoctor.ui.statistics,
  org.eclipse.core.expressions,
- com.nxp.timedoctor.ui
-Eclipse-LazyStart: false
+ net.timedoctor.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

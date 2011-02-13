@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="com.nxp.timedoctor.feature.workbench"
+      id="net.timedoctor.feature.workbench"
       label="%featureName"
       version="1.4.2.qualifier"
       provider-name="%providerName"
-      plugin="com.nxp.timedoctor.product.workbench"
+      plugin="net.timedoctor.product.workbench"
       image="timedoctor_update_120.gif">
 
    <description>
@@ -20,7 +20,7 @@
    </license>
 
    <includes
-         id="com.nxp.timedoctor.feature.base"
+         id="net.timedoctor.feature.base"
          version="0.0.0"/>
 
    <includes
@@ -28,7 +28,7 @@
          version="0.0.0"/>
 
    <includes
-         id="com.nxp.timedoctor.feature.workbench.source"
+         id="net.timedoctor.feature.workbench.source"
          version="0.0.0"/>
 
    <requires>
@@ -40,11 +40,11 @@
       <import plugin="org.eclipse.update.configurator" version="3.1.0" match="compatible"/>
       <import plugin="org.eclipse.ui.forms" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.core.net" version="1.0.0" match="compatible"/>
-      <import plugin="com.nxp.timedoctor.ui"/>
-      <import plugin="com.nxp.timedoctor.core.model"/>
-      <import plugin="com.nxp.timedoctor.core.parser"/>
-      <import plugin="com.nxp.timedoctor.ui.trace"/>
-      <import plugin="com.nxp.timedoctor.ui.statistics"/>
+      <import plugin="net.timedoctor.ui"/>
+      <import plugin="net.timedoctor.core.model"/>
+      <import plugin="net.timedoctor.core.parser"/>
+      <import plugin="net.timedoctor.ui.trace"/>
+      <import plugin="net.timedoctor.ui.statistics"/>
       <import plugin="org.eclipse.core.expressions"/>
       <import plugin="org.eclipse.core.runtime" version="3.2.0" match="compatible"/>
       <import plugin="org.eclipse.help" version="3.2.0" match="compatible"/>
@@ -99,14 +99,14 @@
          unpack="false"/>
 
    <plugin
-         id="com.nxp.timedoctor.product.workbench"
+         id="net.timedoctor.product.workbench"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.nxp.timedoctor.ui.workbench"
+         id="net.timedoctor.ui.workbench"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="com.nxp.timedoctor.product.workbench.DefaultPerspective"
-            id="com.nxp.timedoctor.product.workbench.perspective"
+            class="net.timedoctor.product.workbench.DefaultPerspective"
+            id="net.timedoctor.product.workbench.perspective"
             name="Default"/>
      </extension>
 
@@ -14,7 +14,7 @@
          point="org.eclipse.core.runtime.applications">
       <application>
          <run
-               class="com.nxp.timedoctor.product.workbench.Application">
+               class="net.timedoctor.product.workbench.Application">
          </run>
       </application>
    </extension>
@@ -22,7 +22,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="com.nxp.timedoctor.product.workbench.application"
+            application="net.timedoctor.product.workbench.application"
             name="TimeDoctor">
          <property
                name="preferenceCustomization"
@@ -32,10 +32,10 @@
                value="%aboutText"/>
          <property
                name="aboutImage"
-               value="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_about.gif"/>
+               value="platform:/plugin/net.timedoctor.ui/icons/timedoctor_about.gif"/>
          <property
                name="windowImages"
-               value="platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_16.gif,platform:/plugin/com.nxp.timedoctor.ui/icons/timedoctor_32.gif"/>
+               value="platform:/plugin/net.timedoctor.ui/icons/timedoctor_16.gif,platform:/plugin/net.timedoctor.ui/icons/timedoctor_32.gif"/>
          <property
                name="appName"
                value="TimeDoctor">

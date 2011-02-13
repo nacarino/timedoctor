@@ -12,7 +12,7 @@ BUILD_DIRECTORY=$PWD/build
 PLUGIN_PATH=$PWD/build
 BUILDER=$PWD/configuration
 BUILDFILE=$PWD/build.xml
-PRODUCT_PATH=$PLUGIN_PATH/features/com.nxp.timedoctor.feature.workbench/workbench.product
+PRODUCT_PATH=$PLUGIN_PATH/features/net.timedoctor.feature.workbench/workbench.product
 JAVACSOURCE=1.5
 JAVACTARGET=1.5
 
