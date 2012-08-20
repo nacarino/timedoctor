@@ -1,4 +1,4 @@
-TimeDoctor version 1.4.2 is available, both as a stand-alone tool and as 
+TimeDoctor version 1.4.3 is available, both as a stand-alone tool and as 
 Eclipse plug-in.
 
 INSTALLATION
@@ -36,7 +36,7 @@ Note that both Windows and Linux platforms are x86 (32-bit)
 
 OVERVIEW
 
-1.4.2 is a minor release with these bugs fixed:
+1.4.3 is a minor release with these bugs fixed:
 
 Bug#1835637  TimeDoctor hangs for a empty file
 Bug#1835100  Tasks not rendered properly

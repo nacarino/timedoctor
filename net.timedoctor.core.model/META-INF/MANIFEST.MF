@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TimeDoctor Model Plug-in
 Bundle-SymbolicName: net.timedoctor.core.model;singleton:=true
-Bundle-Version: 1.4.2.qualifier
-Bundle-Vendor: Royal Philips Electronics NV.
+Bundle-Version: 1.4.3.qualifier
+Bundle-Vendor: timedoctor.net
 Bundle-Localization: plugin
 Bundle-ActivationPolicy: lazy
 Export-Package: net.timedoctor.core.model,

@@ -2,7 +2,7 @@
 <feature
       id="net.timedoctor.feature.ide"
       label="%featureName"
-      version="1.4.2.qualifier"
+      version="1.4.3.qualifier"
       provider-name="%providerName"
       plugin="net.timedoctor.product.ide"
       image="timedoctor_update_120.gif">
@@ -12,7 +12,7 @@
    </description>
 
    <copyright>
-      Copyright (c) 2006 Royal Philips Electronics NV. All rights reserved.
+      Copyright (c) 2006-2012 TimeDoctor contributors. All rights reserved.
    </copyright>
 
    <license url="%licenseURL">
@@ -23,17 +23,16 @@
          id="net.timedoctor.feature.base"
          version="0.0.0"/>
 
-   <includes
-         id="net.timedoctor.feature.ide.source"
-         version="0.0.0"/>
-
    <requires>
       <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.expressions"/>
       <import plugin="net.timedoctor.core.model"/>
       <import plugin="net.timedoctor.core.parser"/>
       <import plugin="net.timedoctor.ui.trace"/>
+      <import plugin="net.timedoctor.ui.statistics"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="net.timedoctor.ui"/>
    </requires>
 
    <plugin

@@ -2,8 +2,8 @@
 <feature
       id="net.timedoctor.feature.base"
       label="%featureName"
-      version="1.4.2.qualifier"
-      provider-name="Royal Philips Electronics NV."
+      version="1.4.3.qualifier"
+      provider-name="timedoctor.net"
       image="timedoctor_update_120.gif">
 
    <description>
@@ -11,23 +11,28 @@
    </description>
 
    <copyright>
-      Copyright (c) 2006 Royal Philips Electronics NV. All rights reserved.
+      Copyright (c) 2006-2012 TimeDoctor contributors. All rights reserved.
    </copyright>
 
    <license url="%licenseURL">
       %license
    </license>
 
+   <includes
+         id="org.eclipse.help"
+         version="0.0.0"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="org.apache.lucene"/>
-      <import plugin="org.eclipse.help.appserver"/>
-      <import plugin="org.eclipse.help.base"/>
       <import plugin="org.eclipse.help.ui"/>
       <import plugin="org.eclipse.help.webapp"/>
-      <import plugin="org.eclipse.tomcat"/>
-      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.equinox.http.jetty"/>
+      <import plugin="org.eclipse.core.runtime" version="3.6.0" match="compatible"/>
+      <import plugin="org.eclipse.jface" version="3.6.0" match="compatible"/>
+      <import plugin="com.ibm.icu"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="javax.servlet"/>
    </requires>
 
    <plugin
@@ -70,5 +75,40 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.ui.forms"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="javax.el"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.lucene.misc"
+         download-size="0"
+         install-size="0"
+         version="3.5.0.v20120319-2345"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.lucene.queries"
+         download-size="0"
+         install-size="0"
+         version="3.5.0.v20120319-2345"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.lucene.core"
+         download-size="0"
+         install-size="0"
+         version="3.5.0.v20120319-2345"
+         unpack="false"/>
 
 </feature>

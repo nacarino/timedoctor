@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 Royal Philips Electronics NV.
+ * Copyright (c) 2006-2012 TimeDoctor contributors.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License version 1.0
  * which accompanies this distribution, and is available at
@@ -83,11 +83,9 @@ public class TraceCursorListener implements MouseMoveListener, MouseTrackListene
 	}
 
 	public void mouseEnter(final MouseEvent e) {
-		traceCursor.setVisible(true);
 	}
 
 	public void mouseExit(final MouseEvent e) {
-		traceCursor.setVisible(false);
 	}
 
 	public void mouseHover(final MouseEvent e) {

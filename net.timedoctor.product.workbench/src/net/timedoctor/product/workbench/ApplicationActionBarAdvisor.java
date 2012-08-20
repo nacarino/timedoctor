@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2006 Royal Philips Electronics NV.
+ * Copyright (c) 2006-2012 TimeDoctor contributors.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License version 1.0
  * which accompanies this distribution, and is available at
@@ -24,8 +24,6 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
 import net.timedoctor.internal.ui.actions.OpenAction;
-import net.timedoctor.product.workbench.actions.FindAndUpdateAction;
-import net.timedoctor.product.workbench.actions.ManageConfigurationAction;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction openAction;
@@ -34,8 +32,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     private IWorkbenchAction copyAction;
     private IWorkbenchAction preferenceAction;
     private IWorkbenchAction aboutAction;
-    private IWorkbenchAction updateAction;
-    private IWorkbenchAction manageConfigurationAction;
     private IWorkbenchAction helpAction;
     
     public ApplicationActionBarAdvisor(final IActionBarConfigurer configurer) {
@@ -61,13 +57,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         helpAction = ActionFactory.HELP_CONTENTS.create(window);
         register(helpAction);
-        
-        updateAction = new FindAndUpdateAction(window);
-        register(updateAction);
-        
-        manageConfigurationAction = new ManageConfigurationAction(window);
-        register(manageConfigurationAction);
-        
+       
         aboutAction = ActionFactory.ABOUT.create(window);
         register(aboutAction);
     }
@@ -109,14 +99,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         
         // Help
         helpMenu.add(helpAction);
-        helpMenu.add(new Separator());
-        
-        //Update manager
-        MenuManager updateMenuManager = new MenuManager("Software Updates");
-        updateMenuManager.add(updateAction);
-        updateMenuManager.add(manageConfigurationAction);
-        
-        helpMenu.add(updateMenuManager);
         helpMenu.add(new Separator());
         helpMenu.add(aboutAction);
     }    

@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TimeDoctor Statistics Plug-in
 Bundle-SymbolicName: net.timedoctor.ui.statistics;singleton:=true
-Bundle-Version: 1.4.2.qualifier
-Bundle-Vendor: NXP Semiconductors B.V.
+Bundle-Version: 1.4.3.qualifier
+Bundle-Vendor: timedoctor.net
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- net.timedoctor.ui,
- org.eclipse.core.runtime,
- net.timedoctor.core.model
+Require-Bundle: net.timedoctor.ui,
+ net.timedoctor.core.model,
+ org.eclipse.ui,
+ org.eclipse.core.runtime
 Bundle-ActivationPolicy: lazy
 Export-Package: net.timedoctor.ui.statistics
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

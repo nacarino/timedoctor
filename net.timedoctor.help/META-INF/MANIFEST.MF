@@ -2,7 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Timedoctor File Format Help Plug-in
 Bundle-SymbolicName: net.timedoctor.help;singleton:=true
-Bundle-Version: 1.4.2.qualifier
-Bundle-Vendor: NXP Semiconductors B.V.
+Bundle-Version: 1.4.3.qualifier
+Bundle-Vendor: timedoctor.net
 Bundle-Localization: plugin
 Bundle-ClassPath: html/
+Require-Bundle: org.eclipse.help.ui,
+ org.eclipse.help.webapp,
+ org.eclipse.equinox.http.jetty

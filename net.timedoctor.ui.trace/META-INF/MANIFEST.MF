@@ -2,12 +2,12 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: TimeDoctor Trace Editor Plug-in
 Bundle-SymbolicName: net.timedoctor.ui.trace;singleton:=true
-Bundle-Version: 1.4.2.qualifier
-Bundle-Vendor: Royal Philips Electronics NV.
+Bundle-Version: 1.4.3.qualifier
+Bundle-Vendor: timedoctor.net
 Bundle-Localization: plugin
-Require-Bundle: org.eclipse.ui,
- net.timedoctor.core.model,
- org.eclipse.core.runtime
+Require-Bundle: net.timedoctor.core.model,
+ org.eclipse.core.runtime,
+ org.eclipse.ui
 Bundle-ActivationPolicy: lazy
 Export-Package: net.timedoctor.ui.trace,
  net.timedoctor.ui.trace.actions

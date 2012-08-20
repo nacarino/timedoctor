@@ -2,15 +2,22 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Timedoctor product
 Bundle-SymbolicName: net.timedoctor.product.workbench;singleton:=true
-Bundle-Version: 1.4.2.qualifier
+Bundle-Version: 1.4.3.qualifier
 Bundle-Activator: net.timedoctor.product.workbench.Activator
-Bundle-Vendor: Royal Philips Electronics NV.
+Bundle-Vendor: timedoctor.net
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  net.timedoctor.ui,
- net.timedoctor.ui.workbench,
- org.eclipse.update.ui
+ net.timedoctor.ui.workbench
 Bundle-ActivationPolicy: lazy
-Export-Package: net.timedoctor.product.workbench
+Export-Package: net.timedoctor.product.workbench;
+  uses:="org.eclipse.jface.action,
+   org.eclipse.jface.resource,
+   org.eclipse.ui.application,
+   org.eclipse.ui,
+   org.eclipse.ui.plugin,
+   org.eclipse.equinox.app,
+   org.osgi.framework,
+   org.eclipse.swt.widgets"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
