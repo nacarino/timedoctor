@@ -2,11 +2,11 @@ To build TimeDoctor for your Linux distro/version/platform, please follow these
 steps:
 
 Downloads:
-1) If not present, please download Eclipse SDK 3.3 from 
+1) If not present, please download Eclipse for RCP/RAP developers from 
    http://download.eclipse.org/eclipse/downloads/
    for your relevant Linux distro/version/platform
-2) If not present, please download Java 1.5 (JRE or JDK) from 
-   http://java.sun.com/javase/downloads/index_jdk5.jsp
+2) If not present, please download a Java jre: http://wiki.eclipse.org/Eclipse/Installation
+   
 
 Setup:
 1) Start Eclipse
@@ -20,9 +20,9 @@ RCP export:
    net.timedoctor.feature.workbench
 2) In the Overview sheet, click the "Eclipse Product export wizard" link and follow
    the online instructions
+3) To export for different platforms, install the RCP delta pack: http://ugosan.org/eclipse-rcp-delta-pack/
 
 If you face problems, please raise a support request at     
 http://sourceforge.net/tracker/?func=add&group_id=174793&atid=870647
 
 Good Luck!
-

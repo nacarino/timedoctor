@@ -2,13 +2,14 @@ TimeDoctor version 1.4.3 is available, both as a stand-alone tool and as
 Eclipse plug-in. 
 
 This release has been tested on this configuration:
-    - SUN JRE 1.5.0
-    - Eclipse SDK 3.3
-    - Windows 2000 and XP
-    - RHEL 3 (Update 7) (For other versions please see howto.txt)
-Note that both Windows and Linux platforms are x86 (32-bit)
+    - OpenJDK
+    - Eclipse Juno 4.2.0
+    - Ubuntu 12.04 64 bit desktop
 
-1.4.3 is a minor release with these bugs fixed:
+
+1.4.3 is a minor release to port the code to Eclipse Juno.
+
+1.4.2 is a minor release with these bugs fixed:
 
 Bug#1835637  TimeDoctor hangs for a empty file
 Bug#1835100  Tasks not rendered properly

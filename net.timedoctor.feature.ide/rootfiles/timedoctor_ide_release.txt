@@ -3,40 +3,31 @@ Eclipse plug-in.
 
 INSTALLATION
 
-1) Make sure you have Eclipse version 3.3.0 or higher installed. You can 
+1) Make sure you have Eclipse version 4.2.0 or higher installed. You can 
    download Eclipse from: http://download.eclipse.org/eclipse/downloads/
 
 2) Download the TimeDoctor release to your local disk
 
-3) Unzip the TimeDoctor release file in a local directory, e.g.
-   C:/timedoctor (Change it to equivalent on Linux)
+3) Go to the dropins folder of your Eclipse installation. 
+
+3) Unzip the TimeDoctor release file in the  dropins folder of your Eclipse installation.
 
 4) Start Eclipse
-   - Go to "Help->Software Updates->Manage Configuration";
-   - Select "Add an extension location" and browse to the directory where 
-     you extracted timedoctor (C:/timedoctor);
-   - Select the top-level "eclipse" directory (C:/timedoctor/eclipse);
-   - Click OK to restart Eclipse.
 
-5) Open a sample trace file (eclipse/sample.tdi) via File->Open
+5) Open a sample trace file (timedoctor/eclipse/sample.tdi) via File->Open
 
-See for more information on the extension location:
-	http://www-128.ibm.com/developerworks/library/os-ecl-manage/
-As an alternative to step 4) you can copy the folders
-	eclipse/plugins
-	eclipse/features
-to your Eclipse install directory and start Eclipse with eclipse.exe -clean
-
+See for more information on the dropins folder: http://wiki.eclipse.org/Equinox/p2/Getting_Started#Dropins
+	
 This release has been tested on this configuration:
-    - SUN JRE 1.5.0
-    - Eclipse SDK 3.3
-    - Windows 2000 and XP
-    - RHEL 3 (Update 7)
-Note that both Windows and Linux platforms are x86 (32-bit)
-
+    - OpenJDK
+    - Eclipse Juno 4.2.0
+    - Ubuntu 12.04 64 bit desktop
+    
 OVERVIEW
 
-1.4.3 is a minor release with these bugs fixed:
+1.4.3 is a minor release to port the code to Eclipse Juno.
+
+1.4.2 is a minor release with these bugs fixed:
 
 Bug#1835637  TimeDoctor hangs for a empty file
 Bug#1835100  Tasks not rendered properly
