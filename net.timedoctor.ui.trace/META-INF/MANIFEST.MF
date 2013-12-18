@@ -12,4 +12,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.timedoctor.ui.trace,
  net.timedoctor.ui.trace.actions
 Bundle-Activator: net.timedoctor.ui.trace.TracePluginActivator
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=1.6))"

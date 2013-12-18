@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2007-2012 TimeDoctor contributors.
+ * Copyright (c) 2007-2013 TimeDoctor contributors.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License version 1.0
  * which accompanies this distribution, and is available at
@@ -27,7 +27,6 @@ public class CounterStatistic extends Statistic {
 	
 	// Counters per task execution 
 	private double execCountVal;
-	private double execCountTime;
 	private double windowExecCountVal;
 	private int nExecutions;	
 		
@@ -101,8 +100,6 @@ public class CounterStatistic extends Statistic {
 		totalCountVal = 0d;
 
 		execCountVal = 0d;
-		execCountTime = 0d;
-		
 		windowExecCountVal = 0d;
 		
 		nExecutions = 0;
@@ -144,7 +141,6 @@ public class CounterStatistic extends Statistic {
 			double countTime = clipExecTime(activeStartTime, activeEndTime, countSampleStartTime, countSampleEndTime);
 			double countVal = line.getSample(index+1).val - line.getSample(index).val;
 			countVal = clipCountVal(countVal, countTime, countSampleTime);
-			execCountTime += countTime;
 			execCountVal += countVal;
 
 			double windowCountTime = clipExecTime(windowActiveStartTime, windowActiveEndTime, countSampleStartTime, countSampleEndTime);
@@ -169,7 +165,6 @@ public class CounterStatistic extends Statistic {
 
 		// Reset interval variables for next interval
 		execCountVal = 0d;
-		execCountTime = 0d;
 		windowExecCountVal = 0d;
 
 		nExecutions++;

@@ -9,4 +9,4 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.timedoctor.core.model,
  net.timedoctor.core.model.lines,
  net.timedoctor.core.model.statistics
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=1.6))"

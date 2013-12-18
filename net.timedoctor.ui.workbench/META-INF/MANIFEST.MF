@@ -16,4 +16,4 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  net.timedoctor.ui,
  org.eclipse.ui.views
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=1.6))"

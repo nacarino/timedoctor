@@ -20,4 +20,4 @@ Export-Package: net.timedoctor.product.workbench;
    org.eclipse.equinox.app,
    org.osgi.framework,
    org.eclipse.swt.widgets"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=1.6))"
