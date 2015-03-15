@@ -10,3 +10,4 @@ Export-Package: net.timedoctor.core.model,
  net.timedoctor.core.model.lines,
  net.timedoctor.core.model.statistics
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=1.6))"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

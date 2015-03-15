@@ -13,3 +13,4 @@ Export-Package: net.timedoctor.ui.trace,
  net.timedoctor.ui.trace.actions
 Bundle-Activator: net.timedoctor.ui.trace.TracePluginActivator
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version>=1.6))"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
