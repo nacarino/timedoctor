@@ -30,9 +30,7 @@
       <import plugin="org.eclipse.equinox.http.jetty"/>
       <import plugin="org.eclipse.core.runtime" version="3.6.0" match="compatible"/>
       <import plugin="org.eclipse.jface" version="3.6.0" match="compatible"/>
-      <import plugin="com.ibm.icu"/>
-      <import plugin="org.eclipse.osgi"/>
-      <import plugin="javax.servlet"/>
+      <import plugin="org.apache.lucene.core" version="3.5.0" match="compatible"/>
    </requires>
 
    <plugin
@@ -85,13 +83,6 @@
 
    <plugin
          id="javax.el"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.apache.lucene"
          download-size="0"
          install-size="0"
          version="0.0.0"
